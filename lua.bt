@@ -1,0 +1,29 @@
+define lbt
+	set $index = 0
+	set $p = L.ci
+	while ($p != 0)
+		set $tt = ($p.func.tt_ & 0x3f)
+		if ($tt == 0x06)
+			printf "%d lua function:\t",$index
+			set $gc_union = (union GCUnion*)$p.func.value_.gc
+			output $gc_union.cl.l.p
+			printf "\t"
+			set $proto = $gc_union.cl.l.p
+			set $filename = (char*)$proto.source + 24
+			set $lineno = $proto.lineinfo[$p.u.l.savedpc-$proto.code-1]
+			printf "%s:%d\n",$filename,$lineno
+		end
+		if ($tt == 0x16)
+			printf "%d light c function:\t",$index
+			output $p.func.value_.f
+			printf "\n"
+		end
+		if ($tt == 0x26)
+			printf "%d c closure:\t",$index
+			output $p.func.value_.f
+			printf "\n"
+		end
+		set $index = $index + 1
+		set $p = $p.previous
+	end
+end

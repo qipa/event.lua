@@ -1,0 +1,100 @@
+
+
+
+import"other"
+
+
+
+protocol test_1{
+int[] A
+	string B	}
+
+
+protocol test1
+{
+	test_1 A
+	string B
+}
+
+protocol testdsf
+{
+	test_1 A
+	string a
+}
+
+protocol test2{
+	protocol InnerProtocol {
+		protocol FuckProtocol {
+			test2[] list
+		}
+		int a
+		float b
+		test1[] c 
+	}
+	double a
+	string b
+	InnerProtocol[] c
+}
+
+protocol Info
+{
+	#Item Reward
+}
+
+protocol IncludeOther
+{
+	Message[] messageInfo
+}
+
+protocol Country
+{
+	string cn
+	string en	
+}
+
+protocol Phone
+{
+	string number
+	int type
+	Country country
+}
+protocol Person
+{
+	string name
+	int id
+	Phone[] phone
+}
+
+protocol Persons
+{
+	Person[] person
+}
+
+protocol Ab
+{
+	Persons person
+}
+#每个词长度不能超过64
+#{之后必有空格，}之前必有空格，之后必有空格
+
+
+
+protocol s2c_sync_string
+{
+	int Uid
+	int[] AttrList
+}
+
+protocol CmdInfo
+{
+	int id
+	int[] argnum
+	string cmd
+}
+
+protocol c2s_command
+{
+	int arg1
+	int[] arglist
+	CmdInfo[] cmds
+}
