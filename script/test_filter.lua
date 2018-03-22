@@ -8,15 +8,15 @@ FILE:close()
 
 local filter_list = dump.unpack(content)
 
-local filter = core.create()
+filter = core.create()
 for _,word in pairs(filter_list.ForBiddenCharInName) do
 	filter:add(word)
 end
 
 
 local now = util.time()
-for i = 1,1 do
-	print(filter:filter("mrq fuck u 法轮功 哈哈 mrq 风骚欲女 ,风骚 *李*洪*志*阿扁"))
+for i = 1,1024 * 1024 do
+	filter:filter("mrq fuck u 法轮功哈哈 mrq 风骚欲女 习近平哈哈 习近平老婆,风骚 *李*洪*志*阿扁 1")
  -- 	for _, ts in pairs(filter_list.ForBiddenCharInName) do
  -- 		local s = string.lower(ts)
 	-- 	if string.find("mrq fuck u 法轮功 哈哈 mrq 风骚欲女 ,风骚", s, 1) then
@@ -26,9 +26,9 @@ for i = 1,1 do
 
 end
 print("time diff:",(util.time() - now) * 10)
-event.timer(0,function ()
-	event.breakout()
-end)
+-- event.timer(0,function ()
+-- 	event.breakout()
+-- end)
 -- print("\n")
 -- print("------------------------")
-filter:dump()
+-- filter:dump()

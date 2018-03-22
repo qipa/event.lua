@@ -11,12 +11,17 @@
 
 #include "khash.h"
 
+#define PHASE_SEARCH 0
+#define PHASE_MATCH 1
+
 struct word_tree;
 
 KHASH_MAP_INIT_STR(word,struct word_tree*);
 
 struct word_tree {
 	khash_t(word)* hash;
+	int tail;
+	int index;
 };
 
 int
@@ -43,9 +48,10 @@ void
 word_add(struct word_tree* root_tree, const char* word,size_t size) {
 	struct word_tree* tree = root_tree;
 	int i;
+	int index = 0;
 	for(i = 0;i < size;) {
 		char ch[5] = {0};
-		
+		index++;
 		int length = split_utf8(word,size,i);
 		memcpy(ch,&word[i],length);
 		i += length;
@@ -58,7 +64,9 @@ word_add(struct word_tree* root_tree, const char* word,size_t size) {
 			khiter_t k = kh_put(word, tree->hash, strdup(ch), &result);
 			if (result == 1 || result == 2) {
 				next_tree = malloc(sizeof(*next_tree));
-				next_tree->hash = NULL;
+				next_tree->tail = 0;
+				next_tree->hash = kh_init(word);
+				next_tree->index = index;
 				kh_value(tree->hash, k) = next_tree;
 			} else if (result == 0) {
 				next_tree = kh_value(tree->hash, k);
@@ -66,24 +74,31 @@ word_add(struct word_tree* root_tree, const char* word,size_t size) {
 				assert(0);
 			}
 			
-			if (i != size) {
-				if (!next_tree->hash)
-					next_tree->hash = kh_init(word);
-			}
+			if (i == size)
+				next_tree->tail = 1;
 			tree = next_tree;
 		} else {
 			tree = kh_value(tree->hash, k);
-			if (!tree->hash)
-				tree->hash = kh_init(word);
+			if (i == size)
+				tree->tail = 1;
 		}
 	}
 }
 
-void
-word_filter(struct word_tree* root_tree,char* word,size_t size) {
+char*
+word_filter(struct word_tree* root_tree,const char* word,size_t size,int replace) {
+	char* block = NULL;
+	if (replace)
+		block = strdup(word);
+
 	struct word_tree* tree = root_tree;
 
 	int start = 0;
+	int over = -1;
+	int len = -1;
+
+	int phase = PHASE_SEARCH;
+
 	int i;
 	for(i = 0;i < size;) {
 		char ch[5] = {0};
@@ -92,20 +107,48 @@ word_filter(struct word_tree* root_tree,char* word,size_t size) {
 		memcpy(ch,&word[i],length);
 		i += length;
 
-		khiter_t k = kh_get(word, tree->hash, ch);
-		int missing = (k == kh_end(tree->hash));
-		if (!missing) {
-			tree = kh_value(tree->hash, k);
-			if (!tree->hash) {
-				memset(word + start + 1,'*',i - start - 1);
-				tree = root_tree;
-				start = i;
+		switch(phase) {
+			case PHASE_SEARCH: {
+				khiter_t k = kh_get(word, tree->hash, ch);
+				int missing = (k == kh_end(tree->hash));
+				if (!missing) {
+					tree = kh_value(tree->hash, k);
+					phase = PHASE_MATCH;
+					start = i - length;
+					over = -1;
+				}
+				break;
 			}
-		} else {
-			tree = root_tree;
-			start = i - length;
+			case PHASE_MATCH: {
+				khiter_t k = kh_get(word, tree->hash, ch);
+				int missing = (k == kh_end(tree->hash));
+				if (!missing) {
+					tree = kh_value(tree->hash, k);
+					if (tree->tail)
+						over = i - 1;
+				} else {
+					if (over != -1 && start != over) {
+						if (!replace)
+							return NULL;
+						memset(block + start,'*',over - start + 1);
+					} else {
+						i -= length;
+					}
+					
+					tree = root_tree;
+					phase = PHASE_SEARCH;
+					over = -1;
+					len = -1;
+				}
+				break;
+			}
 		}
 	}
+
+	if (over != -1 && start != over)
+		memset(block + start,'*',over - start + 1);
+
+	return block;
 }
 
 static int
@@ -155,8 +198,12 @@ lfilter(lua_State* L) {
 	struct word_tree* tree = lua_touserdata(L,1);
 	size_t size;
 	const char* word = lua_tolstring(L,2,&size);
-	char* block = strdup(word);
-	word_filter(tree,block,size); 
+	int replace = luaL_optinteger(L,3,1);
+	char* block = word_filter(tree,word,size,replace); 
+	if (!replace) {
+		lua_pushboolean(L,0);
+		return 1;
+	}
 	lua_pushlstring(L,block,size);
 	free(block);
 	return 1;
