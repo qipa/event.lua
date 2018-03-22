@@ -57,8 +57,8 @@ word_add(struct word_tree* root_tree, const char* word,size_t size) {
 		i += length;
 
 		khiter_t k = kh_get(word, tree->hash, ch);
-		int missing = (k == kh_end(tree->hash));
-		if (missing) {
+		int miss = (k == kh_end(tree->hash));
+		if (miss) {
 			struct word_tree* next_tree = NULL;
 			int result;
 			khiter_t k = kh_put(word, tree->hash, strdup(ch), &result);
@@ -86,8 +86,10 @@ word_add(struct word_tree* root_tree, const char* word,size_t size) {
 }
 
 char*
-word_filter(struct word_tree* root_tree,const char* word,size_t size,int replace) {
+word_filter(struct word_tree* root_tree,const char* word,size_t size,int replace,size_t* replace_offset) {
+	
 	char* block = NULL;
+	int block_offset = 0;
 	if (replace)
 		block = strdup(word);
 
@@ -109,30 +111,48 @@ word_filter(struct word_tree* root_tree,const char* word,size_t size,int replace
 
 		switch(phase) {
 			case PHASE_SEARCH: {
+				char tmp[5] = {0};
+				memcpy(tmp,ch,5);
+
 				khiter_t k = kh_get(word, tree->hash, ch);
-				int missing = (k == kh_end(tree->hash));
-				if (!missing) {
+				int miss = (k == kh_end(tree->hash));
+				if (!miss) {
 					tree = kh_value(tree->hash, k);
 					phase = PHASE_MATCH;
 					start = i - length;
 					over = -1;
+				} else {
+					if (replace) {
+						memcpy(block + block_offset, tmp, length);
+						block_offset += length;
+					}
 				}
 				break;
 			}
 			case PHASE_MATCH: {
 				khiter_t k = kh_get(word, tree->hash, ch);
-				int missing = (k == kh_end(tree->hash));
-				if (!missing) {
+				int miss = (k == kh_end(tree->hash));
+				if (!miss) {
 					tree = kh_value(tree->hash, k);
-					if (tree->tail)
+					if (tree->tail) {
 						over = i - 1;
+						len = tree->index;
+					}
 				} else {
+					//回滚一个word
+					i -= length;
 					if (over != -1 && start != over) {
 						if (!replace)
 							return NULL;
-						memset(block + start,'*',over - start + 1);
+						//匹配成功,start~over
+						// memset(block + start, '*', over - start + 1);
+						
+						memset(block + block_offset, '*', len);
+						block_offset += len;
 					} else {
-						i -= length;
+						//匹配失败
+						memcpy(block + block_offset, word + start, i - start);
+						block_offset += i - start;
 					}
 					
 					tree = root_tree;
@@ -145,8 +165,19 @@ word_filter(struct word_tree* root_tree,const char* word,size_t size,int replace
 		}
 	}
 
-	if (over != -1 && start != over)
-		memset(block + start,'*',over - start + 1);
+	if (!replace)
+		return (char*)word;
+
+	if (over != -1 && start != over) {
+		// memset(block + start,'*',over - start + 1);
+		memset(block + block_offset, '*', len);
+		block_offset += len;
+	} else {
+		memcpy(block + block_offset, word + start, i - start);
+		block_offset += i - start;
+	}
+
+	*replace_offset = block_offset;
 
 	return block;
 }
@@ -199,12 +230,17 @@ lfilter(lua_State* L) {
 	size_t size;
 	const char* word = lua_tolstring(L,2,&size);
 	int replace = luaL_optinteger(L,3,1);
-	char* block = word_filter(tree,word,size,replace); 
+
+	size_t replace_offset = 0;
+	char* block = word_filter(tree,word,size,replace,&replace_offset); 
 	if (!replace) {
-		lua_pushboolean(L,0);
+		if (!block)
+			lua_pushboolean(L,0);
+		else
+			lua_pushboolean(L,1);
 		return 1;
 	}
-	lua_pushlstring(L,block,size);
+	lua_pushlstring(L,block,replace_offset);
 	free(block);
 	return 1;
 }
