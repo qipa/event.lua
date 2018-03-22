@@ -16,16 +16,7 @@ end
 
 local now = util.time()
 for i = 1,1 do
-	print(filter:filter("mrq fuck fu k u 法轮 西藏獨立 功哈哈 mrq 风骚欲女 习近平哈哈 习近平老婆,风骚 *李*洪*志*阿扁 1"))
-
-	-- print(filter:filter("习近平老婆1"))
- -- 	for _, ts in pairs(filter_list.ForBiddenCharInName) do
- -- 		local s = string.lower(ts)
-	-- 	if string.find("mrq fuck u 法轮功 哈哈 mrq 风骚欲女 ,风骚", s, 1) then
-	-- 		-- print("ddd")
-	-- 	end
-	-- end
-
+	print(filter:filter("mrq fuck fu k u 法轮 西藏  孩子 獨立 功哈哈 mrq 风骚欲女 阿扁 1"))
 end
 print("time diff:",(util.time() - now) * 10)
 -- event.timer(0,function ()
