@@ -125,5 +125,78 @@ function _M.readline(prompt,func)
     return util_core.readline(prompt or ">>",func or completion)
 end
 
+function _M.to_date(unix_time)
+    return os.date("*t",unix_time)
+end
+
+function _M.to_unix(year,mon,day,hour,min,sec)
+    local time = {
+        year = year,
+        month = mon,
+        day = day,
+        hour = hour,
+        min = min,
+        sec = sec,
+    }
+    return os.time(time)
+end
+
+function _M.format_to_unix(str)
+    local year,mon,day,hour,min,sec = string.match(str,"(.*)-(.*)-(.*) (.*):(.*):(.*)")
+    return _M.to_unix(year,mon,day,hour,min,sec)
+end
+
+function _M.daytime(unix_time,hour,min,sec)
+    local result = os.date("*t",unix_time)
+    result.hour = hour or 0
+    result.min = min or 0
+    result.sec = sec or 0
+    return os.time(result)
+end
+
+function _M.format_to_daytime(unix_time,str)
+    local hour,min = string.match(str,"(%d+):(%d+)")
+    return _M.daytime(unix_time,tonumber(hour),tonumber(min))
+end
+
+function _M.next_time(unix_time,sec)
+    return _M.daytime(unix_time) + sec
+end
+
+function _M.day_start(unix_time)
+    return _M.daytime(unix_time)
+end
+
+function _M.day_over(unix_time)
+    return _M.daytime(unix_time) + 24 * 3600
+end
+
+function _M.week_start(unix_time)
+    local day_start = _M.day_start(unix_time)
+    local result = os.date("*t",day_start)
+
+    local wday = result.wday
+    if wday == 1 then
+        return day_start
+    end
+
+    if wday == 0 then
+        wday = 7
+    end
+    return day_start - (wday-2) * 24 * 3600
+end
+
+function _M.week_over(unix_time)
+    return _M.week_start(unix_time) + 7 * 24 * 3600
+end
+
+function _M.same_day(ti0,ti1,sep)
+
+end
+
+function _M.same_week(ti0,ti1,sep)
+
+end
+
 
 return _M
