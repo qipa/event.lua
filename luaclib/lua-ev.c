@@ -820,6 +820,8 @@ _event_new(lua_State* L) {
 
 int
 luaopen_ev_core(lua_State* L) {
+	luaL_checkversion(L);
+	
 	luaL_newmetatable(L, META_EVENT);
 	const luaL_Reg meta_event[] = {
 		{ "listen", _listen },
