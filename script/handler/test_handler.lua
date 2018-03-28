@@ -27,13 +27,21 @@ end
 
 
 function test_thread_rpc(args)
-	table.print(args)
-	worker.send_mail({hello = "world"})
+	table.print(args,"test_thread_rpc")
+	worker.call_mail("handler.test_handler","mail_rpc",{hello = "world"},function (args)
+		print("mail return",args)
+		table.print(args)
+	end)
 	count = count + 1
 	if count %10000 == 0 then
 				print(count)
 			end
-	return "ok1"
+	return "rpc ok"
+end
+
+function mail_rpc(args)
+	table.print(args,"mail_rpc")
+	return "mail ok"
 end
 
 function _M.test_thread_rpc_(source,session,args)
