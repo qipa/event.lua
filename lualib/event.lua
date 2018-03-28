@@ -175,6 +175,10 @@ function _M.udp(size,callback,ip,port)
 	return udp_session,err
 end
 
+function _M.mailbox(func)
+	return _event:mailbox(func)
+end
+
 function _M.run_process(cmd,line)
     local FILE = io.popen(cmd)
     local fd = FILE:fd()

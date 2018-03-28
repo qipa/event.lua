@@ -10,6 +10,7 @@
 #include "ev.h"
 #include "socket_event.h"
 #include "socket_util.h"
+#include "mail_box.h"
 
 #define LUA_EV_ERROR    0
 #define LUA_EV_TIMEOUT	1
@@ -22,6 +23,7 @@
 #define META_TIMER			"meta_timer"
 #define META_LISTENER 		"meta_listener"
 #define META_UDP 			"meta_udp"
+#define META_MAILBOX		"meta_mailbox"
 
 #define STATE_HEAD 0
 #define STATE_BODY 1
@@ -84,6 +86,14 @@ struct lua_udp_session {
 	size_t recv_size;
 };
 
+struct lua_mailbox {
+	struct lua_ev* lev;
+	struct ev_io io;
+	int recv_mail_fd;
+	int send_mail_fd;
+	int ref;
+	int callback;
+};
 
 static int
 meta_init(lua_State* L,const char* meta) {
@@ -343,6 +353,38 @@ udp_recv(struct ev_loop* loop,struct ev_io* io,int revents) {
         lua_pushinteger(lev->main,ntohs(si.sin_port));
 		
 		lua_pcall(lev->main, 4, 0, 0);
+	}
+}
+
+void
+read_mail(struct ev_loop* loop,ev_io* io,int revents) {
+	struct lua_mailbox* lmailbox = io->data;
+	struct lua_ev* lev = lmailbox->lev;
+
+	for (;;) {
+		struct mail_message* mail = NULL;
+		int n = read(io->fd, &mail, sizeof(mail));
+		if (n < 0) {
+			if (errno == EINTR)
+				continue;
+			else if (errno == EAGAIN) {
+				return;
+			} else {
+				assert(0);
+			}
+		}
+
+		assert(n == sizeof(mail));
+
+		lua_rawgeti(lev->main, LUA_REGISTRYINDEX, lmailbox->callback);
+		lua_rawgeti(lev->main, LUA_REGISTRYINDEX, lmailbox->ref);
+		lua_pushinteger(lev->main, mail->source);
+		lua_pushinteger(lev->main, mail->session);
+		lua_pushlightuserdata(lev->main, mail->data);
+		lua_pushinteger(lev->main, mail->size);
+		lua_pcall(lev->main, 5, 0, 0);
+
+		free(mail);
 	}
 }
 
@@ -776,6 +818,59 @@ _udp_new(lua_State* L) {
 }
 
 static int
+_lmailbox_release(lua_State* L) {
+	struct lua_mailbox* lmailbox = (struct lua_mailbox*)lua_touserdata(L, 1);
+
+	ev_io_stop(lmailbox->lev->loop, &lmailbox->io);
+	close(lmailbox->recv_mail_fd);
+	close(lmailbox->send_mail_fd);
+
+	luaL_unref(L, LUA_REGISTRYINDEX, lmailbox->ref);
+	luaL_unref(L, LUA_REGISTRYINDEX, lmailbox->callback);
+
+	return 1;
+}
+
+static int
+_lmailbox_fd(lua_State* L) {
+	struct lua_mailbox* lmailbox = (struct lua_mailbox*)lua_touserdata(L, 1);
+	lua_pushinteger(L, lmailbox->send_mail_fd);
+	return 1;
+}
+
+
+static int
+_lmailbox_new(lua_State* L) {
+	struct lua_ev* lev = (struct lua_ev*)lua_touserdata(L, 1);
+
+	luaL_checktype(L,2,LUA_TFUNCTION);
+	int callback = luaL_ref(L,LUA_REGISTRYINDEX);
+
+	struct lua_mailbox* lmailbox = lua_newuserdata(L, sizeof(struct lua_mailbox));
+	memset(lmailbox,0,sizeof(*lmailbox));
+
+	int fd[2];
+	if (pipe(fd))
+		return 0;
+
+	socket_nonblock(fd[0]);
+	socket_nonblock(fd[1]);
+
+	lmailbox->lev = lev;
+	lmailbox->recv_mail_fd = fd[0];
+	lmailbox->send_mail_fd = fd[1];
+	lmailbox->callback = callback;
+
+	lmailbox->io.data = lmailbox;
+	ev_io_init(&lmailbox->io,read_mail,lmailbox->recv_mail_fd,EV_READ);
+	ev_io_start(lmailbox->lev->loop,&lmailbox->io);
+
+	lmailbox->ref = meta_init(L,META_MAILBOX);
+
+	return 1;
+}
+
+static int
 _dispatch(lua_State* L) {
 	struct lua_ev* lev = (struct lua_ev*)lua_touserdata(L, 1);
 	ev_loop(lev->loop,0);
@@ -829,6 +924,7 @@ luaopen_ev_core(lua_State* L) {
 		{ "timer", _timer },
 		{ "bind", _bind },
 		{ "udp", _udp_new },
+		{ "mailbox", _lmailbox_new },
 		{ "breakout", _break },
 		{ "dispatch", _dispatch },
 		{ "release", _release },
@@ -880,6 +976,16 @@ luaopen_ev_core(lua_State* L) {
 		{ NULL, NULL },
 	};
 	luaL_newlib(L,meta_udp);
+	lua_setfield(L, -2, "__index");
+	lua_pop(L,1);
+
+	luaL_newmetatable(L, META_MAILBOX);
+	const luaL_Reg meta_mailbox[] = {
+		{ "fd", _lmailbox_fd },
+		{ "release", _lmailbox_release },
+		{ NULL, NULL },
+	};
+	luaL_newlib(L,meta_mailbox);
 	lua_setfield(L, -2, "__index");
 	lua_pop(L,1);
 

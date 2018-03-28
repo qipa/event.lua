@@ -14,7 +14,7 @@ local debugger = require "debugger"
 local helper = require "helper"
 local logger = require "logger"
 local profiler = require "profiler.core"
-local worker = require "worker"
+
 
 table.print = util.dump
 -- table.encode = serialize.pack
@@ -62,8 +62,7 @@ end
 
 local args = {...}
 
-local worker_id = tonumber(args[1])
-local name = args[2]
+local name = args[1]
 
 local func,err = loadfile(string.format("./script/%s.lua",name),"text",_G)
 if not func then
@@ -72,7 +71,6 @@ end
 
 env.name = name
 env.thread_id = util.thread_id()
-env.worker_id = worker_id
 
 local log_path
 if env.log_path then
@@ -117,11 +115,7 @@ util.thread_name(command)
 
 collectgarbage("collect")
 local lua_mem = collectgarbage("count")
-event.error(string.format("thread:%d,worker:%d start,command:%s,lua mem:%fkb,c mem:%fkb",env.thread_id,env.worker_id,command,lua_mem,helper.allocated()/1024))
-
-event.timer(0.01,function (timer)
-	worker.update(worker_id)
-end)
+event.error(string.format("thread:%d start,command:%s,lua mem:%fkb,c mem:%fkb",env.thread_id,command,lua_mem,helper.allocated()/1024))
 
 event.dispatch()
 

@@ -11,6 +11,8 @@
 #include "lualib.h"
 #include "lauxlib.h"
 
+extern int load_helper(lua_State *L);
+
 static void
 signal_deadloop(int sig) {
 	g_breakout = 1;
@@ -36,6 +38,41 @@ ignore_signal(int sig) {
 
 int dlclose(void* handle) {
 	return 0;
+}
+
+
+void*
+thread_main(void* args) {
+	char* startup_args = (char*)args;
+	lua_State* L = luaL_newstate();
+	luaL_openlibs(L);
+	luaL_requiref(L,"helper",load_helper,0);
+
+	if (luaL_loadfile(L,"lualib/bootstrap.lua") != LUA_OK)  {
+		fprintf(stderr,"%s\n",lua_tostring(L,-1));
+		exit(1);
+	}
+
+	int argc = 0;
+	int from = 0;
+	int i;
+	for(i = 0;i < strlen(startup_args);i++) {
+		if (startup_args[i] == '@') {
+			lua_pushlstring(L,&startup_args[from],i - from);
+			from = i+1;
+			++argc;
+		}
+	}
+	++argc;
+	lua_pushlstring(L,&startup_args[from],i - from);
+
+	if (lua_pcall(L,argc,0,0) != LUA_OK)  {
+		fprintf(stderr,"%s\n",lua_tostring(L,-1));
+		exit(1);
+	}
+	lua_close(L);
+
+	return NULL;
 }
 
 /*
@@ -68,35 +105,22 @@ int main(int argc,const char* argv[]) {
 	ignore_signal(SIGPROF);
 	register_signal(SIGUSR1,signal_deadloop);
 
-	lua_State* L = luaL_newstate();
-	luaL_openlibs(L);
+	if (argc > 2) {
+		pthread_t* pids = malloc(sizeof(pthread_t) * (argc - 1));
+		int i;
+		for(i = 1;i < argc;i++) {
+			if (pthread_create(&pids[i-1], NULL, thread_main, (void*)argv[i])) {
+				fprintf(stderr, "create thread mail failed");
+				exit(1);
+			}
+		}
+		for(i = 0;i < argc - 1;i++) {
+			pthread_join(pids[i], NULL);
+		}
 
-	lua_getglobal(L,"package");
-	lua_pushstring(L,"./.libs/?.so");
-	lua_setfield(L,-2,"cpath");
-	lua_pop(L,1);
-
-	lua_getglobal(L,"require");
-	lua_pushstring(L,"worker.core");
-	int status = lua_pcall(L,1,1,0);
-	if (status != LUA_OK)  {
-		fprintf(stderr,"load worker.core error:%s\n",lua_tostring(L,-1));
-		exit(1);
+	} else {
+		thread_main((void*)argv[1]);
 	}
-	lua_getfield(L,-1,"create");
-
-	int i = 1;
-	for(;i < argc;i++) {
-		lua_pushstring(L,argv[i]);
-	}
-
-	status = lua_pcall(L,argc-1,0,0);
-	if (status != LUA_OK)  {
-		fprintf(stderr,"call startup error:%s\n",lua_tostring(L,-1));
-		exit(1);
-	}
-
-	lua_close(L);
 
 	return 0;
 }

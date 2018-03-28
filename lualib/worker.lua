@@ -43,6 +43,10 @@ function _M.call(target,file,method,...)
 	return event.wait(session)
 end
 
+function _M.create(fd,args)
+	return worker.create(fd,args)
+
+end
 
 
 
