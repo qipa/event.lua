@@ -189,7 +189,7 @@ worker_wakeup(worker_ctx_t* ctx) {
 }
 
 void
-worker_callback(worker_ctx_t* ctx,uint32_t source,uint32_t session,void* data,int size) {
+worker_callback(worker_ctx_t* ctx,int source,int session,void* data,int size) {
 	lua_rawgeti(ctx->L, LUA_REGISTRYINDEX, ctx->callback);
 
 	lua_pushinteger(ctx->L,source);
@@ -240,7 +240,7 @@ extern int load_helper(lua_State *L);
 
 
 int
-push(lua_State* L) {
+worker_push(lua_State* L) {
 	worker_ctx_t* ctx = lua_touserdata(L, 1);
 	int target = lua_tointeger(L,2);
 	int session = lua_tointeger(L,3);
@@ -271,6 +271,11 @@ push(lua_State* L) {
 	}
 
 	queue_push(target_ctx->queue,ctx->id,session,data,size);
+	if (!pthread_mutex_trylock(&target_ctx->mutex)) {
+		pthread_cond_signal(&target_ctx->cond);
+		pthread_mutex_unlock(&target_ctx->mutex);
+	}
+
 	worker_unref(target_ctx);
 	lua_pushboolean(L,1);
 	return 1;
@@ -291,7 +296,7 @@ send_mail(lua_State* L) {
 			memcpy(data,str,size);
 			break;
 		}
-		case LUA_TUSERDATA:{
+		case LUA_TLIGHTUSERDATA:{
 			data = lua_touserdata(L, 3);
 			size = lua_tointeger(L, 4);
 			break;
@@ -340,7 +345,7 @@ _worker(void* ud) {
 
 	luaL_newmetatable(L, "meta_worker");
 	const luaL_Reg meta_worker[] = {
-		{ "push", push },
+		{ "push", worker_push },
 		{ "send_mail", send_mail },
 		{ "quit", quit },
 		{ "dispatch", dispatch },
@@ -425,11 +430,53 @@ create(lua_State* L) {
 	return 1;
 }
 
+int
+main_push(lua_State* L) {
+	int target = lua_tointeger(L, 1);
+	int session = lua_tointeger(L, 2);
+
+	void* data = NULL;
+	size_t size = 0;
+
+	switch(lua_type(L,3)) {
+		case LUA_TSTRING: {
+			const char* str = lua_tolstring(L, 3, &size);
+			data = malloc(size);
+			memcpy(data,str,size);
+			break;
+		}
+		case LUA_TLIGHTUSERDATA:{
+			data = lua_touserdata(L, 3);
+			size = lua_tointeger(L, 4);
+			break;
+		}
+		default: {
+			luaL_error(L,"unkown type:%s",lua_typename(L,lua_type(L,3)));
+		}
+	}
+
+	worker_ctx_t* target_ctx = worker_ref(target);
+	if (!target_ctx) {
+		lua_pushboolean(L,0);
+		return 1;
+	}
+
+	queue_push(target_ctx->queue,-1,session,data,size);
+	if (!pthread_mutex_trylock(&target_ctx->mutex)) {
+		pthread_cond_signal(&target_ctx->cond);
+		pthread_mutex_unlock(&target_ctx->mutex);
+	}
+
+	worker_unref(target_ctx);
+	lua_pushboolean(L,1);
+	return 1;
+}
 
 int
 luaopen_worker_core(lua_State* L) {
 	const luaL_Reg l[] = {
 		{ "create", create },
+		{ "push", main_push },
 		{ NULL, NULL },
 	};
 	luaL_newlib(L, l);
