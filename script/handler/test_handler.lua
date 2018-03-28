@@ -28,7 +28,7 @@ end
 
 function test_thread_rpc(args)
 	table.print(args)
-	worker.send_mail(0,{hello = "world"})
+	worker.send_mail({hello = "world"})
 	count = count + 1
 	if count %10000 == 0 then
 				print(count)

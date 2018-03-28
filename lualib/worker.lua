@@ -33,6 +33,10 @@ function _M.main_send(target,file,method,...)
 	worker.push(target,0,table.tostring({file = file,method = method,args = {...}}))
 end
 
+function _M.main_create(fd,args)
+	return worker.create(fd,args)
+end
+
 function _M.send(target,file,method,...)
 	_core:push(target,0,table.tostring({file = file,method = method,args = {...}}))
 end
@@ -49,13 +53,10 @@ function _M.call(target,file,method,...)
 	return event.wait(session)
 end
 
-function _M.send_mail(session,args)
-	_core:send_mail(0,args)
+function _M.send_mail(args)
+	_core:send_mail(0,table.encode(args))
 end
 
-function _M.create(fd,args)
-	return worker.create(fd,args)
-end
 
 
 

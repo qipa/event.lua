@@ -261,7 +261,7 @@ worker_push(lua_State* L) {
 			break;
 		}
 		default:
-			break;
+			luaL_error(L,"unkown type:%s",lua_typename(L,lua_type(L,4)));
 	}
 
 	worker_ctx_t* target_ctx = worker_ref(target);
@@ -302,7 +302,7 @@ send_mail(lua_State* L) {
 			break;
 		}
 		default:
-			break;
+			luaL_error(L,"unkown type:%s",lua_typename(L,lua_type(L,4)));
 	}
 
 	struct mail_message* mail = malloc(sizeof(*mail));
