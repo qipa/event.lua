@@ -24,7 +24,7 @@ event.fork(function ()
 			event.fork(function ()
 				local channel,err
 				while not channel do
-					channel,err = event.connect(string.format("tcp://127.0.0.1:%d",env.httpd_port),4)
+					channel,err = event.connect("tcp://127.0.0.1:1989",4)
 					event.sleep(1)
 				end
 				local str = ""

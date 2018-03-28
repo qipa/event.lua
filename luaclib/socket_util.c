@@ -237,8 +237,7 @@ socket_accept(int listen_fd,char* info) {
     socklen_t len = sizeof(u);
     int client_fd = accept(listen_fd, &u.s, &len);
     if (client_fd < 0) {
-        char* error = strerror(errno);
-        memcpy(info,error,strlen(error) > HOST_SIZE ? HOST_SIZE:strlen(error));
+        snprintf(info, HOST_SIZE, "%s", strerror(errno));
         return -1;
     }
 
@@ -256,7 +255,6 @@ socket_accept(int listen_fd,char* info) {
         snprintf(info, HOST_SIZE, "ipc:unknown");
     }
     
-
     return client_fd;
 }
 
