@@ -18,26 +18,29 @@ end
 
 local count = 0
 function test_rpc(args)
-		count = count + 1
+	count = count + 1
 	if count %10000 == 0 then
-				print(count)
-			end
+		print(count)
+	end
 	return "ok"
 end
 
 
-function test_thread_rpc(args)
-	table.print(args,"test_thread_rpc")
-	worker.call_mail("handler.test_handler","mail_rpc",{hello = "world"},function (args)
-		print("mail return",args)
-		table.print(args)
-	end)
-	count = count + 1
-	if count %10000 == 0 then
-				print(count)
+function test_thread_rpc0(args)
+	local now = util.time()
+	local count = 1024 * 1024
+	for i = 1,count do
+		worker.call_worker(1,"handler.test_handler","test_thread_rpc1",{fuck = "you"},function ()
+			if i == count then
+				print("done",util.time() - now,i)
 			end
-	worker.quit()
+		end)
+	end
 	return "rpc ok"
+end
+
+function test_thread_rpc1(args)
+	return "ok"
 end
 
 function mail_rpc(args)

@@ -98,7 +98,7 @@ function _M.call_worker(target,file,method,args,func)
 	local session = event.gen_session()
 	_worker_userdata:push(target,session,table.tostring({file = file,method = method,args = args}))
 	if func then
-		_session_callback[session] = callback
+		_session_callback[session] = func
 		return
 	end
 	return event.wait(session)

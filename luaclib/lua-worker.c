@@ -308,6 +308,7 @@ send_mail(lua_State* L) {
 	}
 
 	struct mail_message* mail = malloc(sizeof(*mail));
+	mail->next = NULL;
 	mail->source = ctx->id;
 	mail->session = session;
 	mail->data = data;
