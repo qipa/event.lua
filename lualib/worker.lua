@@ -6,10 +6,13 @@ local _M = {}
 
 local _session_callback = {}
 
+--for creator
 local _maibox
 local _mailbox_fd
-local _core
 local _worker_group = {}
+
+--for worker
+local _worker_userdata
 
 function _M.main_send(target,file,method,args)
 	worker.push(target,0,table.tostring({file = file,method = method,args = args}))
@@ -57,9 +60,9 @@ function _M.join()
 	end
 end
 
-function _M.dispatch(core)
-	_core = core
-	core:dispatch(function (source,session,data,size)
+function _M.dispatch(worker_ud)
+	_worker_userdata = worker_ud
+	_worker_userdata:dispatch(function (source,session,data,size)
 		local message = table.decode(data,size)
 		if message.ret then
 			if _session_callback[session] then
@@ -74,9 +77,9 @@ function _M.dispatch(core)
 			end
 			if session ~= 0 then
 				if source < 0 then
-					_core:send_mail(session,table.tostring({ret = true,args = result}))
+					_worker_userdata:send_mail(session,table.tostring({ret = true,args = result}))
 				else
-					core:push(source,session,table.tostring({ret = true,args = result}))
+					_worker_userdata:push(source,session,table.tostring({ret = true,args = result}))
 				end
 			end
 		end
@@ -84,16 +87,16 @@ function _M.dispatch(core)
 end
 
 function _M.quit()
-	_core:quit()
+	_worker_userdata:quit()
 end
 
 function _M.send_worker(target,file,method,args)
-	_core:push(target,0,table.tostring({file = file,method = method,args = args}))
+	_worker_userdata:push(target,0,table.tostring({file = file,method = method,args = args}))
 end
 
 function _M.call_worker(target,file,method,args,func)
 	local session = event.gen_session()
-	_core:push(target,session,table.tostring({file = file,method = method,args = args}))
+	_worker_userdata:push(target,session,table.tostring({file = file,method = method,args = args}))
 	if func then
 		_session_callback[session] = callback
 		return
@@ -102,21 +105,18 @@ function _M.call_worker(target,file,method,args,func)
 end
 
 function _M.send_mail(file,method,args)
-	_core:send_mail(0,table.tostring({file = file,method = method,args = args}))
+	_worker_userdata:send_mail(0,table.tostring({file = file,method = method,args = args}))
 end
 
 function _M.call_mail(file,method,args,func)
 	local session = event.gen_session()
-	_core:send_mail(session,table.tostring({file = file,method = method,args = args}))
+	_worker_userdata:send_mail(session,table.tostring({file = file,method = method,args = args}))
 	if func then
 		_session_callback[session] = func
 		return
 	end
 	return event.wait(session)
 end
-
-
-
 
 
 return _M
