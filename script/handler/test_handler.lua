@@ -33,6 +33,7 @@ function test_thread_rpc0(args)
 		worker.call_worker(1,"handler.test_handler","test_thread_rpc1",{fuck = "you"},function ()
 			if i == count then
 				print("done",util.time() - now,i)
+				worker.quit()
 			end
 		end)
 	end
@@ -40,6 +41,12 @@ function test_thread_rpc0(args)
 end
 
 function test_thread_rpc1(args)
+	count = count + 1
+	if count == 1024 * 1024 then
+		print(count)
+		worker.quit()
+	end
+
 	return "ok"
 end
 
