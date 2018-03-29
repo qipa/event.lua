@@ -14,7 +14,7 @@ local debugger = require "debugger"
 local helper = require "helper"
 local logger = require "logger"
 local profiler = require "profiler.core"
-
+local worker = require "worker"
 
 table.print = util.dump
 -- table.encode = serialize.pack
@@ -118,6 +118,8 @@ local lua_mem = collectgarbage("count")
 event.error(string.format("thread:%d start,command:%s,lua mem:%fkb,c mem:%fkb",env.thread_id,command,lua_mem,helper.allocated()/1024))
 
 event.dispatch()
+
+worker.join()
 
 if env.lua_profiler ~= nil then
 	profiler.stop(env.lua_profiler)

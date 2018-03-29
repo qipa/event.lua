@@ -93,6 +93,7 @@ struct lua_mailbox {
 	int send_mail_fd;
 	int ref;
 	int callback;
+	int closed;
 };
 
 static int
@@ -820,6 +821,8 @@ _udp_new(lua_State* L) {
 static int
 _lmailbox_release(lua_State* L) {
 	struct lua_mailbox* lmailbox = (struct lua_mailbox*)lua_touserdata(L, 1);
+	if (lmailbox->closed)
+		luaL_error(L,"mail box already closed");
 
 	ev_io_stop(lmailbox->lev->loop, &lmailbox->io);
 	close(lmailbox->recv_mail_fd);
@@ -828,13 +831,14 @@ _lmailbox_release(lua_State* L) {
 	luaL_unref(L, LUA_REGISTRYINDEX, lmailbox->ref);
 	luaL_unref(L, LUA_REGISTRYINDEX, lmailbox->callback);
 
+	lmailbox->closed = 1;
 	return 1;
 }
 
 static int
-_lmailbox_fd(lua_State* L) {
+_lmailbox_alive(lua_State* L) {
 	struct lua_mailbox* lmailbox = (struct lua_mailbox*)lua_touserdata(L, 1);
-	lua_pushinteger(L, lmailbox->send_mail_fd);
+	lua_pushinteger(L, lmailbox->closed == 1);
 	return 1;
 }
 
@@ -860,14 +864,16 @@ _lmailbox_new(lua_State* L) {
 	lmailbox->recv_mail_fd = fd[0];
 	lmailbox->send_mail_fd = fd[1];
 	lmailbox->callback = callback;
+	lmailbox->closed = 0;
 
 	lmailbox->io.data = lmailbox;
 	ev_io_init(&lmailbox->io,read_mail,lmailbox->recv_mail_fd,EV_READ);
 	ev_io_start(lmailbox->lev->loop,&lmailbox->io);
 
 	lmailbox->ref = meta_init(L,META_MAILBOX);
+	lua_pushinteger(L, lmailbox->send_mail_fd);
 
-	return 1;
+	return 2;
 }
 
 static int
@@ -981,7 +987,7 @@ luaopen_ev_core(lua_State* L) {
 
 	luaL_newmetatable(L, META_MAILBOX);
 	const luaL_Reg meta_mailbox[] = {
-		{ "fd", _lmailbox_fd },
+		{ "alive", _lmailbox_alive },
 		{ "release", _lmailbox_release },
 		{ NULL, NULL },
 	};

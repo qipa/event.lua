@@ -21,6 +21,7 @@ local _listener_ctx = setmetatable({},{__mode = "k"})
 local _channel_ctx = setmetatable({},{__mode = "k"})
 local _timer_ctx = setmetatable({},{__mode = "k"})
 local _udp_ctx = setmetatable({},{__mode = "k"})
+local _mailbox_ctx = setmetatable({},{__mode = "k"})
 
 local co_running = coroutine.running
 local co_yield = coroutine.yield
@@ -176,7 +177,11 @@ function _M.udp(size,callback,ip,port)
 end
 
 function _M.mailbox(func)
-	return _event:mailbox(func)
+	local mailbox,fd = _event:mailbox(func)
+	if mailbox then
+		_mailbox_ctx[mailbox] = fd
+	end
+	return mailbox,fd
 end
 
 function _M.run_process(cmd,line)
@@ -257,6 +262,12 @@ function _M.dispatch()
 	for udp_session in pairs(_udp_ctx) do
 		if udp_session:alive() then
 			udp_session:destroy()
+		end
+	end
+
+	for mailbox in pairs(_mailbox_ctx) do
+		if mailbox:alive() then
+			mailbox:release()
 		end
 	end
 	

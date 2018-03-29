@@ -26,11 +26,9 @@ typedef struct workder_ctx {
 	pthread_cond_t cond;
 	struct message_queue* queue;
 	int id;
-	uint32_t session;
 	int quit;
 	int ref;
 	int callback;
-	char* startup_args;
 	uint32_t oversion;
 	uint32_t nversion;
 	lua_State* L;
@@ -131,7 +129,6 @@ worker_create() {
 	pthread_cond_init(&worker_ctx->cond,NULL);
 
 	worker_ctx->id = -1;
-	worker_ctx->session = 1;
 	worker_ctx->quit = 0;
 	worker_ctx->ref = 1;
 	worker_ctx->queue = queue_create();
@@ -149,10 +146,16 @@ workder_quit(worker_ctx_t* ctx) {
 void
 worker_release(worker_ctx_t* ctx) {
 	queue_free(ctx->queue);
-	if (ctx->startup_args) {
-		free(ctx->startup_args);
+	pthread_mutex_destroy(&ctx->mutex);
+	pthread_cond_destroy(&ctx->cond);
+	while(ctx->mail_first) {
+		struct mail_message* mail = ctx->mail_first;
+		ctx->mail_first = ctx->mail_first->next;
+		if (mail->data)
+			free(mail->data);
+		free(mail);
 	}
-	free(ctx);
+	lua_close(ctx->L);
 }
 
 int
@@ -221,7 +224,7 @@ worker_dispatch(worker_ctx_t* ctx) {
 			pthread_cond_timedwait(&ctx->cond,&ctx->mutex,&timeout);
 
 			pthread_mutex_unlock(&ctx->mutex);
-			// usleep(100);
+
 			ctx->nversion++;
 			worker_wakeup(ctx);
 		} else {
@@ -237,7 +240,6 @@ worker_dispatch(worker_ctx_t* ctx) {
 
 
 extern int load_helper(lua_State *L);
-
 
 int
 worker_push(lua_State* L) {
@@ -369,7 +371,6 @@ _worker(void* ud) {
 	pthread_cond_init(&ctx->cond,NULL);
 
 	ctx->id = -1;
-	ctx->session = 1;
 	ctx->quit = 0;
 	ctx->ref = 1;
 	ctx->queue = queue_create();
@@ -401,12 +402,7 @@ _worker(void* ud) {
 	}
 	ctx->L = L;
 	worker_dispatch(ctx);
-
-	lua_close(L);
-
-	workder_quit(ctx);
 	free(args);
-
 	return NULL;
 }
 
@@ -428,6 +424,13 @@ create(lua_State* L) {
 
 	lua_pushinteger(L, pid);
 	return 1;
+}
+
+int
+join(lua_State* L) {
+	pthread_t pid = lua_tointeger(L, 1);
+	pthread_join(pid, NULL);
+	return 0;
 }
 
 int
@@ -476,6 +479,7 @@ int
 luaopen_worker_core(lua_State* L) {
 	const luaL_Reg l[] = {
 		{ "create", create },
+		{ "join", join },
 		{ "push", main_push },
 		{ NULL, NULL },
 	};

@@ -36,6 +36,7 @@ function test_thread_rpc(args)
 	if count %10000 == 0 then
 				print(count)
 			end
+	worker.quit()
 	return "rpc ok"
 end
 
