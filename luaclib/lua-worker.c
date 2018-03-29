@@ -8,6 +8,7 @@
 #include <signal.h>
 #include <sys/time.h> 
 #include <errno.h>
+#include <semaphore.h>
 
 #include "lua.h"
 #include "lualib.h"
@@ -19,6 +20,7 @@
 struct startup_args {
 	int fd;
 	char* args;
+	sem_t sem;
 };
 
 typedef struct workder_ctx {
@@ -402,7 +404,9 @@ _worker(void* ud) {
 		exit(1);
 	}
 	ctx->L = L;
+	sem_post(&args->sem);
 	worker_dispatch(ctx);
+	sem_destroy(&args->sem);
 	free(args);
 	return NULL;
 }
@@ -418,11 +422,12 @@ create(lua_State* L) {
 	struct startup_args* args = malloc(sizeof(*args));
 	args->fd = fd;
 	args->args = strdup(startup_args);
+	sem_init(&args->sem, 0, -1);
 
 	pthread_t pid;
 	if (pthread_create(&pid, NULL, _worker, args))
 		exit(1);
-
+	sem_wait(&args->sem);
 	lua_pushinteger(L, pid);
 	return 1;
 }

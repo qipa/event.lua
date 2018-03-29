@@ -56,3 +56,6 @@ function dump_model()
 	return {value_report,binder_report}
 end
 
+function top()
+	return event.run_process("top -n 1")
+end

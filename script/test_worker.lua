@@ -7,7 +7,6 @@ event.fork(function ()
 	print(worker.create("test.lua"))
 	print(worker.create("test.lua"))
 	-- print(worker.create(mailbox:fd(),"test.lua"))
-	event.sleep(1)
 
 	local now = util.time()
 	local count = 1024 * 1024
