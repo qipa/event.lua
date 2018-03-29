@@ -3,19 +3,17 @@ local import = require "import"
 local model = require "model"
 local helper = require "helper"
 
-local _M = {}
 
-function _M.stop()
+function stop()
 	event.breakout()
 end
 
-function _M.mem()
-	print("mem")
+function mem()
 	local mem = collectgarbage("count")
 	return string.format("lua mem:%fkb,c mem:%fkb",mem,helper.allocated() / 1024)
 end
 
-function _M.gc()
+function gc()
 	event.co_clean()
 	collectgarbage("collect")
 	helper.free()
@@ -23,12 +21,12 @@ function _M.gc()
 	return string.format("lua mem:%fkb,c mem:%fkb",mem,helper.allocated() / 1024)
 end
 
-function _M.mem_dump()
+function mem_dump()
 	helper.heap.dump("dump")
 	return "ok"
 end
 
-function _M.reload(file)
+function reload(file)
 	local list
 	if file then
 		import.reload(file)
@@ -40,19 +38,21 @@ function _M.reload(file)
 	return table.tostring(list)
 end
 
-function _M.ping()
+function ping()
 	return "ok"
 end
 
-function _M.debug(file,line)
+function debug(file,line)
 	debugger_ctx = {file = file,line = line}
 	return "ok"
 end
 
+function run(file)
+	dofile(string.format("./script/%s.lua",file))
+end
 
-function _M.dump_model()
+function dump_model()
 	local value_report,binder_report = model.count_model()
 	return {value_report,binder_report}
 end
 
-return _M

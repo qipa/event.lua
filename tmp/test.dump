@@ -1,0 +1,666 @@
+{
+	["Ab"] = {
+		["fields"] = {
+			{
+				["array"] = false,
+				["fields"] = {
+					{
+						["array"] = true,
+						["fields"] = {
+							{
+								["array"] = false,
+								["name"] = "name",
+								["type"] = 3,
+								["type_name"] = "string",
+							},
+							{
+								["array"] = false,
+								["name"] = "id",
+								["type"] = 0,
+								["type_name"] = "int",
+							},
+							{
+								["array"] = true,
+								["fields"] = {
+									{
+										["array"] = false,
+										["name"] = "number",
+										["type"] = 3,
+										["type_name"] = "string",
+									},
+									{
+										["array"] = false,
+										["name"] = "type",
+										["type"] = 0,
+										["type_name"] = "int",
+									},
+									{
+										["array"] = false,
+										["fields"] = {
+											{
+												["array"] = false,
+												["name"] = "cn",
+												["type"] = 3,
+												["type_name"] = "string",
+											},
+											{
+												["array"] = false,
+												["name"] = "en",
+												["type"] = 3,
+												["type_name"] = "string",
+											},
+										},
+										["name"] = "country",
+										["type"] = 4,
+										["type_name"] = "Country",
+									},
+								},
+								["name"] = "phone",
+								["type"] = 4,
+								["type_name"] = "Phone",
+							},
+						},
+						["name"] = "person",
+						["type"] = 4,
+						["type_name"] = "Person",
+					},
+				},
+				["name"] = "person",
+				["type"] = 4,
+				["type_name"] = "Persons",
+			},
+		},
+		["file"] = "test.protocol",
+	},
+	["CmdInfo"] = {
+		["fields"] = {
+			{
+				["array"] = false,
+				["name"] = "id",
+				["type"] = 0,
+				["type_name"] = "int",
+			},
+			{
+				["array"] = true,
+				["name"] = "argnum",
+				["type"] = 0,
+				["type_name"] = "int",
+			},
+			{
+				["array"] = false,
+				["name"] = "cmd",
+				["type"] = 3,
+				["type_name"] = "string",
+			},
+		},
+		["file"] = "test.protocol",
+	},
+	["Country"] = {
+		["fields"] = {
+			{
+				["array"] = false,
+				["name"] = "cn",
+				["type"] = 3,
+				["type_name"] = "string",
+			},
+			{
+				["array"] = false,
+				["name"] = "en",
+				["type"] = 3,
+				["type_name"] = "string",
+			},
+		},
+		["file"] = "test.protocol",
+	},
+	["IncludeOther"] = {
+		["fields"] = {
+			{
+				["array"] = true,
+				["fields"] = {
+					{
+						["array"] = true,
+						["name"] = "id",
+						["type"] = 0,
+						["type_name"] = "int",
+					},
+					{
+						["array"] = false,
+						["name"] = "name",
+						["type"] = 3,
+						["type_name"] = "string",
+					},
+					{
+						["array"] = false,
+						["fields"] = {
+							{
+								["array"] = true,
+								["name"] = "id",
+								["type"] = 0,
+								["type_name"] = "int",
+							},
+							{
+								["array"] = true,
+								["name"] = "titile",
+								["type"] = 3,
+								["type_name"] = "string",
+							},
+						},
+						["name"] = "list",
+						["type"] = 4,
+						["type_name"] = "List",
+					},
+				},
+				["name"] = "messageInfo",
+				["type"] = 4,
+				["type_name"] = "Message",
+			},
+		},
+		["file"] = "test.protocol",
+	},
+	["Info"] = {
+		["file"] = "test.protocol",
+	},
+	["Person"] = {
+		["fields"] = {
+			{
+				["array"] = false,
+				["name"] = "name",
+				["type"] = 3,
+				["type_name"] = "string",
+			},
+			{
+				["array"] = false,
+				["name"] = "id",
+				["type"] = 0,
+				["type_name"] = "int",
+			},
+			{
+				["array"] = true,
+				["fields"] = {
+					{
+						["array"] = false,
+						["name"] = "number",
+						["type"] = 3,
+						["type_name"] = "string",
+					},
+					{
+						["array"] = false,
+						["name"] = "type",
+						["type"] = 0,
+						["type_name"] = "int",
+					},
+					{
+						["array"] = false,
+						["fields"] = {
+							{
+								["array"] = false,
+								["name"] = "cn",
+								["type"] = 3,
+								["type_name"] = "string",
+							},
+							{
+								["array"] = false,
+								["name"] = "en",
+								["type"] = 3,
+								["type_name"] = "string",
+							},
+						},
+						["name"] = "country",
+						["type"] = 4,
+						["type_name"] = "Country",
+					},
+				},
+				["name"] = "phone",
+				["type"] = 4,
+				["type_name"] = "Phone",
+			},
+		},
+		["file"] = "test.protocol",
+	},
+	["Persons"] = {
+		["fields"] = {
+			{
+				["array"] = true,
+				["fields"] = {
+					{
+						["array"] = false,
+						["name"] = "name",
+						["type"] = 3,
+						["type_name"] = "string",
+					},
+					{
+						["array"] = false,
+						["name"] = "id",
+						["type"] = 0,
+						["type_name"] = "int",
+					},
+					{
+						["array"] = true,
+						["fields"] = {
+							{
+								["array"] = false,
+								["name"] = "number",
+								["type"] = 3,
+								["type_name"] = "string",
+							},
+							{
+								["array"] = false,
+								["name"] = "type",
+								["type"] = 0,
+								["type_name"] = "int",
+							},
+							{
+								["array"] = false,
+								["fields"] = {
+									{
+										["array"] = false,
+										["name"] = "cn",
+										["type"] = 3,
+										["type_name"] = "string",
+									},
+									{
+										["array"] = false,
+										["name"] = "en",
+										["type"] = 3,
+										["type_name"] = "string",
+									},
+								},
+								["name"] = "country",
+								["type"] = 4,
+								["type_name"] = "Country",
+							},
+						},
+						["name"] = "phone",
+						["type"] = 4,
+						["type_name"] = "Phone",
+					},
+				},
+				["name"] = "person",
+				["type"] = 4,
+				["type_name"] = "Person",
+			},
+		},
+		["file"] = "test.protocol",
+	},
+	["Phone"] = {
+		["fields"] = {
+			{
+				["array"] = false,
+				["name"] = "number",
+				["type"] = 3,
+				["type_name"] = "string",
+			},
+			{
+				["array"] = false,
+				["name"] = "type",
+				["type"] = 0,
+				["type_name"] = "int",
+			},
+			{
+				["array"] = false,
+				["fields"] = {
+					{
+						["array"] = false,
+						["name"] = "cn",
+						["type"] = 3,
+						["type_name"] = "string",
+					},
+					{
+						["array"] = false,
+						["name"] = "en",
+						["type"] = 3,
+						["type_name"] = "string",
+					},
+				},
+				["name"] = "country",
+				["type"] = 4,
+				["type_name"] = "Country",
+			},
+		},
+		["file"] = "test.protocol",
+	},
+	["c2s_command"] = {
+		["fields"] = {
+			{
+				["array"] = false,
+				["name"] = "arg1",
+				["type"] = 0,
+				["type_name"] = "int",
+			},
+			{
+				["array"] = true,
+				["name"] = "arglist",
+				["type"] = 0,
+				["type_name"] = "int",
+			},
+			{
+				["array"] = true,
+				["fields"] = {
+					{
+						["array"] = false,
+						["name"] = "id",
+						["type"] = 0,
+						["type_name"] = "int",
+					},
+					{
+						["array"] = true,
+						["name"] = "argnum",
+						["type"] = 0,
+						["type_name"] = "int",
+					},
+					{
+						["array"] = false,
+						["name"] = "cmd",
+						["type"] = 3,
+						["type_name"] = "string",
+					},
+				},
+				["name"] = "cmds",
+				["type"] = 4,
+				["type_name"] = "CmdInfo",
+			},
+		},
+		["file"] = "test.protocol",
+	},
+	["s2c_sync_string"] = {
+		["fields"] = {
+			{
+				["array"] = false,
+				["name"] = "Uid",
+				["type"] = 0,
+				["type_name"] = "int",
+			},
+			{
+				["array"] = true,
+				["name"] = "AttrList",
+				["type"] = 0,
+				["type_name"] = "int",
+			},
+		},
+		["file"] = "test.protocol",
+	},
+	["test1"] = {
+		["fields"] = {
+			{
+				["array"] = false,
+				["fields"] = {
+					{
+						["array"] = true,
+						["name"] = "A",
+						["type"] = 0,
+						["type_name"] = "int",
+					},
+					{
+						["array"] = false,
+						["name"] = "B",
+						["type"] = 3,
+						["type_name"] = "string",
+					},
+				},
+				["name"] = "A",
+				["type"] = 4,
+				["type_name"] = "test_1",
+			},
+			{
+				["array"] = false,
+				["name"] = "B",
+				["type"] = 3,
+				["type_name"] = "string",
+			},
+		},
+		["file"] = "test.protocol",
+	},
+	["test2"] = {
+		["children"] = {
+			["InnerProtocol"] = {
+				["children"] = {
+					["FuckProtocol"] = {
+						["fields"] = {
+							{
+								["array"] = true,
+								["fields"] = {
+									{
+										["array"] = false,
+										["name"] = "a",
+										["type"] = 2,
+										["type_name"] = "double",
+									},
+									{
+										["array"] = false,
+										["name"] = "b",
+										["type"] = 3,
+										["type_name"] = "string",
+									},
+									{
+										["array"] = true,
+										["fields"] = {
+											{
+												["array"] = false,
+												["name"] = "a",
+												["type"] = 0,
+												["type_name"] = "int",
+											},
+											{
+												["array"] = false,
+												["name"] = "b",
+												["type"] = 1,
+												["type_name"] = "float",
+											},
+											{
+												["array"] = true,
+												["fields"] = {
+													{
+														["array"] = false,
+														["fields"] = {
+															{
+																["array"] = true,
+																["name"] = "A",
+																["type"] = 0,
+																["type_name"] = "int",
+															},
+															{
+																["array"] = false,
+																["name"] = "B",
+																["type"] = 3,
+																["type_name"] = "string",
+															},
+														},
+														["name"] = "A",
+														["type"] = 4,
+														["type_name"] = "test_1",
+													},
+													{
+														["array"] = false,
+														["name"] = "B",
+														["type"] = 3,
+														["type_name"] = "string",
+													},
+												},
+												["name"] = "c",
+												["type"] = 4,
+												["type_name"] = "test1",
+											},
+										},
+										["name"] = "c",
+										["type"] = 4,
+										["type_name"] = "InnerProtocol",
+									},
+								},
+								["name"] = "list",
+								["type"] = 4,
+								["type_name"] = "test2",
+							},
+						},
+						["file"] = "test.protocol",
+					},
+				},
+				["fields"] = {
+					{
+						["array"] = false,
+						["name"] = "a",
+						["type"] = 0,
+						["type_name"] = "int",
+					},
+					{
+						["array"] = false,
+						["name"] = "b",
+						["type"] = 1,
+						["type_name"] = "float",
+					},
+					{
+						["array"] = true,
+						["fields"] = {
+							{
+								["array"] = false,
+								["fields"] = {
+									{
+										["array"] = true,
+										["name"] = "A",
+										["type"] = 0,
+										["type_name"] = "int",
+									},
+									{
+										["array"] = false,
+										["name"] = "B",
+										["type"] = 3,
+										["type_name"] = "string",
+									},
+								},
+								["name"] = "A",
+								["type"] = 4,
+								["type_name"] = "test_1",
+							},
+							{
+								["array"] = false,
+								["name"] = "B",
+								["type"] = 3,
+								["type_name"] = "string",
+							},
+						},
+						["name"] = "c",
+						["type"] = 4,
+						["type_name"] = "test1",
+					},
+				},
+				["file"] = "test.protocol",
+			},
+		},
+		["fields"] = {
+			{
+				["array"] = false,
+				["name"] = "a",
+				["type"] = 2,
+				["type_name"] = "double",
+			},
+			{
+				["array"] = false,
+				["name"] = "b",
+				["type"] = 3,
+				["type_name"] = "string",
+			},
+			{
+				["array"] = true,
+				["fields"] = {
+					{
+						["array"] = false,
+						["name"] = "a",
+						["type"] = 0,
+						["type_name"] = "int",
+					},
+					{
+						["array"] = false,
+						["name"] = "b",
+						["type"] = 1,
+						["type_name"] = "float",
+					},
+					{
+						["array"] = true,
+						["fields"] = {
+							{
+								["array"] = false,
+								["fields"] = {
+									{
+										["array"] = true,
+										["name"] = "A",
+										["type"] = 0,
+										["type_name"] = "int",
+									},
+									{
+										["array"] = false,
+										["name"] = "B",
+										["type"] = 3,
+										["type_name"] = "string",
+									},
+								},
+								["name"] = "A",
+								["type"] = 4,
+								["type_name"] = "test_1",
+							},
+							{
+								["array"] = false,
+								["name"] = "B",
+								["type"] = 3,
+								["type_name"] = "string",
+							},
+						},
+						["name"] = "c",
+						["type"] = 4,
+						["type_name"] = "test1",
+					},
+				},
+				["name"] = "c",
+				["type"] = 4,
+				["type_name"] = "InnerProtocol",
+			},
+		},
+		["file"] = "test.protocol",
+	},
+	["test_1"] = {
+		["fields"] = {
+			{
+				["array"] = true,
+				["name"] = "A",
+				["type"] = 0,
+				["type_name"] = "int",
+			},
+			{
+				["array"] = false,
+				["name"] = "B",
+				["type"] = 3,
+				["type_name"] = "string",
+			},
+		},
+		["file"] = "test.protocol",
+	},
+	["testdsf"] = {
+		["fields"] = {
+			{
+				["array"] = false,
+				["fields"] = {
+					{
+						["array"] = true,
+						["name"] = "A",
+						["type"] = 0,
+						["type_name"] = "int",
+					},
+					{
+						["array"] = false,
+						["name"] = "B",
+						["type"] = 3,
+						["type_name"] = "string",
+					},
+				},
+				["name"] = "A",
+				["type"] = 4,
+				["type_name"] = "test_1",
+			},
+			{
+				["array"] = false,
+				["name"] = "a",
+				["type"] = 3,
+				["type_name"] = "string",
+			},
+		},
+		["file"] = "test.protocol",
+	},
+}
