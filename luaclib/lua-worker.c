@@ -161,36 +161,46 @@ worker_release(worker_ctx_t* ctx) {
 }
 
 int
-worker_send_mail(worker_ctx_t* ctx,struct mail_message* mail) {
-	for (;;) {
-		int n = write(ctx->fd, &mail, sizeof(mail));
-		if (n < 0) {
-			if (errno == EINTR) {
-				continue;
-			} else if (errno == EAGAIN ) {
-				return -1;
-			} else {
-				fprintf(stderr,"worker send mail error %s.\n", strerror(errno));
-				assert(0);
-			}
-		}
-		assert(n == sizeof(mail));
-		return 0;
-	}
-}
-
-void
-worker_wakeup(worker_ctx_t* ctx) {
+worker_send_mail(worker_ctx_t* ctx) {
 	while(ctx->mail_first) {
 		struct mail_message* mail = ctx->mail_first;
 		struct mail_message* next_mail = mail->next;
-		if (worker_send_mail(ctx,mail) == -1) {
-			return;
-		} else {
-			ctx->mail_first = next_mail;
+		for (;;) {
+			int n = write(ctx->fd, &mail, sizeof(mail));
+			if (n < 0) {
+				if (errno == EINTR) {
+					continue;
+				} else if (errno == EAGAIN ) {
+					return -1;
+				} else {
+					fprintf(stderr,"worker send mail error %s.\n", strerror(errno));
+					assert(0);
+				}
+			}
+			assert(n == sizeof(mail));
+			break;
 		}
+		ctx->mail_first = next_mail;
 	}
 	ctx->mail_first = ctx->mail_last = NULL;
+	return 0;
+}
+
+int
+worker_push(int target,int source,int session,void* data,size_t size) {
+	worker_ctx_t* target_ctx = worker_ref(target);
+	if (!target_ctx) {
+		return -1;
+	}
+
+	queue_push(target_ctx->queue,source,session,data,size);
+	if (!pthread_mutex_trylock(&target_ctx->mutex)) {
+		pthread_cond_signal(&target_ctx->cond);
+		pthread_mutex_unlock(&target_ctx->mutex);
+	}
+
+	worker_unref(target_ctx);
+	return 0;
 }
 
 void
@@ -228,9 +238,10 @@ worker_dispatch(worker_ctx_t* ctx) {
 			pthread_mutex_unlock(&ctx->mutex);
 
 			ctx->nversion++;
-			worker_wakeup(ctx);
+			worker_send_mail(ctx);
 		} else {
 			worker_callback(ctx,message->source,message->session,message->data,message->size);
+			worker_send_mail(ctx);
 			if (ctx->quit) {
 				workder_quit(ctx);
 				break;
@@ -244,7 +255,7 @@ worker_dispatch(worker_ctx_t* ctx) {
 extern int load_helper(lua_State *L);
 
 int
-worker_push(lua_State* L) {
+module_push(lua_State* L) {
 	worker_ctx_t* ctx = lua_touserdata(L, 1);
 	int target = lua_tointeger(L,2);
 	int session = lua_tointeger(L,3);
@@ -268,19 +279,10 @@ worker_push(lua_State* L) {
 			luaL_error(L,"unkown type:%s",lua_typename(L,lua_type(L,4)));
 	}
 
-	worker_ctx_t* target_ctx = worker_ref(target);
-	if (!target_ctx) {
+	if (worker_push(target,ctx->id,session,data,size) < 0) {
 		lua_pushboolean(L,0);
 		return 1;
 	}
-
-	queue_push(target_ctx->queue,ctx->id,session,data,size);
-	if (!pthread_mutex_trylock(&target_ctx->mutex)) {
-		pthread_cond_signal(&target_ctx->cond);
-		pthread_mutex_unlock(&target_ctx->mutex);
-	}
-
-	worker_unref(target_ctx);
 	lua_pushboolean(L,1);
 	return 1;
 }
@@ -316,9 +318,7 @@ send_mail(lua_State* L) {
 	mail->data = data;
 	mail->size = size;
 	if (ctx->mail_first == NULL) {
-		if (worker_send_mail(ctx,mail) == -1) {
-			ctx->mail_first = ctx->mail_last = mail;
-		}
+		ctx->mail_first = ctx->mail_last = mail;
 	} else {
 		ctx->mail_last->next = mail;
 		ctx->mail_last = mail;
@@ -350,7 +350,7 @@ _worker(void* ud) {
 
 	luaL_newmetatable(L, "meta_worker");
 	const luaL_Reg meta_worker[] = {
-		{ "push", worker_push },
+		{ "push", module_push },
 		{ "send_mail", send_mail },
 		{ "quit", quit },
 		{ "dispatch", dispatch },
@@ -464,19 +464,10 @@ main_push(lua_State* L) {
 		}
 	}
 
-	worker_ctx_t* target_ctx = worker_ref(target);
-	if (!target_ctx) {
+	if (worker_push(target,-1,session,data,size) < 0) {
 		lua_pushboolean(L,0);
 		return 1;
 	}
-
-	queue_push(target_ctx->queue,-1,session,data,size);
-	if (!pthread_mutex_trylock(&target_ctx->mutex)) {
-		pthread_cond_signal(&target_ctx->cond);
-		pthread_mutex_unlock(&target_ctx->mutex);
-	}
-
-	worker_unref(target_ctx);
 	lua_pushboolean(L,1);
 	return 1;
 }
