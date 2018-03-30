@@ -15,7 +15,7 @@ table.print = util.dump
 table.encode = dump.pack
 table.decode = dump.unpack
 table.tostring = dump.tostring
-
+string.split = util.split
 _G.import = import.import
 
 local worker_core,args = ...

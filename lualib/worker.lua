@@ -34,17 +34,24 @@ function _M.create(args)
 			local message = table.decode(data,size)
 			if message.ret then
 				if _session_callback[session] then
-					_session_callback[session](message.args)
+					if message.args then
+						_session_callback[session](message.args)
+					end
 				else
-					event.wakeup(session,message.args)
+					if message.args then
+						event.wakeup(session,true,message.args)
+					else
+						event.wakeup(session,false,message.err)
+					end
 				end
 			else
 				local ok,result = xpcall(route.dispatch,debug.traceback,message.file,message.method,message.args)
-				if not ok then
-					event.error(result)
-				end
 				if session ~= 0 then
-					worker.push(source,session,table.tostring({ret = true,args = result}))
+					if not ok then
+						worker:push(source,session,table.tostring({ret = true,err = result}))
+					else
+						worker:push(source,session,table.tostring({ret = true,args = result}))
+					end
 				end
 			end
 		end)
@@ -66,22 +73,35 @@ function _M.dispatch(worker_ud)
 		local message = table.decode(data,size)
 		if message.ret then
 			if _session_callback[session] then
-				_session_callback[session](message.args)
+				if message.args then
+					_session_callback[session](message.args)
+				end
 			else
-				event.wakeup(session,message.args)
-			end
-		else
-			local ok,result = xpcall(route.dispatch,debug.traceback,message.file,message.method,message.args)
-			if not ok then
-				event.error(result)
-			end
-			if session ~= 0 then
-				if source < 0 then
-					_worker_userdata:send_mail(session,table.tostring({ret = true,args = result}))
+				if message.args then
+					event.wakeup(session,true,message.args)
 				else
-					_worker_userdata:push(source,session,table.tostring({ret = true,args = result}))
+					event.wakeup(session,false,message.err)
 				end
 			end
+		else
+			event.fork(function ()
+				local ok,result = xpcall(route.dispatch,debug.traceback,message.file,message.method,message.args)
+				if session ~= 0 then
+					if source < 0 then
+						if not ok then
+							_worker_userdata:send_mail(session,table.tostring({ret = true,err = result}))
+						else
+							_worker_userdata:send_mail(session,table.tostring({ret = true,args = result}))
+						end
+					else
+						if not ok then
+							_worker_userdata:push(source,session,table.tostring({ret = true,err = result}))
+						else
+							_worker_userdata:push(source,session,table.tostring({ret = true,args = result}))
+						end
+					end
+				end
+			end)
 		end
 	end)
 end
@@ -101,7 +121,11 @@ function _M.call_worker(target,file,method,args,func)
 		_session_callback[session] = func
 		return
 	end
-	return event.wait(session)
+	local ok,result = event.wait(session)
+	if not ok then
+		error(result)
+	end
+	return result
 end
 
 function _M.send_mail(file,method,args)
@@ -115,7 +139,11 @@ function _M.call_mail(file,method,args,func)
 		_session_callback[session] = func
 		return
 	end
-	return event.wait(session)
+	local ok,result = event.wait(session)
+	if not ok then
+		error(result)
+	end
+	return result
 end
 
 

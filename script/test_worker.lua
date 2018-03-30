@@ -10,9 +10,9 @@ event.fork(function ()
 
 	local now = util.time()
 	local count = 1024 * 1024
-	for i = 1,count do
-		-- local result = worker.main_call(0,"handler.test_handler","test_thread_rpc0",{fuck = "you"})
-		local result = worker.main_call(0,"handler.test_handler","test_thread_rpc1",{fuck = "you"})
+	for i = 1,1 do
+		local result = worker.main_call(0,"handler.test_handler","test_thread_rpc0",{fuck = "you"})
+		-- local result = worker.main_call(0,"handler.test_handler","test_thread_rpc1",{fuck = "you"})
 		if i == count then
 			print("done",util.time() - now,i)
 			-- event.breakout()
