@@ -42,9 +42,9 @@ end
 
 function test_thread_rpc1(args)
 	count = count + 1
-	if count == 1024 * 1024 then
+	if count%10000 == 0 then
 		print(count)
-		worker.quit()
+		-- worker.quit()
 	end
 
 	return "ok"
