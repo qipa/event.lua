@@ -100,9 +100,9 @@ function _M.load()
 			return protocolcore.encode(_ctx,map[name],tbl)
 		end
 
-		decode[name] = function (str)
+		decode[name] = function (...)
 			local info = meta[name]
-			return protocolcore.decode(_ctx,map[name],str)
+			return protocolcore.decode(_ctx,map[name],...)
 		end
 	end
 	_M.encode = encode

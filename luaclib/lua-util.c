@@ -282,11 +282,6 @@ ltostring(lua_State* L) {
                 break;
             case LUA_TNIL:
                 lua_pushliteral(L, "nil");
-            case LUA_TLIGHTUSERDATA:
-                void* data = lua_touserdata(L, 1);
-                size_t size = lua_tointeger(L, 2);
-                lua_pushlstring(L, data, size);
-                free(data);
                 break;
             default: {
                 int tt = luaL_getmetafield(L, 1, "__name");  /* try name */
@@ -411,6 +406,14 @@ labort(lua_State* L) {
     return 0;
 }
 
+static int
+lclone_string(lua_State* L) {
+    void* data = lua_touserdata(L, 1);
+    size_t size = lua_tointeger(L, 2);
+    lua_pushlstring(L,data,size);
+    return 1;
+}
+
 int
 luaopen_util_core(lua_State* L){
     luaL_Reg l[] = {
@@ -430,6 +433,7 @@ luaopen_util_core(lua_State* L){
         { "readline", lreadline },
         { "getaddrinfo", lgetaddrinfo },
         { "abort", labort },
+        { "clone_string", lclone_string },
         { NULL, NULL },
     };
     luaL_newlib(L,l);

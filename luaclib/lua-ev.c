@@ -569,6 +569,11 @@ _listen(lua_State* L) {
 		flag |= SOCKET_OPT_REUSEABLE_PORT;
 
 	lev_listener->listener = ev_listener_bind(loop,addr,sizeof(*addr),16,flag,accept_socket,lev_listener);
+	if (!lev_listener->listener) {
+		lua_pushboolean(L, 0);
+		lua_pushstring(L, strdup(strerror(errno)));
+		return 2;
+	}
 
 	lev_listener->ref = meta_init(L,META_LISTENER);
 

@@ -22,19 +22,24 @@ end
 
 local function do_send(ctx,file,method,args,func)
 	if ctx.status == CONNECT_STATUS.CLOSED then
-		local ctx = {status = CONNECT_STATUS.CLOSED}
+		ctx.status = CONNECT_STATUS.CONNECTING
 		event.fork(function ()
-			ctx.status = CONNECT_STATUS.CONNECTING
 			while true do
-				event.sleep(1)
 				local channel,reason = event.connect(ctx.addr,4)
 				if not channel then
 					event.error(string.format("connect %s failed:%s",ctx.name,reason))
+					event.sleep(1)
 				else
+					event.error(string.format("connect %s success",ctx.name))
 					channel.name = ctx.name
 					channel.monitor = event.gen_session()
 					ctx.status = CONNECT_STATUS.CONNECTED
 					ctx.channel = channel
+					for _,message in ipairs(ctx.cached_message) do
+						print(table.unpack(message))
+						ctx.channel:send(table.unpack(message))
+					end
+
 					event.wait(channel.monitor)
 				end
 			end
@@ -44,7 +49,7 @@ local function do_send(ctx,file,method,args,func)
 		table.insert(ctx.cached_message,{file,method,args,func})
 		return
 	end
-	if func then
+	if not func then
 		ctx.channel:send(file,method,args)
 	else
 		ctx.channel:send_back(file,method,args,func)

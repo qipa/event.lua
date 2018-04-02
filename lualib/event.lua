@@ -109,15 +109,15 @@ function _M.listen(addr,header,callback,channel_class,multi)
 
 	multi = multi or false
 
-	local listener
+	local listener,reason
 	if info.file then
-		listener = _event:listen(header,multi,true,info.file)
+		listener,reason = _event:listen(header,multi,true,info.file)
 	else
-		listener = _event:listen(header,multi,false,info.ip,info.port)
+		listener,reason = _event:listen(header,multi,false,info.ip,info.port)
 	end
 
 	if not listener then
-		return false
+		return false,reason
 	end
 	_listener_ctx[listener] = {callback = callback,channel_class = channel_class}
 	return listener

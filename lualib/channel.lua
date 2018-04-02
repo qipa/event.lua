@@ -102,6 +102,7 @@ function channel:write(str)
 end
 
 function channel:send(file,method,...)
+print("!@#!@#")
 	local str = pack_table({file = file,method = method,session = 0,args = {...}})
 	self:write(str)
 end

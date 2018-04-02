@@ -624,7 +624,20 @@ _decode_protocol(lua_State* L) {
 		luaL_error(L,"index:%d error",index);
 	}
 	size_t size;
-	const char* str = luaL_checklstring(L,3,&size);
+	const char* str = NULL;
+	switch(lua_type(L,3)) {
+		case LUA_TSTRING: {
+			str = lua_tolstring(L, 3, &size);
+			break;
+		}
+		case LUA_TLIGHTUSERDATA:{
+			str = lua_touserdata(L, 3);
+			size = lua_tointeger(L, 4);
+			break;
+		}
+		default:
+			luaL_error(L,"unkown type:%s",lua_typename(L,lua_type(L,3)));
+	}
 
 	struct message_reader reader;
 	reader.ptr = (char*)str;
@@ -636,10 +649,11 @@ _decode_protocol(lua_State* L) {
 
 	struct protocol* ptl = ctx->slots[index];
 	lua_createtable(L,0,ptl->size);
+	int top = lua_gettop(L);
 	int i;
 	for(i=0;i < ptl->size;i++) {
 		struct field* f = &ptl->field[i];
-		unpack_one(L,&reader,f,4,depth);
+		unpack_one(L,&reader,f,top,depth);
 	}
 	
 	if (reader.offset != reader.size) {

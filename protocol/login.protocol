@@ -1,0 +1,16 @@
+
+protocol role_info
+{
+	int id
+	string name
+}
+
+protocol c2s_auth
+{
+	string account
+}
+
+protocol s2c_auth
+{
+	role_info[] list
+}
