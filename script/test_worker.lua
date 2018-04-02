@@ -3,9 +3,8 @@ local worker = require "worker"
 local util = require "util"
 
 event.fork(function ()
-
-	print(worker.create("test.lua"))
-	print(worker.create("test.lua"))
+	print(worker.create("worker_main"))
+	print(worker.create("worker_main"))
 	-- print(worker.create(mailbox:fd(),"test.lua"))
 
 	local now = util.time()

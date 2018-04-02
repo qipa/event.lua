@@ -33,7 +33,7 @@ function test_thread_rpc0(args)
 		worker.call_worker(1,"handler.test_handler","test_thread_rpc1",{fuck = "you"},function ()
 			if i == count then
 				print("done",util.time() - now,i)
-				worker.quit()
+				-- worker.quit()
 			end
 		end)
 	end

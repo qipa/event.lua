@@ -324,6 +324,8 @@ local function event_dispatch(ev,...)
 	end
 end
 
-_event = event_core.new(event_dispatch)
+function _M.prepare()
+	_event = event_core.new(event_dispatch)
+end
 
 return _M

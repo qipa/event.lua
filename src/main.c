@@ -53,7 +53,9 @@ thread_main(void* args) {
 		exit(1);
 	}
 
-	int argc = 0;
+	lua_pushboolean(L, 1);
+
+	int argc = 1;
 	int from = 0;
 	int i;
 	for(i = 0;i < strlen(startup_args);i++) {

@@ -362,10 +362,24 @@ _worker(void* ud) {
 
 	lua_settop(L,0);
 
-	if (luaL_loadfile(L,"lualib/worker_startup.lua") != LUA_OK)  {
+	if (luaL_loadfile(L,"lualib/bootstrap.lua") != LUA_OK)  {
 		fprintf(stderr,"%s\n",lua_tostring(L,-1));
 		exit(1);
 	}
+
+	lua_pushboolean(L, 0);
+	int argc = 1;
+	int from = 0;
+	int i = 0;
+	for(;i < strlen(args->args);i++) {
+		if (args->args[i] == '@') {
+			lua_pushlstring(L,&args->args[from],i - from);
+			from = i+1;
+			++argc;
+		}
+	}
+	++argc;
+	lua_pushlstring(L,&args->args[from],i - from);
 
 	worker_ctx_t* ctx = lua_newuserdata(L,sizeof(*ctx));
 	memset(ctx,0,sizeof(*ctx));
@@ -386,18 +400,7 @@ _worker(void* ud) {
 
 	add_worker(ctx);
 
-	int argc = 1;
-	int from = 0;
-	int i = 0;
-	for(;i < strlen(args->args);i++) {
-		if (args->args[i] == '@') {
-			lua_pushlstring(L,&args->args[from],i - from);
-			from = i+1;
-			++argc;
-		}
-	}
 	++argc;
-	lua_pushlstring(L,&args->args[from],i - from);
 
 	if (lua_pcall(L,argc,0,0) != LUA_OK)  {
 		fprintf(stderr,"%s\n",lua_tostring(L,-1));
