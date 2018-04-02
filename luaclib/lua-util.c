@@ -282,6 +282,11 @@ ltostring(lua_State* L) {
                 break;
             case LUA_TNIL:
                 lua_pushliteral(L, "nil");
+            case LUA_TLIGHTUSERDATA:
+                void* data = lua_touserdata(L, 1);
+                size_t size = lua_tointeger(L, 2);
+                lua_pushlstring(L, data, size);
+                free(data);
                 break;
             default: {
                 int tt = luaL_getmetafield(L, 1, "__name");  /* try name */
