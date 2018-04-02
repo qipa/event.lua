@@ -9,7 +9,7 @@ local stdin = {}
 local total = 0
 local time = os.time()
 function collect(...)
-	count = count + 1
+	total = total + 1
 	local stack = {...}
 	for i = #stack,1,-1 do
 		local frame = stack[i]
@@ -34,9 +34,14 @@ function collect(...)
 		time = now
 		local info = {}
 		for frame,count in pairs(stdin) do
-			table.insert(info,{frame = frame,percent = count / count})
+			table.insert(info,{frame = frame,percent = count / total})
 		end
-		util.dump(stdin)
+		table.sort(info,function (l,r)
+			return l.percent > r.percent
+		end)
+		for _,detail in ipairs(info) do
+			print(detail.frame,string.format("%f%%",detail.percent * 100))
+		end
 	end
 end
 
