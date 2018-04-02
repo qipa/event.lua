@@ -415,8 +415,8 @@ lclone_string(lua_State* L) {
 }
 
 struct packet {
-    int rseed;
-    int wseed;
+    uint8_t rseed;
+    uint8_t wseed;
 };
 
 static int
@@ -425,11 +425,10 @@ lpacket_unpack(lua_State* L) {
     char* data = lua_touserdata(L, 2);
     size_t size = lua_tointeger(L, 3);
 
-    uint32_t* tmp = (uint32_t*)data;
     int i;
-    for (i = 0; i < size / sizeof(uint32_t); ++i) {
-        tmp[i] = tmp[i] ^ packet->rseed;
-        packet->rseed += tmp[i];
+    for (i = 0; i < size; ++i) {
+        data[i] = data[i] ^ packet->rseed;
+        packet->rseed += data[i];
     }
     ushort id = data[0] | data[1] << 8;
 
@@ -446,12 +445,7 @@ lpacket_pack(lua_State* L) {
     size_t size;
     const char* data = luaL_checklstring(L, 3, &size);
 
-    static const size_t seg_size = sizeof(uint32_t);
-    size_t total = size + sizeof(short);
-    if (total % seg_size != 0) {
-        total = ((total / seg_size) * seg_size) + seg_size;
-    }
-    total += sizeof(short);
+    size_t total = size + sizeof(short) * 2;
 
     char* mb = malloc(total);
     memset(mb,0,total);
@@ -459,11 +453,11 @@ lpacket_pack(lua_State* L) {
     memcpy(mb+2,&id,2);
     memcpy(mb+4,&data,size);
 
-    uint32_t* tmp = (uint32_t*)&mb[2];
     int i;
-    for (i = 0; i < (total - sizeof(short)) / sizeof(uint32_t); ++i) {
-        tmp[i] = tmp[i] ^ packet->wseed;
-        packet->wseed += tmp[i];
+    for (i = 2; i < total; ++i) {
+        char tmp = mb[i];
+        mb[i] = mb[i] ^ packet->wseed;
+        packet->wseed += tmp;
     }
     lua_pushlightuserdata(L, mb);
     lua_pushinteger(L, total);
