@@ -414,6 +414,81 @@ lclone_string(lua_State* L) {
     return 1;
 }
 
+struct packet {
+    int rseed;
+    int wseed;
+};
+
+static int
+lpacket_unpack(lua_State* L) {
+    struct packet* packet = lua_touserdata(L, 1);
+    char* data = lua_touserdata(L, 2);
+    size_t size = lua_tointeger(L, 3);
+
+    uint32_t* tmp = (uint32_t*)data;
+    int i;
+    for (i = 0; i < size / sizeof(uint32_t); ++i) {
+        tmp[i] = tmp[i] ^ packet->rseed;
+        packet->rseed += tmp[i];
+    }
+    ushort id = data[0] | data[1] << 8;
+
+    lua_pushinteger(L, id);
+    lua_pushlightuserdata(L, &data[2]);
+    lua_pushinteger(L, size - 2);
+    return 3;
+}
+
+static int
+lpacket_pack(lua_State* L) {
+    struct packet* packet = lua_touserdata(L, 1);
+    int id = lua_tointeger(L, 2);
+    size_t size;
+    const char* data = luaL_checklstring(L, 3, &size);
+
+    static const size_t seg_size = sizeof(uint32_t);
+    size_t total = size + sizeof(short);
+    if (total % seg_size != 0) {
+        total = ((total / seg_size) * seg_size) + seg_size;
+    }
+    total += sizeof(short);
+
+    char* mb = malloc(total);
+    memset(mb,0,total);
+    memcpy(mb,&total,2);
+    memcpy(mb+2,&id,2);
+    memcpy(mb+4,&data,size);
+
+    uint32_t* tmp = (uint32_t*)&mb[2];
+    int i;
+    for (i = 0; i < (total - sizeof(short)) / sizeof(uint32_t); ++i) {
+        tmp[i] = tmp[i] ^ packet->wseed;
+        packet->wseed += tmp[i];
+    }
+    lua_pushlightuserdata(L, mb);
+    lua_pushinteger(L, total);
+    return 2;
+}
+
+static int
+lpacket_new(lua_State* L) {
+    struct packet* packet = lua_newuserdata(L, sizeof(*packet));
+    packet->rseed = 0;
+    packet->wseed = 0;
+
+    if (luaL_newmetatable(L, "meta_packte")) {
+        const luaL_Reg meta_packte[] = {
+            { "pack", lpacket_pack },
+            { "unpack", lpacket_unpack },
+            { NULL, NULL },
+        };
+        luaL_newlib(L,meta_packte);
+        lua_setfield(L, -2, "__index");
+    }
+    lua_setmetatable(L, -2);
+    return 1;
+}
+
 int
 luaopen_util_core(lua_State* L){
     luaL_Reg l[] = {
@@ -434,6 +509,7 @@ luaopen_util_core(lua_State* L){
         { "getaddrinfo", lgetaddrinfo },
         { "abort", labort },
         { "clone_string", lclone_string },
+        { "packet_new", lpacket_new },
         { NULL, NULL },
     };
     luaL_newlib(L,l);

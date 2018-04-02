@@ -16,15 +16,9 @@ end
 
 local _M = {}
 
-local function pack(data)
-	local pat = string.format("I2c%d",data:len())
-	return string.pack(pat,data:len()+2,data)
-end
-
 function _M.login(channel,account)
 	local data = protocol.encode.c2s_auth({account = account})
-	print(data,data:len())
-	channel:write(pack(data))
+	channel:write(channel.packet:pack(1,data))
 end
 
 event.fork(function ()
@@ -35,8 +29,8 @@ event.fork(function ()
 		event.error(err)
 		return
 	end
+	channel.packet = util.packet_new()
 
-	
 	while true do
 		local line = util.readline(">>")
 		if line then

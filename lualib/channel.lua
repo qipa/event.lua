@@ -97,8 +97,8 @@ local function pack_table(tbl)
 	return string.pack(pat,str:len()+4,str)
 end
 
-function channel:write(str)
-	self.buffer:write(str)
+function channel:write(...)
+	self.buffer:write(...)
 end
 
 function channel:send(file,method,...)

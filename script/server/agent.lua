@@ -26,7 +26,8 @@ end
 
 function client_channel:data(data,size)
 	print("data",data,size)
-	
+	local id,data,size = self.packet:unpack(data,size)
+	table.print(protocol.decode.c2s_auth(data,size))
 	if not self.login then
 		self:forward_login(data,size)
 	else
@@ -37,6 +38,7 @@ end
 
 local function client_accept(_,channel)
 	channel.id = countor
+	channel.packet = util.packet_new()
 	countor = countor + 1
 	model.bind_client_with_id(channel.id,channel)
 end

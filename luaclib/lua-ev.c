@@ -452,7 +452,7 @@ _session_write(lua_State* L) {
 			memcpy(data,str,size);
 			break;
 		}
-		case LUA_TUSERDATA:{
+		case LUA_TLIGHTUSERDATA:{
 			data = lua_touserdata(L,2);
 			size = lua_tointeger(L,3);
 			break;
