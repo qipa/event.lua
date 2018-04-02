@@ -65,6 +65,7 @@ env.tid = util.thread_id()
 local command = string.format("event@%s@%d",name,env.uid)
 util.thread_name(command)
 
+print("main",main)
 if main then
 	local log_path
 	if env.log_path then
@@ -79,6 +80,13 @@ if main then
 	event.error = function (...)
 		runtime_logger:ERROR(...)
 	end
+
+	local _G_protect = {}
+	function _G_protect.__newindex(self,k,v)
+		rawset(_G,k,v)
+		runtime_logger:WARN(string.format("%s:%s add to _G",k,v))
+	end
+	setmetatable(_G,_G_protect)
 
 	if env.lua_profiler ~= nil then
 		profiler.start()
@@ -99,13 +107,6 @@ else
 		worker.send_mail("handler.logger_handler","log_worker",{...})
 	end
 end
-
-local _G_protect = {}
-function _G_protect.__newindex(self,k,v)
-	rawset(_G,k,v)
-	runtime_logger:WARN(string.format("%s:%s add to _G",k,v))
-end
-setmetatable(_G,_G_protect)
 
 local ok,err = xpcall(func,debug.traceback,table.unpack(args,3))
 if not ok then

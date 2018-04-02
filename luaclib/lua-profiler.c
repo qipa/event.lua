@@ -126,12 +126,10 @@ hook_func (lua_State *L, lua_Debug *ar) {
 		traceback(cursor->L,state_list->report,&argc);
 		cursor = cursor->prev;
 	}
-
-	int r = lua_pcall(state_list->report,argc,0,0);
-	if (r != LUA_OK)  {
+	printf("\033c");
+	if (lua_pcall(state_list->report,argc,0,0) != LUA_OK)  {
 		fprintf(stderr,"%s\n",lua_tostring(state_list->report,-1));
 	}
-	start_profiler();
 }
 
 static void
@@ -140,7 +138,6 @@ signal_profiler(int sig, siginfo_t* sinfo, void* ucontext) {
 	if (!state_list->report) {
 		return;
 	}
-	stop_profiler();
 	lua_sethook(state_list->tail->L,hook_func, LUA_MASKCOUNT, 1);
 }
 

@@ -2,12 +2,20 @@ package.path = string.format("%s;%s",package.path,"./lualib/?.lua;./script/?.lua
 package.cpath = string.format("%s;%s",package.cpath,"./.libs/?.so")
 
 local dump = require "dump.core"
+local util = require "util"
 local report = {}
 
+local stdin = {}
+local total = 0
+local time = os.time()
 function collect(...)
+	count = count + 1
 	local stack = {...}
 	for i = #stack,1,-1 do
 		local frame = stack[i]
+		
+		stdin[frame] = (stdin[frame] or 0) + 1
+
 		local info = report[frame]
 		if not info then
 			report[frame] = {child = {},parent = {}}
@@ -20,6 +28,15 @@ function collect(...)
 		if next_frame then
 			info.child[next_frame] = (info.child[next_frame] or 0) + 1
 		end
+	end
+	local now = os.time()
+	if now - time >= 1 then
+		time = now
+		local info = {}
+		for frame,count in pairs(stdin) do
+			table.insert(info,{frame = frame,percent = count / count})
+		end
+		util.dump(stdin)
 	end
 end
 

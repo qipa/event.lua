@@ -65,7 +65,7 @@ event.fork(function ()
 		for i = 1,1024 * 10 do
 			test1()
 		end
-		event.sleep(0.01)
+		event.sleep(0.1)
 	end
 
 end)
