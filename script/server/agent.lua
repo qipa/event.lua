@@ -21,13 +21,14 @@ function client_channel:disconnect()
 
 end
 
-function client_channel:forward_login(data,size)
-	rpc.send_login("handler.login_handler","client_forward",{id = self.id,data = util.clone_string(data,size)})
+function client_channel:forward_login(message_id,data,size)
+	rpc.send_login("handler.login_handler","client_forward",{client_id = self.id,message_id = message_id,data = util.clone_string(data,size)},true)
 end
 
 function client_channel:data(data,size)
+	local id,data,size = self.packet:unpack(data,size)
 	if not self.login then
-		self:forward_login(data,size)
+		self:forward_login(id,data,size)
 	else
 		local id,data,size = self.packet:unpack(data,size)
 		local name = protocol_forward.forward[id]

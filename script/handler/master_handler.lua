@@ -9,23 +9,23 @@ local _M = {}
 
 local channel_ctx = {}
 
-function _M.enter(channel)
+function enter(channel)
 	local ctx = {channel = channel}
 	model.bind_channel_ctx_with_channel(channel,ctx)
 end
 
-function _M.leave(channel)
+function leave(channel)
 	model.unbind_channel_ctx_with_channel(channel)
 end
 
-function _M.register(name,port)
+function register(name,port)
 	local ctx = model.fetch_channel_ctx_with_channel(channel)
 	ctx.name = name
 	ctx.port = port
 	return "ok"
 end
 
-function _M.get_info(name)
+function get_info(name)
 	local result = {}
 	for ch,ctx in pairs(model.fetch_channel_ctx()) do
 		if ctx.name == name then
@@ -35,7 +35,7 @@ function _M.get_info(name)
 	return result
 end
 
-function _M.console(cmd,...)
+function console(cmd,...)
 	local args = {...}
 	local session = event.gen_session()
 	event.fork(function ()
@@ -65,4 +65,3 @@ function _M.console(cmd,...)
 	return event.wait(session)
 end
 
-return _M

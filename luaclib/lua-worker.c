@@ -308,7 +308,7 @@ send_mail(lua_State* L) {
 			break;
 		}
 		default:
-			luaL_error(L,"unkown type:%s",lua_typename(L,lua_type(L,4)));
+			luaL_error(L,"unkown type:%s",lua_typename(L,lua_type(L,3)));
 	}
 
 	struct mail_message* mail = malloc(sizeof(*mail));

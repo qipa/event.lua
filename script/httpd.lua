@@ -21,17 +21,17 @@ function master_channel:disconnect()
 end
 
 event.fork(function ()
- --    local channel,err
- --    while not channel do
- --        channel,err = event.connect(string.format("tcp://127.0.0.1:%d",env.master),4,master_channel)
- --        if not channel then
- --            event.error(string.format("httpd connect master:%d failed:%s",env.master,err))
- --            event.sleep(1)
- --        end
- --    end
-	-- event.error(string.format("httpd connect master:%d success",env.master))
+    local channel,err
+    while not channel do
+        channel,err = event.connect(string.format("tcp://127.0.0.1:%d",env.master),4,master_channel)
+        if not channel then
+            event.error(string.format("httpd connect master:%d failed:%s",env.master,err))
+            event.sleep(1)
+        end
+    end
+	event.error(string.format("httpd connect master:%d success",env.master))
     
- --    channel:call("handler.master_handler","register","httpd")
+    channel:call("handler.master_handler","register","httpd")
 
 
 

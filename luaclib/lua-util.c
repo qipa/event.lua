@@ -443,7 +443,20 @@ lpacket_pack(lua_State* L) {
     struct packet* packet = lua_touserdata(L, 1);
     int id = lua_tointeger(L, 2);
     size_t size;
-    const char* data = luaL_checklstring(L, 3, &size);
+    const char* data = NULL;
+    switch(lua_type(L,3)) {
+        case LUA_TSTRING: {
+            data = lua_tolstring(L, 3, &size);
+            break;
+        }
+        case LUA_TLIGHTUSERDATA:{
+            data = lua_touserdata(L, 3);
+            size = lua_tointeger(L, 4);
+            break;
+        }
+        default:
+            luaL_error(L,"unkown type:%s",lua_typename(L,lua_type(L,3)));
+    }
 
     size_t total = size + sizeof(short) * 2;
 
