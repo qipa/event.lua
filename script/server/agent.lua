@@ -3,6 +3,7 @@ local channel = require "channel"
 local util = require "util"
 local model = require "model"
 local protocol = require "protocol"
+local protocol_forward = import "server.protocol_forward"
 
 local rpc = import "server.rpc"
 
@@ -25,13 +26,12 @@ function client_channel:forward_login(data,size)
 end
 
 function client_channel:data(data,size)
-	print("data",data,size)
-	local id,data,size = self.packet:unpack(data,size)
-	table.print(protocol.decode.c2s_auth(data,size))
 	if not self.login then
 		self:forward_login(data,size)
 	else
-		local message = protocol.decode.c2s_auth(data,size)
+		local id,data,size = self.packet:unpack(data,size)
+		local name = protocol_forward.forward[id]
+		local message = protocol.decode[name](data,size)
 	end
 end
 

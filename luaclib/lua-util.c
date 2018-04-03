@@ -422,7 +422,7 @@ struct packet {
 static int
 lpacket_unpack(lua_State* L) {
     struct packet* packet = lua_touserdata(L, 1);
-    char* data = lua_touserdata(L, 2);
+    uint8_t* data = lua_touserdata(L, 2);
     size_t size = lua_tointeger(L, 3);
 
     int i;
@@ -447,15 +447,15 @@ lpacket_pack(lua_State* L) {
 
     size_t total = size + sizeof(short) * 2;
 
-    char* mb = malloc(total);
+    uint8_t* mb = malloc(total);
     memset(mb,0,total);
     memcpy(mb,&total,2);
     memcpy(mb+2,&id,2);
-    memcpy(mb+4,&data,size);
+    memcpy(mb+4,data,size);
 
     int i;
     for (i = 2; i < total; ++i) {
-        char tmp = mb[i];
+        uint8_t tmp = mb[i];
         mb[i] = mb[i] ^ packet->wseed;
         packet->wseed += tmp;
     }
