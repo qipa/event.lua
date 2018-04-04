@@ -28,6 +28,7 @@ struct client_manager {
 	struct ev_loop* loop;
 	struct ev_listener* listener;
 	struct object_container* container;
+	int alive;
 	accept_callback accept_func;
 	close_callback close_func;
 	data_callback data_func;
@@ -59,6 +60,8 @@ read_complete(struct ev_session* ev_session, void* ud) {
 			if (total >= 2) {
 				uint8_t header[2];
 				ev_session_read(ev_session,(char*)header,2);
+				client->need = header[0] | header[1] << 8;
+				client->need -= 2;
 			} else {
 				return;
 			}
@@ -130,6 +133,7 @@ client_manager_init(struct client_manager* manager,struct ev_loop* loop,size_t m
 	manager->container = container_create(max);
 	manager->loop = loop;
 	manager->ud = ud;
+	manager->alive = 1;
 }
 
 int
@@ -203,6 +207,7 @@ client_manager_release(struct client_manager* manager) {
 	client_manager_stop(manager);
 	container_foreach(manager->container,close_client);
 	container_release(manager->container);
+	manager->alive = 0;
 }
 
 static void 
@@ -229,7 +234,7 @@ ldata(void* ud,int client_id,int message_id,void* data,size_t size) {
 	lua_pushinteger(callback_ud->L, message_id);
 	lua_pushlightuserdata(callback_ud->L, data);
 	lua_pushinteger(callback_ud->L, size);
-	lua_pcall(callback_ud->L, 3, 0, 0);
+	lua_pcall(callback_ud->L, 4, 0, 0);
 }
 
 static int
@@ -335,11 +340,13 @@ lclient_manager_set_callback(lua_State* L) {
 	return 0;
 }
 
-static int
+int
 lclient_manager_release(lua_State* L) {
 	struct client_manager* manager = lua_touserdata(L, 1);
-	client_manager_release(manager);
-	free(manager->ud);
+	if (manager->alive == 1) {
+		client_manager_release(manager);
+		free(manager->ud);
+	}
 	return 0;
 }
 
@@ -358,14 +365,12 @@ lcreate_client_manager(lua_State* L,struct ev_loop* loop,size_t max) {
             { "stop", lclient_manager_stop },
             { "close", lclient_manager_close },
             { "send", lclient_manager_send },
+            { "release", lclient_manager_release },
             { "set_callback", lclient_manager_set_callback },
             { NULL, NULL },
         };
         luaL_newlib(L,meta_client_manager);
         lua_setfield(L, -2, "__index");
-
-        lua_pushcfunction(L, lclient_manager_release);
-        lua_setfield(L, -2, "__gc");
     }
     lua_setmetatable(L, -2);
     return 1;

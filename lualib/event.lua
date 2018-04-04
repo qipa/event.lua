@@ -22,6 +22,7 @@ local _channel_ctx = setmetatable({},{__mode = "k"})
 local _timer_ctx = setmetatable({},{__mode = "k"})
 local _udp_ctx = setmetatable({},{__mode = "k"})
 local _mailbox_ctx = setmetatable({},{__mode = "k"})
+local _client_manager_ctx = setmetatable({},{__mode = "k"})
 
 local co_running = coroutine.running
 local co_yield = coroutine.yield
@@ -184,6 +185,14 @@ function _M.mailbox(func)
 	return mailbox,fd
 end
 
+function _M.client_manager(max)
+	local client_mgr = _event:client_manager(max)
+	if client_mgr then
+		_client_manager_ctx[client_mgr] = true
+	end
+	return client_mgr
+end
+
 function _M.run_process(cmd,line)
     local FILE = io.popen(cmd)
     local fd = FILE:fd()
@@ -269,6 +278,10 @@ function _M.dispatch()
 		if mailbox:alive() then
 			mailbox:release()
 		end
+	end
+
+	for client_mgr in pairs(_client_manager_ctx) do
+		client_mgr:release()
 	end
 	
 	_event:release()
