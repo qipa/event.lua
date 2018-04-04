@@ -878,6 +878,18 @@ _lmailbox_new(lua_State* L) {
 	return 2;
 }
 
+extern int lcreate_client_manager(lua_State* L,struct ev_loop* loop,size_t max);
+
+static int
+_client_manager_new(lua_State* L) {
+	struct lua_ev* lev = (struct lua_ev*)lua_touserdata(L, 1);
+	int max = luaL_checkinteger(L, 2);
+	if (max <= 0) {
+		luaL_error(L,"error create client manager,size invalid");
+	}
+	return lcreate_client_manager(L,lev->loop,max);
+}
+
 static int
 _dispatch(lua_State* L) {
 	struct lua_ev* lev = (struct lua_ev*)lua_touserdata(L, 1);
@@ -899,7 +911,6 @@ _break(lua_State* L) {
 	ev_break(lev->loop,EVBREAK_ALL);
 	return 0;
 }
-
 
 static int
 _event_new(lua_State* L) {
@@ -933,6 +944,7 @@ luaopen_ev_core(lua_State* L) {
 		{ "bind", _bind },
 		{ "udp", _udp_new },
 		{ "mailbox", _lmailbox_new },
+		{ "client_manager", _client_manager_new },
 		{ "breakout", _break },
 		{ "dispatch", _dispatch },
 		{ "release", _release },

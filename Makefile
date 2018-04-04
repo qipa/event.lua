@@ -90,7 +90,7 @@ efence :
 $(TARGET) : $(MAIN_OBJ) $(STATIC_LIBS)
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS) -Wl,-E
 
-$(LUA_CLIB_PATH)/ev.so : $(LUA_CLIB_SRC)/lua-ev.c $(LUA_CLIB_SRC)/socket_event.c $(LUA_CLIB_SRC)/socket_util.c $(LIBEV_SHARE_LIB) | $(LUA_CLIB_PATH)
+$(LUA_CLIB_PATH)/ev.so : $(LUA_CLIB_SRC)/lua-ev.c $(LUA_CLIB_SRC)/lua-client.c $(LUA_CLIB_SRC)/socket_event.c $(LUA_CLIB_SRC)/socket_util.c $(LUA_CLIB_SRC)/object_container.c $(LIBEV_SHARE_LIB) | $(LUA_CLIB_PATH)
 	$(CC) $(CFLAGS) -Wno-strict-aliasing $(SHARED) $^ -o $@ -I$(LUA_INC) -I$(LIBEV_INC)
 
 $(LUA_CLIB_PATH)/worker.so : $(LUA_CLIB_SRC)/lua-worker.c $(LUA_CLIB_SRC)/message_queue.c | $(LUA_CLIB_PATH)
