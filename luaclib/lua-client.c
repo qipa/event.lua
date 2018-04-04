@@ -8,6 +8,7 @@
 #include "lua.h"
 #include "lualib.h"
 #include "lauxlib.h"
+#include "lstate.h"
 
 #include "ev.h"
 #include "socket_event.h"
@@ -62,6 +63,7 @@ read_complete(struct ev_session* ev_session, void* ud) {
 				ev_session_read(ev_session,(char*)header,2);
 				client->need = header[0] | header[1] << 8;
 				client->need -= 2;
+				assert(client->need > 0);
 			} else {
 				return;
 			}
@@ -122,6 +124,12 @@ accept_client(struct ev_listener *listener, int fd, char* info, void *ud) {
 	client->manager = manager;
 	client->session = ev_session_bind(manager->loop,fd);
 	client->id = container_add(manager->container,client->session);
+	client->need = 0;
+	if (client->id == -1) {
+		ev_session_free(client->session);
+		free(client);
+		return;
+	}
 	client->seed = 0;
 	ev_session_setcb(client->session,read_complete,NULL,error_happen,client);
 	ev_session_enable(client->session,EV_READ);
@@ -355,7 +363,7 @@ int
 lcreate_client_manager(lua_State* L,struct ev_loop* loop,size_t max) {
 	struct callback_ud* ud = malloc(sizeof(*ud));
 	memset(ud,0,sizeof(*ud));
-	ud->L = L;
+	ud->L = G(L)->mainthread;//callback must be run in main thread
 
 	struct client_manager* manager = lua_newuserdata(L, sizeof(*manager));
 	client_manager_init(manager,loop,max,ud);

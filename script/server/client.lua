@@ -18,7 +18,9 @@ local _M = {}
 
 function _M.login(channel,account)
 	local data = protocol.encode.c2s_auth({account = account})
-	channel:write(channel.packet:pack(1,data))
+	for i = 1,1024 * 1024 do
+		channel:write(channel.packet:pack(1,data))
+	end
 end
 
 event.fork(function ()

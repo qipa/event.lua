@@ -83,17 +83,17 @@ gcc: unrecognized option '-qversion'
 gcc: no input files
 configure:3167: $? = 1
 configure:3187: checking whether the C compiler works
-configure:3209: gcc    conftest.c  >&5
+configure:3209: gcc   -lrt -lm -ldl -lpthread -lssl -lstdc++ conftest.c  >&5
 configure:3213: $? = 0
 configure:3261: result: yes
 configure:3264: checking for C compiler default output file name
 configure:3266: result: a.out
 configure:3272: checking for suffix of executables
-configure:3279: gcc -o conftest    conftest.c  >&5
+configure:3279: gcc -o conftest   -lrt -lm -ldl -lpthread -lssl -lstdc++ conftest.c  >&5
 configure:3283: $? = 0
 configure:3305: result: 
 configure:3327: checking whether we are cross compiling
-configure:3335: gcc -o conftest    conftest.c  >&5
+configure:3335: gcc -o conftest   -lrt -lm -ldl -lpthread -lssl -lstdc++ conftest.c  >&5
 configure:3339: $? = 0
 configure:3346: ./conftest
 configure:3350: $? = 0
@@ -196,7 +196,7 @@ configure:6040: gcc -c -g -O3  conftest.c >&5
 configure:6043: $? = 0
 configure:6047: /usr/bin/nm -B conftest.o \| sed -n -e 's/^.*[ ]\([ABCDGIRSTW][ABCDGIRSTW]*\)[ ][ ]*\([_A-Za-z][_A-Za-z0-9]*\)$/\1 \2 \2/p' | sed '/ __gnu_lto/d' \> conftest.nm
 configure:6050: $? = 0
-configure:6116: gcc -o conftest -g -O3   conftest.c conftstm.o >&5
+configure:6116: gcc -o conftest -g -O3  -lrt -lm -ldl -lpthread -lssl -lstdc++ conftest.c conftstm.o >&5
 configure:6119: $? = 0
 configure:6157: result: ok
 configure:6194: checking for sysroot
@@ -247,7 +247,7 @@ configure: failed program was:
 configure:7332: checking for ANSI C header files
 configure:7352: gcc -c -g -O3  conftest.c >&5
 configure:7352: $? = 0
-configure:7425: gcc -o conftest -g -O3   conftest.c  >&5
+configure:7425: gcc -o conftest -g -O3  -lrt -lm -ldl -lpthread -lssl -lstdc++ conftest.c  >&5
 configure:7425: $? = 0
 configure:7425: ./conftest
 configure:7425: $? = 0
@@ -322,7 +322,7 @@ configure:9790: gcc -shared  -fPIC -DPIC conftest.o  -v -Wl,-soname -Wl,conftest
 configure:9793: $? = 0
 configure:9807: result: no
 configure:9967: checking dynamic linker characteristics
-configure:10467: gcc -o conftest -g -O3   -Wl,-rpath -Wl,/foo conftest.c  >&5
+configure:10467: gcc -o conftest -g -O3  -lrt -lm -ldl -lpthread -lssl -lstdc++ -Wl,-rpath -Wl,/foo conftest.c  >&5
 configure:10467: $? = 0
 configure:10701: result: GNU/Linux ld.so
 configure:10808: checking how to hardcode library paths into programs
@@ -590,16 +590,16 @@ configure:11488: result: yes
 configure:11488: checking for sys/signalfd.h
 configure:11488: result: yes
 configure:11502: checking for inotify_init
-configure:11502: gcc -o conftest -g -O3   conftest.c  >&5
+configure:11502: gcc -o conftest -g -O3  -lrt -lm -ldl -lpthread -lssl -lstdc++ conftest.c  >&5
 configure:11502: $? = 0
 configure:11502: result: yes
 configure:11502: checking for epoll_ctl
-configure:11502: gcc -o conftest -g -O3   conftest.c  >&5
+configure:11502: gcc -o conftest -g -O3  -lrt -lm -ldl -lpthread -lssl -lstdc++ conftest.c  >&5
 configure:11502: $? = 0
 configure:11502: result: yes
 configure:11502: checking for kqueue
-configure:11502: gcc -o conftest -g -O3   conftest.c  >&5
-/tmp/ccs1iuJZ.o: In function `main':
+configure:11502: gcc -o conftest -g -O3  -lrt -lm -ldl -lpthread -lssl -lstdc++ conftest.c  >&5
+/tmp/ccltA76k.o: In function `main':
 /data/caiguanqiu/event.lua/3rd/libev/conftest.c:65: undefined reference to `kqueue'
 collect2: ld returned 1 exit status
 configure:11502: $? = 1
@@ -674,8 +674,8 @@ configure: failed program was:
 | }
 configure:11502: result: no
 configure:11502: checking for port_create
-configure:11502: gcc -o conftest -g -O3   conftest.c  >&5
-/tmp/ccxcvw5Y.o: In function `main':
+configure:11502: gcc -o conftest -g -O3  -lrt -lm -ldl -lpthread -lssl -lstdc++ conftest.c  >&5
+/tmp/cc4Xkjqp.o: In function `main':
 /data/caiguanqiu/event.lua/3rd/libev/conftest.c:65: undefined reference to `port_create'
 collect2: ld returned 1 exit status
 configure:11502: $? = 1
@@ -750,172 +750,34 @@ configure: failed program was:
 | }
 configure:11502: result: no
 configure:11502: checking for poll
-configure:11502: gcc -o conftest -g -O3   conftest.c  >&5
+configure:11502: gcc -o conftest -g -O3  -lrt -lm -ldl -lpthread -lssl -lstdc++ conftest.c  >&5
 configure:11502: $? = 0
 configure:11502: result: yes
 configure:11502: checking for select
-configure:11502: gcc -o conftest -g -O3   conftest.c  >&5
+configure:11502: gcc -o conftest -g -O3  -lrt -lm -ldl -lpthread -lssl -lstdc++ conftest.c  >&5
 configure:11502: $? = 0
 configure:11502: result: yes
 configure:11502: checking for eventfd
-configure:11502: gcc -o conftest -g -O3   conftest.c  >&5
+configure:11502: gcc -o conftest -g -O3  -lrt -lm -ldl -lpthread -lssl -lstdc++ conftest.c  >&5
 configure:11502: $? = 0
 configure:11502: result: yes
 configure:11502: checking for signalfd
-configure:11502: gcc -o conftest -g -O3   conftest.c  >&5
+configure:11502: gcc -o conftest -g -O3  -lrt -lm -ldl -lpthread -lssl -lstdc++ conftest.c  >&5
 configure:11502: $? = 0
 configure:11502: result: yes
 configure:11514: checking for clock_gettime
-configure:11514: gcc -o conftest -g -O3   conftest.c  >&5
-/tmp/ccOyGEE8.o: In function `main':
-/data/caiguanqiu/event.lua/3rd/libev/conftest.c:69: undefined reference to `clock_gettime'
-collect2: ld returned 1 exit status
-configure:11514: $? = 1
-configure: failed program was:
-| /* confdefs.h */
-| #define PACKAGE_NAME ""
-| #define PACKAGE_TARNAME ""
-| #define PACKAGE_VERSION ""
-| #define PACKAGE_STRING ""
-| #define PACKAGE_BUGREPORT ""
-| #define PACKAGE_URL ""
-| #define PACKAGE "libev"
-| #define VERSION "4.22"
-| #define STDC_HEADERS 1
-| #define HAVE_SYS_TYPES_H 1
-| #define HAVE_SYS_STAT_H 1
-| #define HAVE_STDLIB_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_MEMORY_H 1
-| #define HAVE_STRINGS_H 1
-| #define HAVE_INTTYPES_H 1
-| #define HAVE_STDINT_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_DLFCN_H 1
-| #define LT_OBJDIR ".libs/"
-| #define HAVE_SYS_INOTIFY_H 1
-| #define HAVE_SYS_EPOLL_H 1
-| #define HAVE_POLL_H 1
-| #define HAVE_SYS_SELECT_H 1
-| #define HAVE_SYS_EVENTFD_H 1
-| #define HAVE_SYS_SIGNALFD_H 1
-| #define HAVE_INOTIFY_INIT 1
-| #define HAVE_EPOLL_CTL 1
-| #define HAVE_POLL 1
-| #define HAVE_SELECT 1
-| #define HAVE_EVENTFD 1
-| #define HAVE_SIGNALFD 1
-| /* end confdefs.h.  */
-| /* Define clock_gettime to an innocuous variant, in case <limits.h> declares clock_gettime.
-|    For example, HP-UX 11i <limits.h> declares gettimeofday.  */
-| #define clock_gettime innocuous_clock_gettime
-| 
-| /* System header to define __stub macros and hopefully few prototypes,
-|     which can conflict with char clock_gettime (); below.
-|     Prefer <limits.h> to <assert.h> if __STDC__ is defined, since
-|     <limits.h> exists even on freestanding compilers.  */
-| 
-| #ifdef __STDC__
-| # include <limits.h>
-| #else
-| # include <assert.h>
-| #endif
-| 
-| #undef clock_gettime
-| 
-| /* Override any GCC internal prototype to avoid an error.
-|    Use char because int might match the return type of a GCC
-|    builtin and then its argument prototype would still apply.  */
-| #ifdef __cplusplus
-| extern "C"
-| #endif
-| char clock_gettime ();
-| /* The GNU C library defines this for functions which it implements
-|     to always fail with ENOSYS.  Some functions are actually named
-|     something starting with __ and the normal name is an alias.  */
-| #if defined __stub_clock_gettime || defined __stub___clock_gettime
-| choke me
-| #endif
-| 
-| int
-| main ()
-| {
-| return clock_gettime ();
-|   ;
-|   return 0;
-| }
-configure:11514: result: no
-configure:11523: checking for clock_gettime syscall
-configure:11538: gcc -o conftest -g -O3   conftest.c  >&5
-configure:11538: $? = 0
-configure:11543: result: yes
+configure:11514: gcc -o conftest -g -O3  -lrt -lm -ldl -lpthread -lssl -lstdc++ conftest.c  >&5
+configure:11514: $? = 0
+configure:11514: result: yes
 configure:11618: checking for nanosleep
-configure:11618: gcc -o conftest -g -O3   conftest.c  >&5
+configure:11618: gcc -o conftest -g -O3  -lrt -lm -ldl -lpthread -lssl -lstdc++ conftest.c  >&5
 configure:11618: $? = 0
 configure:11618: result: yes
 configure:11693: checking for library containing floor
-configure:11724: gcc -o conftest -g -O3   conftest.c  >&5
-conftest.c:44: warning: conflicting types for built-in function 'floor'
-/tmp/cc4mQxo7.o: In function `main':
-/data/caiguanqiu/event.lua/3rd/libev/conftest.c:48: undefined reference to `floor'
-collect2: ld returned 1 exit status
-configure:11724: $? = 1
-configure: failed program was:
-| /* confdefs.h */
-| #define PACKAGE_NAME ""
-| #define PACKAGE_TARNAME ""
-| #define PACKAGE_VERSION ""
-| #define PACKAGE_STRING ""
-| #define PACKAGE_BUGREPORT ""
-| #define PACKAGE_URL ""
-| #define PACKAGE "libev"
-| #define VERSION "4.22"
-| #define STDC_HEADERS 1
-| #define HAVE_SYS_TYPES_H 1
-| #define HAVE_SYS_STAT_H 1
-| #define HAVE_STDLIB_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_MEMORY_H 1
-| #define HAVE_STRINGS_H 1
-| #define HAVE_INTTYPES_H 1
-| #define HAVE_STDINT_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_DLFCN_H 1
-| #define LT_OBJDIR ".libs/"
-| #define HAVE_SYS_INOTIFY_H 1
-| #define HAVE_SYS_EPOLL_H 1
-| #define HAVE_POLL_H 1
-| #define HAVE_SYS_SELECT_H 1
-| #define HAVE_SYS_EVENTFD_H 1
-| #define HAVE_SYS_SIGNALFD_H 1
-| #define HAVE_INOTIFY_INIT 1
-| #define HAVE_EPOLL_CTL 1
-| #define HAVE_POLL 1
-| #define HAVE_SELECT 1
-| #define HAVE_EVENTFD 1
-| #define HAVE_SIGNALFD 1
-| #define HAVE_CLOCK_SYSCALL 1
-| #define HAVE_NANOSLEEP 1
-| /* end confdefs.h.  */
-| 
-| /* Override any GCC internal prototype to avoid an error.
-|    Use char because int might match the return type of a GCC
-|    builtin and then its argument prototype would still apply.  */
-| #ifdef __cplusplus
-| extern "C"
-| #endif
-| char floor ();
-| int
-| main ()
-| {
-| return floor ();
-|   ;
-|   return 0;
-| }
-configure:11724: gcc -o conftest -g -O3   conftest.c -lm   >&5
+configure:11724: gcc -o conftest -g -O3  -lrt -lm -ldl -lpthread -lssl -lstdc++ conftest.c  >&5
 conftest.c:44: warning: conflicting types for built-in function 'floor'
 configure:11724: $? = 0
-configure:11741: result: -lm
+configure:11741: result: none required
 configure:11865: checking that generated files are newer than configure
 configure:11871: result: done
 configure:11898: creating ./config.status
@@ -937,7 +799,6 @@ on localhost.localdomain
 
 config.status:1098: creating Makefile
 config.status:1098: creating config.h
-config.status:1279: config.h is unchanged
 config.status:1327: executing depfiles commands
 config.status:1327: executing libtool commands
 
@@ -955,8 +816,8 @@ ac_cv_env_CPPFLAGS_set=
 ac_cv_env_CPPFLAGS_value=
 ac_cv_env_CPP_set=
 ac_cv_env_CPP_value=
-ac_cv_env_LDFLAGS_set=
-ac_cv_env_LDFLAGS_value=
+ac_cv_env_LDFLAGS_set=set
+ac_cv_env_LDFLAGS_value='-lrt -lm -ldl -lpthread -lssl -lstdc++'
 ac_cv_env_LIBS_set=
 ac_cv_env_LIBS_value=
 ac_cv_env_build_alias_set=
@@ -965,7 +826,7 @@ ac_cv_env_host_alias_set=
 ac_cv_env_host_alias_value=
 ac_cv_env_target_alias_set=
 ac_cv_env_target_alias_value=
-ac_cv_func_clock_gettime=no
+ac_cv_func_clock_gettime=yes
 ac_cv_func_epoll_ctl=yes
 ac_cv_func_eventfd=yes
 ac_cv_func_inotify_init=yes
@@ -1012,7 +873,7 @@ ac_cv_prog_ac_ct_STRIP=strip
 ac_cv_prog_cc_c89=
 ac_cv_prog_cc_g=yes
 ac_cv_prog_make_make_set=yes
-ac_cv_search_floor=-lm
+ac_cv_search_floor='none required'
 am_cv_CC_dependencies_compiler_type=gcc3
 am_cv_make_support_nested_variables=yes
 am_cv_prog_cc_c_o=yes
@@ -1084,9 +945,9 @@ INSTALL_PROGRAM='${INSTALL}'
 INSTALL_SCRIPT='${INSTALL}'
 INSTALL_STRIP_PROGRAM='$(install_sh) -c -s'
 LD='/usr/bin/ld -m elf_x86_64'
-LDFLAGS=''
+LDFLAGS='-lrt -lm -ldl -lpthread -lssl -lstdc++'
 LIBOBJS=''
-LIBS='-lm '
+LIBS=''
 LIBTOOL='$(SHELL) $(top_builddir)/libtool'
 LIPO=''
 LN_S='ln -s'
@@ -1204,7 +1065,7 @@ target_alias=''
 #define HAVE_SELECT 1
 #define HAVE_EVENTFD 1
 #define HAVE_SIGNALFD 1
-#define HAVE_CLOCK_SYSCALL 1
+#define HAVE_CLOCK_GETTIME 1
 #define HAVE_NANOSLEEP 1
 #define HAVE_FLOOR 1
 

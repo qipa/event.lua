@@ -33,9 +33,7 @@ ev.lo: ev.c config.h /usr/include/stdlib.h /usr/include/features.h \
  /usr/include/sys/resource.h /usr/include/bits/resource.h \
  /usr/include/unistd.h /usr/include/bits/posix_opt.h \
  /usr/include/bits/environments.h /usr/include/bits/confname.h \
- /usr/include/getopt.h /usr/include/sys/syscall.h \
- /usr/include/asm/unistd.h /usr/include/asm/unistd_64.h \
- /usr/include/bits/syscall.h /usr/include/sys/statfs.h \
+ /usr/include/getopt.h /usr/include/sys/statfs.h \
  /usr/include/bits/statfs.h /usr/include/sys/inotify.h \
  /usr/include/stdint.h /usr/include/bits/wchar.h /usr/include/inttypes.h \
  /usr/include/math.h /usr/include/bits/huge_val.h \
@@ -190,14 +188,6 @@ ev.h:
 /usr/include/bits/confname.h:
 
 /usr/include/getopt.h:
-
-/usr/include/sys/syscall.h:
-
-/usr/include/asm/unistd.h:
-
-/usr/include/asm/unistd_64.h:
-
-/usr/include/bits/syscall.h:
 
 /usr/include/sys/statfs.h:
 

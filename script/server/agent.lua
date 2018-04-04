@@ -14,7 +14,6 @@ model.register_binder("client","id")
 local function client_data(client_id,message_id,data,size)
 	print(client_id,message_id,data,size)
 	local client_info = model.fetch_client_with_id(client_id)
-	
 	if not client_info.login then
 		rpc.send_login("handler.login_handler","client_forward",{client_id = client_id,message_id = message_id,data = util.clone_string(data,size)},true)
 	else
@@ -25,7 +24,7 @@ end
 
 local function client_accept(id)
 	print("client_accept",id)
-	model.bind(id,{login = false})
+	model.bind_client_with_id(id,{login = false})
 end
 
 local function client_close(id)
@@ -43,7 +42,7 @@ event.fork(function ()
 	-- mongodb:init("sunset")
 	-- model.set_mongodb(mongodb)
 
-	local client_manager = event.client_manager(1024)
+	client_manager = event.client_manager(1024)
 	local callback = {
 		accept = client_accept,
 		close = client_close,
