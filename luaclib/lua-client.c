@@ -102,8 +102,8 @@ error_happen(struct ev_session* session,void* ud) {
 	int id = client->id;
 	ev_session_free(client->session);
 	container_remove(client->manager->container,client->id);
-	free(client);
 	client->manager->close_func(client->manager->ud,id);
+	free(client);
 }
 
 static void 
@@ -122,6 +122,7 @@ accept_client(struct ev_listener *listener, int fd, char* info, void *ud) {
 	client->manager = manager;
 	client->session = ev_session_bind(manager->loop,fd);
 	client->id = container_add(manager->container,client->session);
+	client->seed = 0;
 	ev_session_setcb(client->session,read_complete,NULL,error_happen,client);
 	ev_session_enable(client->session,EV_READ);
 	manager->accept_func(manager->ud,client->id);
