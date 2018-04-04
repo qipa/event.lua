@@ -29,7 +29,6 @@ struct client_manager {
 	struct ev_loop* loop;
 	struct ev_listener* listener;
 	struct object_container* container;
-	int alive;
 	accept_callback accept_func;
 	close_callback close_func;
 	data_callback data_func;
@@ -44,8 +43,11 @@ struct ev_client {
 	uint8_t seed;
 };
 
-struct callback_ud {
+struct lclient_manager {
+	struct client_manager* manager;
+	int alive;
 	lua_State* L;
+	int ref;
 	int accept_ref;
 	int close_ref;
 	int data_ref;
@@ -136,13 +138,14 @@ accept_client(struct ev_listener *listener, int fd, char* info, void *ud) {
 	manager->accept_func(manager->ud,client->id);
 }
 
-void
-client_manager_init(struct client_manager* manager,struct ev_loop* loop,size_t max,void* ud) {
+struct client_manager*
+client_manager_create(struct ev_loop* loop,size_t max,void* ud) {
+	struct client_manager* manager = malloc(sizeof(*manager));
 	memset(manager,0,sizeof(*manager));
 	manager->container = container_create(max);
 	manager->loop = loop;
 	manager->ud = ud;
-	manager->alive = 1;
+	return manager;
 }
 
 int
@@ -216,51 +219,51 @@ client_manager_release(struct client_manager* manager) {
 	client_manager_stop(manager);
 	container_foreach(manager->container,close_client);
 	container_release(manager->container);
-	manager->alive = 0;
+	free(manager);
 }
 
 static void 
 laccept(void* ud,int id) {
-	struct callback_ud* callback_ud = ud;
-	lua_rawgeti(callback_ud->L, LUA_REGISTRYINDEX, callback_ud->accept_ref);
-	lua_pushinteger(callback_ud->L, id);
-	lua_pcall(callback_ud->L, 1, 0, 0);
+	struct lclient_manager* client_manager = ud;
+	lua_rawgeti(client_manager->L, LUA_REGISTRYINDEX, client_manager->accept_ref);
+	lua_pushinteger(client_manager->L, id);
+	lua_pcall(client_manager->L, 1, 0, 0);
 }
 
 static void 
 lclose(void* ud,int id) {
-	struct callback_ud* callback_ud = ud;
-	lua_rawgeti(callback_ud->L, LUA_REGISTRYINDEX, callback_ud->close_ref);
-	lua_pushinteger(callback_ud->L, id);
-	lua_pcall(callback_ud->L, 1, 0, 0);
+	struct lclient_manager* client_manager = ud;
+	lua_rawgeti(client_manager->L, LUA_REGISTRYINDEX, client_manager->close_ref);
+	lua_pushinteger(client_manager->L, id);
+	lua_pcall(client_manager->L, 1, 0, 0);
 }
 
 static void
 ldata(void* ud,int client_id,int message_id,void* data,size_t size) {
-	struct callback_ud* callback_ud = ud;
-	lua_rawgeti(callback_ud->L, LUA_REGISTRYINDEX, callback_ud->data_ref);
-	lua_pushinteger(callback_ud->L, client_id);
-	lua_pushinteger(callback_ud->L, message_id);
-	lua_pushlightuserdata(callback_ud->L, data);
-	lua_pushinteger(callback_ud->L, size);
-	lua_pcall(callback_ud->L, 4, 0, 0);
+	struct lclient_manager* client_manager = ud;
+	lua_rawgeti(client_manager->L, LUA_REGISTRYINDEX, client_manager->data_ref);
+	lua_pushinteger(client_manager->L, client_id);
+	lua_pushinteger(client_manager->L, message_id);
+	lua_pushlightuserdata(client_manager->L, data);
+	lua_pushinteger(client_manager->L, size);
+	lua_pcall(client_manager->L, 4, 0, 0);
 }
 
 static int
 lclient_manager_start(lua_State* L){
-	struct client_manager* manager = lua_touserdata(L, 1);
+	struct lclient_manager* client_manager = lua_touserdata(L, 1);
 	const char* ip = luaL_checkstring(L, 2);
 	int port = luaL_checkinteger(L, 3);
-	if (!manager->accept_func) {
+	if (!client_manager->manager->accept_func) {
 		luaL_error(L,"client manager start error,should set accept callback first");
 	}
-	if (!manager->close_func) {
+	if (!client_manager->manager->close_func) {
 		luaL_error(L,"client manager start error,should set close callback first");
 	}
-	if (!manager->data_func) {
+	if (!client_manager->manager->data_func) {
 		luaL_error(L,"client manager start error,should set data callback first");
 	}
-	if (client_manager_start(manager,ip,port) == -1) {
+	if (client_manager_start(client_manager->manager,ip,port) == -1) {
 		lua_pushboolean(L, 0);
 		lua_pushstring(L, strerror(errno));
 		return 2;
@@ -271,31 +274,31 @@ lclient_manager_start(lua_State* L){
 
 static int
 lclient_manager_stop(lua_State* L) {
-	struct client_manager* manager = lua_touserdata(L, 1);
-	if (!manager->listener)
+	struct lclient_manager* client_manager = lua_touserdata(L, 1);
+	if (!client_manager->manager->listener)
 		luaL_error(L,"client manager stop failed,no listener");
-	client_manager_stop(manager);
+	client_manager_stop(client_manager->manager);
 	return 0;
 }
 
 static int
 lclient_manager_close(lua_State* L) {
-	struct client_manager* manager = lua_touserdata(L, 1);
+	struct lclient_manager* client_manager = lua_touserdata(L, 1);
 	int client_id = luaL_checkinteger(L, 2);
-	struct ev_client* client = container_get(manager->container,client_id);
+	struct ev_client* client = container_get(client_manager->manager->container,client_id);
 	if (!client)
 		luaL_error(L,"client manager send failed,no such client:%d",client_id);
-	client_manager_close(manager,client_id);
+	client_manager_close(client_manager->manager,client_id);
 	return 0;
 }
 
 static int
 lclient_manager_send(lua_State* L) {
-	struct client_manager* manager = lua_touserdata(L, 1);
+	struct lclient_manager* client_manager = lua_touserdata(L, 1);
 	int client_id = luaL_checkinteger(L, 2);
 	int message_id = luaL_checkinteger(L, 3);
 
-	struct ev_client* client = container_get(manager->container,client_id);
+	struct ev_client* client = container_get(client_manager->manager->container,client_id);
 	if (!client)
 		luaL_error(L,"client manager send failed,no such client:%d",client_id);
 
@@ -320,7 +323,7 @@ lclient_manager_send(lua_State* L) {
     if (size == 0)
     	luaL_error(L,"client manager send failed,size is zero");
 
-    client_manager_send(manager,client_id,message_id,data,size);
+    client_manager_send(client_manager->manager,client_id,message_id,data,size);
     if (need_free)
     	free(data);
     return 0;
@@ -328,45 +331,45 @@ lclient_manager_send(lua_State* L) {
 
 static int
 lclient_manager_set_callback(lua_State* L) {
-	struct client_manager* manager = lua_touserdata(L, 1);
+	struct lclient_manager* client_manager = lua_touserdata(L, 1);
 	luaL_checktype(L, 2, LUA_TTABLE);
-
-	struct callback_ud* ud = manager->ud;
 
 	lua_getfield(L, 2, "accept");
 	luaL_checktype(L, -1, LUA_TFUNCTION);
-	ud->accept_ref = luaL_ref(L, LUA_REGISTRYINDEX);
+	client_manager->accept_ref = luaL_ref(L, LUA_REGISTRYINDEX);
 
 	lua_getfield(L, 2, "close");
 	luaL_checktype(L, -1, LUA_TFUNCTION);
-	ud->close_ref = luaL_ref(L, LUA_REGISTRYINDEX);
+	client_manager->close_ref = luaL_ref(L, LUA_REGISTRYINDEX);
 
 	lua_getfield(L, 2, "data");
 	luaL_checktype(L, -1, LUA_TFUNCTION);
-	ud->data_ref = luaL_ref(L, LUA_REGISTRYINDEX);
+	client_manager->data_ref = luaL_ref(L, LUA_REGISTRYINDEX);
 
-	client_manager_callback(manager,laccept,lclose,ldata);
+	client_manager_callback(client_manager->manager,laccept,lclose,ldata);
 	return 0;
 }
 
 int
 lclient_manager_release(lua_State* L) {
-	struct client_manager* manager = lua_touserdata(L, 1);
-	if (manager->alive == 1) {
-		client_manager_release(manager);
-		free(manager->ud);
+	struct lclient_manager* client_manager = lua_touserdata(L, 1);
+	if (client_manager->alive == 1) {
+		client_manager->alive = 0;
+		client_manager_release(client_manager->manager);
+		luaL_unref(L, LUA_REGISTRYINDEX, client_manager->ref);
+		luaL_unref(L, LUA_REGISTRYINDEX, client_manager->accept_ref);
+		luaL_unref(L, LUA_REGISTRYINDEX, client_manager->close_ref);
+		luaL_unref(L, LUA_REGISTRYINDEX, client_manager->data_ref);
 	}
 	return 0;
 }
 
 int
 lcreate_client_manager(lua_State* L,struct ev_loop* loop,size_t max) {
-	struct callback_ud* ud = malloc(sizeof(*ud));
-	memset(ud,0,sizeof(*ud));
-	ud->L = G(L)->mainthread;//callback must be run in main thread
-
-	struct client_manager* manager = lua_newuserdata(L, sizeof(*manager));
-	client_manager_init(manager,loop,max,ud);
+	struct lclient_manager* client_manager = lua_newuserdata(L, sizeof(*client_manager));
+	client_manager->manager = client_manager_create(loop,max,client_manager);
+	client_manager->alive = 1;
+	client_manager->L = G(L)->mainthread;//callback must be run in main thread
 
 	if (luaL_newmetatable(L, "meta_client_manager")) {
         const luaL_Reg meta_client_manager[] = {
@@ -382,5 +385,9 @@ lcreate_client_manager(lua_State* L,struct ev_loop* loop,size_t max) {
         lua_setfield(L, -2, "__index");
     }
     lua_setmetatable(L, -2);
+
+    lua_pushvalue(L, -1);
+    client_manager->ref = luaL_ref(L, LUA_REGISTRYINDEX);
+
     return 1;
 }
