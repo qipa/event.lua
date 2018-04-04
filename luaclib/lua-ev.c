@@ -192,12 +192,9 @@ read_complete(struct ev_session* ev_session, void* ud) {
 						return;
 
 					char* data = THREAD_CACHED_BUFFER;
-					int needfree = 0;
-					if (lev_session->need > THREAD_CACHED_SIZE) {
-						needfree = 1;
+					if (lev_session->need > THREAD_CACHED_SIZE)
 						data = malloc(lev_session->need);
-					}
-			
+
 					ev_session_read(lev_session->session,data,lev_session->need);
 
 					lua_rawgeti(lev->main, LUA_REGISTRYINDEX, lev->callback);
@@ -208,7 +205,7 @@ read_complete(struct ev_session* ev_session, void* ud) {
 					lua_pcall(lev->main, 4, 0, 0);
 					lev_session->state = STATE_HEAD;
 
-					if (needfree)
+					if (data != THREAD_CACHED_BUFFER)
 						free(data);
 					break;
 				}

@@ -28,7 +28,7 @@ end
 
 function test_thread_rpc0(args)
 	local now = util.time()
-	local count = 1024 * 1024
+	local count = 1024
 	for i = 1,count do
 		worker.call_worker(1,"handler.test_handler","test_thread_rpc1",{fuck = "you"},function ()
 			if i == count then

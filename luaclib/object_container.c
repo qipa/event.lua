@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include "object_container.h"
 
 struct object_sot {
 	int index;
@@ -53,6 +54,16 @@ void*
 container_get(struct object_container* container,int id) {
 	void* object = container->mgr[id];
 	return object;
+}
+
+void
+container_foreach(struct object_container* container,foreach_func func) {
+	int i;
+	for(i = 0;i < container->size;i++) {
+		if (container->mgr[i]) {
+			func(i,container->mgr[i]);
+		}
+	}
 }
 
 int

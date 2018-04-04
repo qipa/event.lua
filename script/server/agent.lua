@@ -3,6 +3,7 @@ local channel = require "channel"
 local util = require "util"
 local model = require "model"
 local protocol = require "protocol"
+local mongo = require "mongo"
 local protocol_forward = import "server.protocol_forward"
 
 local rpc = import "server.rpc"
@@ -10,6 +11,7 @@ local rpc = import "server.rpc"
 local client_channel = channel:inherit()
 
 model.register_binder("client","id")
+model.register_value("mongodb")
 
 local countor = 1
 
@@ -47,5 +49,12 @@ end
 event.fork(function ()
 	protocol.parse("login")
 	protocol.load()
+	local mongodb,reason = event.connect("tcp://127.0.0.1:10105",4,mongo)
+	if not mongodb then
+		print(reason)
+		os.exit()
+	end
+	mongodb:init("sunset")
+	model.set_mongodb(mongodb)
 	print(event.listen("tcp://0.0.0.0:1989",2,client_accept,client_channel))
 end)
