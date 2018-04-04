@@ -338,20 +338,20 @@ lreadline(lua_State* L) {
 
 static int
 lgetaddrinfo(lua_State* L) {
-    const char* host = lua_tostring(L,1);
-    int port = lua_tointeger(L,2);
+    const char* nodename = lua_tostring(L,1);
+    const char* servname = lua_tostring(L,2);
     
-    struct addrinfo ai_hints;
+    struct addrinfo hints;
     struct addrinfo* ai_list = NULL;
     struct addrinfo* ai_ptr = NULL;
 
-    memset(&ai_hints, 0, sizeof(ai_hints));
-    ai_hints.ai_family = AF_UNSPEC;
-    ai_hints.ai_socktype = SOCK_STREAM;
-    ai_hints.ai_protocol = IPPROTO_TCP;
-    ai_hints.ai_flags = AI_PASSIVE;
+    memset(&hints, 0, sizeof(hints));
+    hints.ai_family = AF_UNSPEC;
+    hints.ai_socktype = SOCK_STREAM;
+    hints.ai_protocol = IPPROTO_TCP;
+    hints.ai_flags = AI_PASSIVE;
 
-    int status = getaddrinfo(host, NULL, &ai_hints, &ai_list);
+    int status = getaddrinfo(nodename, servname, &hints, &ai_list);
     if (status != 0) {
         free(ai_list);
         lua_pushboolean(L,0);
