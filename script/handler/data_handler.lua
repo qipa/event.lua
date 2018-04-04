@@ -22,16 +22,17 @@ function lru:insert(id)
 	local node = self.node_ctx[id]
 	if not node then
 		self.count = self.count + 1
+		node = {pre = nil,nxt = nil,id = id}
 		if self.head == nil then
-			self.head = self.tail = {pre = nil,nxt = nil,id = id}
-			self.node_ctx[id] = self.head
+			self.head = node
+			self.tail = node
 		else
-			local node = {id = id}
-			node.pre = nil
+			self.head.pre = node
 			node.nxt = self.head
 			self.head = node
-			self.node_ctx[id] = node
 		end
+
+		self.node_ctx[id] = node
 
 		if self.count > self.max then
 			local node = self.tail
@@ -47,7 +48,9 @@ function lru:insert(id)
 		local pre_node = node.pre
 		local nxt_node = node.nxt
 		pre_node.nxt = nxt_node
-		nxt_node.pre = pre_node
+		if nxt_node then
+			nxt_node.pre = pre_node
+		end
 		node.pre = nil
 		node.nxt = self.head
 		self.head = node
