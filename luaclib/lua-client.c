@@ -43,16 +43,6 @@ struct ev_client {
 	uint8_t seed;
 };
 
-struct lclient_manager {
-	struct client_manager* manager;
-	int alive;
-	lua_State* L;
-	int ref;
-	int accept_ref;
-	int close_ref;
-	int data_ref;
-};
-
 static void
 read_complete(struct ev_session* ev_session, void* ud) {
 	struct ev_client* client = ud;
@@ -221,6 +211,16 @@ client_manager_release(struct client_manager* manager) {
 	container_release(manager->container);
 	free(manager);
 }
+
+struct lclient_manager {
+	struct client_manager* manager;
+	int alive;
+	lua_State* L;
+	int ref;
+	int accept_ref;
+	int close_ref;
+	int data_ref;
+};
 
 static void 
 laccept(void* ud,int id) {
