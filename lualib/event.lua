@@ -145,7 +145,7 @@ function _M.connect(addr,header,channel_class)
 	end
 	local result,error_or_buffer = _M.wait(session)
 	if result then
-		return create_channel(channel_class,error_or_buffer,ip,port)
+		return create_channel(channel_class,error_or_buffer,info.file or string.format("%s:%s",info.ip,info.port))
 	else
 		return false,error_or_buffer
 	end
