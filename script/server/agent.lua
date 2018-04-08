@@ -15,7 +15,7 @@ local function client_data(client_id,message_id,data,size)
 	print(client_id,message_id,data,size)
 	local client_info = model.fetch_client_with_id(client_id)
 	if not client_info.login then
-		rpc.send_login("handler.login_handler","client_forward",{client_id = client_id,message_id = message_id,data = util.clone_string(data,size)},true)
+		rpc.send_login("handler.login_handler","client_forward",{client_id = client_id,message_id = message_id,data = string.copy(data,size)},true)
 	else
 		local name = protocol_forward.forward[message_id]
 		local message = protocol.decode[name](data,size)

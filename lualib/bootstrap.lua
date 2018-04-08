@@ -25,6 +25,7 @@ table.decode = dump.unpack
 table.tostring = dump.tostring
 
 string.split = util.split
+string.copy = util.clone_string
 
 _G.MODEL_BINDER = model.register_binder
 _G.MODEL_VALUE = model.register_value
