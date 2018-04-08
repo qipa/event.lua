@@ -13,7 +13,7 @@ _cached_data = _cached_data or {}
 _log_ctx = _log_ctx or nil
 _data_in_log = _data_in_log or {}
 
-local LOG_MAX_TO_DIST = 1 * 1024 * 1024
+local LOG_MAX_TO_DIST = 16 * 1024 * 1024
 local LOG_PATH = "./tmp/"
 
 local OP = {UPDATE = 1,SET = 2}
@@ -115,6 +115,8 @@ local function find_cached(name,id)
 	return cached_ctx.ctx[id].data
 end
 
+--把所有从日志文件的数据，写到各自的文件中
+--尽量减少磁盘的随机写，收集数据，一次性写入
 local function log_recover(validate)
 	local FILE = assert(io.open(string.format("%s/data.log",LOG_PATH),"r"))
 	if not FILE then
