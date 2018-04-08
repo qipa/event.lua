@@ -115,11 +115,13 @@ local function find_cached(name,id)
 	return cached_ctx.ctx[id].data
 end
 
-local function log_recover()
+local function log_recover(validate)
 	local FILE = assert(io.open(string.format("%s/data.log",LOG_PATH),"r"))
 	if not FILE then
 		return
 	end
+
+	local need_dump_disk = {}
 
 	while true do
 		local name = FILE:read()
@@ -128,23 +130,63 @@ local function log_recover()
 		end
 		local id = FILE:read()
 		local op = tonumber(FILE:read())
-		local md5 = FILE:read()
+		local md5_origin = FILE:read()
 		local size = FILE:read()
 		local content = FILE:read(tonumber(size))
-		if op == OP.UPDATE then
-			local fs = get_persistence(name)
-			fs:save(id,table.decode(content))
-		else
+		if validate then
+			local md5_content = tohex(MD5(content))
+			if md5_origin ~= md5_content then
+				print("log recover failed")
+				os.exit(1)
+			end
+		end
 
+		if op == OP.UPDATE then
+			local info = need_dump_disk[name]
+			if not info then
+				info = {}
+				need_dump_disk[name] = info
+			end
+			info[tonumber(id)] = content
+		else
+			local info = need_dump_disk[name]
+			if not info then
+				info = {}
+				need_dump_disk[name] = info
+			end
+
+			local data = info[tonumber(id)]
+			if data then
+				data = find_cached(name,tonumber(id))
+				if not data then
+					local fs = get_persistence(name)
+					data = fs:load(tonumber(id))
+				end
+				if data then
+					info[tonumber(id)] = data
+				end
+			end
+			assert(data ~= nil,id)
+			for k,v in pairs(content) do
+				data[k] = v
+			end
 		end
 	end
+
 	FILE:close()
+
+	for name,info in pairs(need_dump_disk) do
+		local fs = get_persistence(name)
+		for id,data in pairs(info) do
+			fs:save(id,data)
+		end
+	end
 	_data_in_log = {}
 end
 
 local function log_flush()
 	_log_ctx.FILE:close()
-	log_recover()
+	log_recover(false)
 	os.remove(string.format("%s/data.log",LOG_PATH))
 	local FILE = assert(io.open(string.format("%s/data.log",LOG_PATH),"a+"))
 	if not FILE then
@@ -156,6 +198,13 @@ local function log_flush()
 end
 
 local function log_data(name,id,data,op)
+	local info = _data_in_log[name]
+	if not info then
+		info = {}
+		_data_in_log[name] = info
+	end
+	info[id] = true
+
 	if not _log_ctx then
 		local FILE = assert(io.open(string.format("%s/data.log",LOG_PATH),"a+"))
 		_log_ctx = {}
@@ -183,14 +232,17 @@ end
 function load(args)
 	local name = args.name
 	local id = args.id
+	local field = args.field
 	
 	local data = find_cached(name,id)
 	if not data then
+		--缓存没有数据，看看是否在最近的log里
 		local info = _data_in_log[name]
 		if info and info[id] then
 			log_flush()
 		end
-	
+		
+		--从磁盘里load出来
 		local fs = get_persistence(name)
 		data = fs:load(id)
 		if data then
@@ -198,7 +250,16 @@ function load(args)
 		end
 	end
 
-	return data
+	if not field or next(field) == nil then
+		return data
+	end
+
+	local result = {}
+	for f in pairs(field) do
+		result[f] = data[f]
+	end
+
+	return result
 end
 
 function update(args)
@@ -207,12 +268,6 @@ function update(args)
 	local data = args.data
 	update_cached(name,id,data)
 	log_data(name,id,data,0)
-	local info = _data_in_log[name]
-	if not info then
-		info = {}
-		_data_in_log[name] = info
-	end
-	info[id] = true
 end
 
 function set(args)
@@ -221,15 +276,16 @@ function set(args)
 	local setter = args.setter
 	set_cached(name,id,setter)
 	log_data(name,id,setter,1)
-	local info = _data_in_log[name]
-	if not info then
-		info = {}
-		_data_in_log[name] = info
-	end
-	info[id] = true
 end
 
-log_recover()
+function stop()
+	_log_ctx.FILE:close()
+	log_recover(false)
+	os.remove(string.format("%s/data.log",LOG_PATH))
+end
+
+--启动的时候先从日志文件里恢复
+log_recover(true)
 
 event.fork(function ()
 	event.timer(1,function ()
