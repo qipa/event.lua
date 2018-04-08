@@ -8,11 +8,10 @@ function channel:inherit()
 	return children
 end
 
-function channel:new(buffer,ip,port)
+function channel:new(buffer,addr)
 	local ctx = setmetatable({},{__index = self})
 	ctx.buffer = buffer
-	ctx.ip = ip or "unknown"
-	ctx.port = port or "unknown"
+	ctx.addr = addr or "unknown"
 	ctx.session_ctx = {}
 	return ctx
 end

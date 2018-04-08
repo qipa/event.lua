@@ -270,7 +270,7 @@ function update(args)
 	local id = args.id
 	local data = args.data
 	update_cached(name,id,data)
-	log_data(name,id,data,1)
+	log_data(name,id,data,OP.UPDATE)
 end
 
 function set(args)
@@ -278,7 +278,7 @@ function set(args)
 	local id = args.id
 	local setter = args.setter
 	set_cached(name,id,setter)
-	log_data(name,id,setter,2)
+	log_data(name,id,setter,OP.SET)
 end
 
 function stop()

@@ -71,12 +71,12 @@ local function co_monitor(co,ok,state,session)
 	end
 end
 
-local function create_channel(channel_class,buffer,ip,port)
+local function create_channel(channel_class,buffer,addr)
 	local channel_obj
 	if channel_class then
-		channel_obj = channel_class:new(buffer,ip,port)
+		channel_obj = channel_class:new(buffer,addr)
 	else
-		channel_obj = channel:new(buffer,ip,port)
+		channel_obj = channel:new(buffer,addr)
 	end
 	channel_obj:init()
 	_channel_ctx[buffer] = channel_obj
@@ -135,9 +135,9 @@ function _M.connect(addr,header,channel_class)
 	end
 	local ok,err
 	if info.file then
-		ok,err = _event:connect(header,session,true,info.file)
+		ok,err = _event:connect(false,header,session,true,info.file)
 	else
-		ok,err = _event:connect(header,session,false,info.ip,info.port)
+		ok,err = _event:connect(false,header,session,false,info.ip,info.port)
 	end
 
 	if not ok then
@@ -149,6 +149,24 @@ function _M.connect(addr,header,channel_class)
 	else
 		return false,error_or_buffer
 	end
+end
+
+function _M.block_connect(addr,header,channel_class)
+	local info = resolve_addr(addr)
+	if not info then
+		return false,string.format("error addr:%s",addr)
+	end
+	local buffer,reason
+	if info.file then
+		buffer,reason = _event:connect(true,header,-1,true,info.file)
+	else
+		buffer,reason = _event:connect(true,header,-1,false,info.ip,info.port)
+	end
+
+	if not buffer then
+		return false,reason
+	end
+	return create_channel(channel_class,buffer,ip,port)
 end
 
 function _M.bind(fd,channel_class)
@@ -305,9 +323,9 @@ EV[EV_TIMEOUT] = function (timer)
 	end
 end
 
-EV[EV_ACCEPT] = function (listener,buffer,ip,port)
+EV[EV_ACCEPT] = function (listener,buffer,addr)
 	local info = _listener_ctx[listener]
-	local channel_obj = create_channel(info.channel_class,buffer,ip,port)
+	local channel_obj = create_channel(info.channel_class,buffer,addr)
 	info.callback(listener,channel_obj)
 end
 

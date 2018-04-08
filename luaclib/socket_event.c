@@ -268,16 +268,16 @@ ev_session_bind(struct ev_loop* loop,int fd) {
 }
 
 ev_session_t*
-ev_session_connect(struct ev_loop* loop,struct sockaddr* addr, int addrlen,int* status) {
-
+ev_session_connect(struct ev_loop* loop,struct sockaddr* addr, int addrlen, int block,int* status) {
 	int result = 0;
-	int fd = socket_connect(addr,addrlen,&result);
+	int fd = socket_connect(addr,addrlen,block,&result);
 	if (fd < 0) {
 		*status = CONNECT_STATUS_CONNECT_FAIL;
 		return NULL;
 	}
 	ev_session_t* ev_session = ev_session_bind(loop,fd);
 
+	//if connect op is block,result here must be true
 	*status = CONNECT_STATUS_CONNECTING;
 	if (result)
 		*status = CONNECT_STATUS_CONNECTED;

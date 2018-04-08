@@ -580,18 +580,18 @@ _listen(lua_State* L) {
 static int
 _connect(lua_State* L) {
 	struct lua_ev* lev = (struct lua_ev*)lua_touserdata(L, 1);
-	
-	int header = lua_tointeger(L, 2);
+	int block = lua_toboolean(L, 2);
+	int header = lua_tointeger(L, 3);
 	if (header != 0) {
 		if (header != HEADER_TYPE_WORD && header != HEADER_TYPE_DWORD)
 			luaL_error(L,"error header size:%d",header);
 	}
 
-	int wait = lua_tointeger(L, 3);
-	int ipc = lua_toboolean(L, 4);
+	int wait = lua_tointeger(L, 4);
+	int ipc = lua_toboolean(L, 5);
 	struct sockaddr* addr;
 	if (ipc) {
-		const char* file = lua_tostring(L, 5);
+		const char* file = lua_tostring(L, 6);
 
 		struct sockaddr_un su;
 		su.sun_family = AF_UNIX;  
@@ -599,8 +599,8 @@ _connect(lua_State* L) {
 
 		addr = (struct sockaddr*)&su;
 	} else {
-		const char* ip = lua_tostring(L, 5);
-		int port = lua_tointeger(L, 6);
+		const char* ip = lua_tostring(L, 6);
+		int port = lua_tointeger(L, 7);
 
 		struct sockaddr_in si;
 		si.sin_family = AF_INET;
@@ -614,7 +614,7 @@ _connect(lua_State* L) {
 	struct lua_ev_session* lev_session = session_create(L,lev,-1,header);
 	lev_session->lev = lev;
 	lev_session->wait = wait;
-	lev_session->session = ev_session_connect(lev->loop,addr,sizeof(*addr),&status);
+	lev_session->session = ev_session_connect(lev->loop,addr,sizeof(*addr),block,&status);
 
 	if (status == CONNECT_STATUS_CONNECT_FAIL) {
 		lua_pushboolean(L,0);
@@ -622,9 +622,11 @@ _connect(lua_State* L) {
 		return 2;
 	}
 
-	ev_session_setcb(lev_session->session,NULL,connect_complete,NULL,lev_session);
-	ev_session_enable(lev_session->session,EV_WRITE);
-	lua_pushboolean(L,1);
+	if (!block) {
+		ev_session_setcb(lev_session->session,NULL,connect_complete,NULL,lev_session);
+		ev_session_enable(lev_session->session,EV_WRITE);
+		lua_pushboolean(L,1);
+	} 
 	
 	return 1;
 }

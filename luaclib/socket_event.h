@@ -19,7 +19,7 @@ int ev_listener_fd(struct ev_listener* listener);
 void ev_listener_free(struct ev_listener* listener);
 
 struct ev_session* ev_session_bind(struct ev_loop* loop,int fd);
-struct ev_session* ev_session_connect(struct ev_loop* loop,struct sockaddr* addr, int addrlen,int* connected);
+struct ev_session* ev_session_connect(struct ev_loop* loop,struct sockaddr* addr, int addrlen, int block, int* connected);
 void ev_session_free(struct ev_session* ev_session);
 void ev_session_setcb(struct ev_session* ev_session,ev_session_callback read_cb,ev_session_callback write_cb,ev_session_callback event_cb,void* userdata);
 void ev_session_enable(struct ev_session* ev_session,int ev);

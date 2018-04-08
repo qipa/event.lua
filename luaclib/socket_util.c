@@ -117,28 +117,37 @@ socket_listen(struct sockaddr* addr, int addrlen, int backlog,int flag) {
 }
 
 int
-socket_connect(struct sockaddr* addr, int addrlen,int* connected) {
+socket_connect(struct sockaddr* addr, int addrlen, int block, int* connected) {
     int fd = socket(addr->sa_family, SOCK_STREAM, 0);
-    if (fd < 0) {
+    if (fd < 0)
         return -1;
-    }
 
     socket_keep_alive(fd);
-    socket_nonblock(fd);
     socket_closeonexec(fd);
 
-    int status = connect(fd, addr, addrlen);
-    if (status != 0 && errno != EINPROGRESS) {
-        close(fd);
-        return -1;
-    }
-
-    if(status == 0) {
+    int status;
+    if (!block) {
+        socket_nonblock(fd);
+        status = connect(fd, addr, addrlen);
+        if (status != 0 && errno != EINPROGRESS) {
+            close(fd);
+            return -1;
+        }
+        if(status == 0) {
+            *connected = 1;
+            return fd;
+        }
+        *connected = 0;
+    } else {
+        status = connect(fd, addr, addrlen);
+        if (status != 0) {
+            close(fd);
+            return -1;
+        }
+        socket_nonblock(fd);
         *connected = 1;
-        return fd;
     }
 
-    *connected = 0;
     return fd;
 }
 

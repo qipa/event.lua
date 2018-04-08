@@ -42,7 +42,7 @@ int socket_reuse_port(int fd);
 int socket_recv_buffer(int fd,int size);
 int socket_send_buffer(int fd,int size);
 
-int socket_connect(struct sockaddr* addr, int addrlen,int* connected);
+int socket_connect(struct sockaddr* addr, int addrlen, int block, int* connected);
 int socket_listen(struct sockaddr* addr, int addrlen,int backlog,int flag);
 int socket_bind(struct sockaddr *addr, int addrlen, int flag,int protocol);
 int socket_accept(int fd,char* info);
