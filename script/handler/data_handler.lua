@@ -14,7 +14,7 @@ _log_ctx = _log_ctx or nil
 _data_in_log = _data_in_log or {}
 
 local LOG_MAX_TO_DIST = 16 * 1024 * 1024
-local LOG_PATH = "./tmp/"
+local LOG_PATH = "./tmp"
 
 local OP = {UPDATE = 1,SET = 2}
 local lru = {}
@@ -118,7 +118,7 @@ end
 --把所有从日志文件的数据，写到各自的文件中
 --尽量减少磁盘的随机写，收集数据，一次性写入
 local function log_recover(validate)
-	local FILE = assert(io.open(string.format("%s/data.log",LOG_PATH),"r"))
+	local FILE = io.open(string.format("%s/data.log",LOG_PATH),"r")
 	if not FILE then
 		return
 	end
@@ -149,7 +149,7 @@ local function log_recover(validate)
 				info = {}
 				need_dump_disk[name] = info
 			end
-			info[tonumber(id)] = content
+			info[tonumber(id)] = table.decode(content)
 		else
 			local info = need_dump_disk[name]
 			if not info then
@@ -169,7 +169,8 @@ local function log_recover(validate)
 				end
 			end
 			assert(data ~= nil,id)
-			for k,v in pairs(content) do
+			local setter = table.decode(content)
+			for k,v in pairs(setter) do
 				data[k] = v
 			end
 		end
@@ -269,7 +270,7 @@ function update(args)
 	local id = args.id
 	local data = args.data
 	update_cached(name,id,data)
-	log_data(name,id,data,0)
+	log_data(name,id,data,1)
 end
 
 function set(args)
@@ -277,7 +278,7 @@ function set(args)
 	local id = args.id
 	local setter = args.setter
 	set_cached(name,id,setter)
-	log_data(name,id,setter,1)
+	log_data(name,id,setter,2)
 end
 
 function stop()
