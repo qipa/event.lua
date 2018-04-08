@@ -107,10 +107,7 @@ function _M.listen(addr,header,callback,channel_class,multi)
 	if not info then
 		return false,string.format("error addr:%s",addr)
 	end
-
-	multi = multi or false
-
-	local listener,reason = _event:listen(header,multi,info)
+	local listener,reason = _event:listen(header,multi or false,info)
 
 	if not listener then
 		return false,reason
