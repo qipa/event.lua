@@ -532,11 +532,13 @@ _listen(lua_State* L) {
 	}
 	
 	int multi = lua_toboolean(L, 3);
-	int ipc = lua_toboolean(L, 4);
+	luaL_checktype(L, 4, LUA_TTABLE);
+	lua_getfield(L, 4, "file");
 
 	struct sockaddr* addr;
-	if (ipc) {
-		const char* file = lua_tostring(L, 5);
+	if (!lua_isnil(L, -1)) {
+		const char* file = luaL_checkstring(L, -1);
+		lua_pop(L, 1);
 		unlink(file);
 
 		struct sockaddr_un su;
@@ -545,8 +547,14 @@ _listen(lua_State* L) {
 
 		addr = (struct sockaddr*)&su;
 	} else {
-		const char* ip = lua_tostring(L, 5);
-		int port = lua_tointeger(L, 6);
+		lua_pop(L, 1);
+		lua_getfield(L, 4, "ip");
+		const char* ip = luaL_checkstring(L, -1);
+		lua_pop(L, 1);
+
+		lua_getfield(L, 4, "port");
+		int port = luaL_checkinteger(L, -1);
+		lua_pop(L, 1);
 
 		struct sockaddr_in si;
 		si.sin_family = AF_INET;
@@ -580,18 +588,20 @@ _listen(lua_State* L) {
 static int
 _connect(lua_State* L) {
 	struct lua_ev* lev = (struct lua_ev*)lua_touserdata(L, 1);
-	int block = lua_toboolean(L, 2);
-	int header = lua_tointeger(L, 3);
+	int header = lua_tointeger(L, 2);
 	if (header != 0) {
 		if (header != HEADER_TYPE_WORD && header != HEADER_TYPE_DWORD)
 			luaL_error(L,"error header size:%d",header);
 	}
 
-	int wait = lua_tointeger(L, 4);
-	int ipc = lua_toboolean(L, 5);
+	int wait = lua_tointeger(L, 3);
+	luaL_checktype(L, 4, LUA_TTABLE);
+	lua_getfield(L, 4, "file");
+
 	struct sockaddr* addr;
-	if (ipc) {
-		const char* file = lua_tostring(L, 6);
+	if (!lua_isnil(L, -1)) {
+		const char* file = luaL_checkstring(L, -1);
+		lua_pop(L, 1);
 
 		struct sockaddr_un su;
 		su.sun_family = AF_UNIX;  
@@ -599,8 +609,14 @@ _connect(lua_State* L) {
 
 		addr = (struct sockaddr*)&su;
 	} else {
-		const char* ip = lua_tostring(L, 6);
-		int port = lua_tointeger(L, 7);
+		lua_pop(L, 1);
+		lua_getfield(L, 4, "ip");
+		const char* ip = luaL_checkstring(L, -1);
+		lua_pop(L, 1);
+
+		lua_getfield(L, 4, "port");
+		int port = luaL_checkinteger(L, -1);
+		lua_pop(L, 1);
 
 		struct sockaddr_in si;
 		si.sin_family = AF_INET;
@@ -609,6 +625,10 @@ _connect(lua_State* L) {
 
 		addr = (struct sockaddr*)&si;
 	}
+
+	int block = 1;
+	if (wait > 0)
+		block = 0;
 
 	int status;
 	struct lua_ev_session* lev_session = session_create(L,lev,-1,header);

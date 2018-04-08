@@ -3,7 +3,7 @@ local mongo = require "mongo"
 local helper = require "helper"
 
 event.fork(function ()
-	local channel,reason = event.block_connect("tcp://127.0.0.1:10105",4,mongo)
+	local channel,reason = event.connect("tcp://127.0.0.1:10105",4,mongo)
 	if not channel then
 		print(reason)
 		os.exit(1)

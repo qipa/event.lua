@@ -110,12 +110,7 @@ function _M.listen(addr,header,callback,channel_class,multi)
 
 	multi = multi or false
 
-	local listener,reason
-	if info.file then
-		listener,reason = _event:listen(header,multi,true,info.file)
-	else
-		listener,reason = _event:listen(header,multi,false,info.ip,info.port)
-	end
+	local listener,reason = _event:listen(header,multi,info)
 
 	if not listener then
 		return false,reason
@@ -135,9 +130,9 @@ function _M.connect(addr,header,channel_class)
 	end
 	local ok,err
 	if info.file then
-		ok,err = _event:connect(false,header,session,true,info.file)
+		ok,err = _event:connect(header,session,info)
 	else
-		ok,err = _event:connect(false,header,session,false,info.ip,info.port)
+		ok,err = _event:connect(header,session,info)
 	end
 
 	if not ok then
@@ -158,9 +153,9 @@ function _M.block_connect(addr,header,channel_class)
 	end
 	local buffer,reason
 	if info.file then
-		buffer,reason = _event:connect(true,header,-1,true,info.file)
+		buffer,reason = _event:connect(header,0,info)
 	else
-		buffer,reason = _event:connect(true,header,-1,false,info.ip,info.port)
+		buffer,reason = _event:connect(header,0,info)
 	end
 
 	if not buffer then
