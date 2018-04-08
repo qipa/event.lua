@@ -166,7 +166,7 @@ function _M.block_connect(addr,header,channel_class)
 	if not buffer then
 		return false,reason
 	end
-	return create_channel(channel_class,buffer,ip,port)
+	return create_channel(channel_class,buffer,info.file or string.format("%s:%s",info.ip,info.port))
 end
 
 function _M.bind(fd,channel_class)
