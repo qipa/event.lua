@@ -9,6 +9,6 @@ event.fork(function ()
 	end
 	for i = 1,1024 do
 		local data =channel:call("handler.data_handler","load_data",{name = "user",id = i})
-		table.print(data)
 	end
+	print("done")
 end)
