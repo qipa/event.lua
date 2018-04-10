@@ -6,11 +6,7 @@ local util = require "util"
 
 local _ctx
 
-local _M = setmetatable({},{__gc = function ()
-	if _ctx then
-		protocolcore.release(_ctx)
-	end
-end})
+local _M = {}
 
 local function replace_field(info)
 	if info.fields ~= nil then
@@ -95,22 +91,26 @@ function _M.load()
 	local decode = {}
 
 	local name_map = {}
+
 	_ctx = protocolcore.new()
 	for i,info in ipairs(meta) do
 		_ctx:load(i,info.name,info.proto)
+
+		encode[info.name] = function (tbl)
+			return _ctx:encode(i,tbl)
+		end
+
+		decode[i] = function (data,size)
+			local message =  _ctx:decode(data,size)
+			return info.name,message
+		end
+
 		name_map[info.name] = i
-
-		encode[i] = function (tbl)
-			return _ctx:encode(_ctx,i,tbl)
-		end
-
-		decode[i] = function (...)
-			return _ctx:decode(_ctx,i,...)
-		end
 	end
 
 	_M.encode = encode
 	_M.decode = decode
+	_M.handler = {}
 end
 
 function _M.dump(id)
