@@ -103,10 +103,6 @@ error_happen(struct ev_session* session,void* ud) {
 static void 
 accept_client(struct ev_listener *listener, int fd, const char* addr, void *ud) {
 	struct client_manager* manager = ud;
-	if (fd < 0) {
-		fprintf(stderr,"accept fd error:%s\n",addr);
-		return;
-	}
 
 	socket_nonblock(fd);
 	socket_keep_alive(fd);
@@ -264,6 +260,7 @@ lclient_manager_start(lua_State* L){
 	if (!client_manager->manager->data_func) {
 		luaL_error(L,"client manager start error,should set data callback first");
 	}
+	client_manager_stop(client_manager->manager);
 	if (client_manager_start(client_manager->manager,ip,port) == -1) {
 		lua_pushboolean(L, 0);
 		lua_pushstring(L, strerror(errno));
@@ -276,9 +273,9 @@ lclient_manager_start(lua_State* L){
 static int
 lclient_manager_stop(lua_State* L) {
 	struct lclient_manager* client_manager = lua_touserdata(L, 1);
-	if (!client_manager->manager->listener)
-		luaL_error(L,"client manager stop failed,no listener");
-	client_manager_stop(client_manager->manager);
+	if (client_manager_stop(client_manager->manager) < 0) {
+		luaL_error(L,"client manager already stop");
+	}
 	return 0;
 }
 

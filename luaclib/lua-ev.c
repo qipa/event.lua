@@ -275,11 +275,6 @@ accept_socket(struct ev_listener *listener, int fd, const char* addr, void *ud) 
 	struct lua_ev_listener* lev_listener = ud;
 	struct lua_ev* lev = lev_listener->lev;
 
-	if (fd < 0) {
-		fprintf(stderr,"accept fd error:%s\n",addr);
-		return;
-	}
-
 	socket_nonblock(fd);
 	socket_keep_alive(fd);
 	socket_closeonexec(fd);
