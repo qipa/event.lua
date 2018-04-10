@@ -41,6 +41,7 @@ struct ev_client {
 	int id;
 	int need;
 	uint8_t seed;
+	uint16_t order;
 };
 
 static void
@@ -75,9 +76,19 @@ read_complete(struct ev_session* ev_session, void* ud) {
 			        data[i] = data[i] ^ client->seed;
 			        client->seed += data[i];
 			    }
-			    ushort id = data[0] | data[1] << 8;
+			    ushort order = data[0] | data[1] << 8;
+			    ushort id = data[2] | data[3] << 8;
 
-			    client->manager->data_func(client->manager->ud,client->id,id,&data[2],client->need - 2);
+			    if (order != client->order) {
+			    	ev_session_free(client->session);
+					container_remove(client->manager->container,client->id);
+					client->manager->close_func(client->manager->ud,id);
+					free(client);
+					return;
+			    } else {
+			    	client->order++;
+			    }
+			    client->manager->data_func(client->manager->ud,client->id,id,&data[3],client->need - 4);
 
 			    if (data != CACHED_BUFFER)
 			    	free(data);
@@ -119,6 +130,7 @@ accept_client(struct ev_listener *listener, int fd, const char* addr, void *ud) 
 		return;
 	}
 	client->seed = 0;
+	client->order = 0;
 	ev_session_setcb(client->session,read_complete,NULL,error_happen,client);
 	ev_session_enable(client->session,EV_READ);
 	manager->accept_func(manager->ud,client->id,addr);
