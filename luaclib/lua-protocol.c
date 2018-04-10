@@ -878,7 +878,7 @@ lprotocol_ctx_release(lua_State* L) {
 }
 
 int
-_dump_all_protocol(lua_State* L) {
+ldump_protocol(lua_State* L) {
 	struct context* ctx = lua_touserdata(L,1);
 	lua_newtable(L);
 	int i;
@@ -917,7 +917,7 @@ dump_nest(lua_State* L,struct field* parent) {
 }
 
 int
-_dump_protocol(lua_State* L) {
+ldetail_protocol(lua_State* L) {
 	struct context* ctx = lua_touserdata(L,1);
 	int index = lua_tointeger(L,2);
 	if (index >= ctx->cap) {
@@ -976,8 +976,8 @@ lprotocol_ctx_new(lua_State* L) {
             { "load", lload_protocol },
             { "encode", lencode_protocol },
 			{ "decode", ldecode_protocol },
-			{ "dump_all", _dump_all_protocol },
-			{ "dump", _dump_protocol },
+			{ "dump", ldump_protocol },
+			{ "detail", ldetail_protocol },
             { NULL, NULL },
         };
         luaL_newlib(L,meta_protocol);

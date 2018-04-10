@@ -113,23 +113,33 @@ function _M.load()
 	_M.decode = decode
 end
 
-function _M.dump(name)
-	if not name then
-		local map = protocolcore.dump_all(_ctx)
-		for name in pairs(map) do
-			_M.dump(name)
+function _M.dump(id)
+	if not id then
+		local map = _ctx:dump()
+		for name,id in pairs(map) do
+			_M.dump(id)
 		end
 		return
 	end
-	local map = protocolcore.dump_all(_ctx)
+	local map = _ctx:detail(id)
+	table.print(map)
 end
 
-function _M.dumpfile(path)
-	for name,raw in pairs(_protocol_raw) do
-		local fd = io.open(string.format("%s/%s.dump",path,name),"w")
-		fd:write(raw)
-		fd:close()
+function _M.dumpfile()
+	local meta = {}
+	for _,raw in pairs(_protocol_raw) do
+		local info = load("return"..raw)()
+		for name,proto in pairs(info) do
+			table.insert(meta,{name = name,proto = proto})
+		end
 	end
+	table.sort(meta,function (l,r)
+		return l.name < r.name
+	end)
+
+	local FILE = io.open("tmp/protocol.dump","w")
+	FILE:write(dump.tostring(meta))
+	FILE:close()
 end
 
 return _M
