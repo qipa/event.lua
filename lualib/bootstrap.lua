@@ -76,7 +76,7 @@ if main then
 		log_path = string.format("%s/error@%s@%s.log",env.log_path,env.name,env.uid)
 	end
 
-	local runtime_logger = logger:create("runtime",env.log_lv,log_path,5)
+	local runtime_logger = logger:create("runtime",{level = env.log_lv,addr = "ipc://log.ipc"},5)
 	event.error = function (...)
 		runtime_logger:ERROR(...)
 	end
@@ -84,7 +84,7 @@ if main then
 	local _G_protect = {}
 	function _G_protect.__newindex(self,k,v)
 		rawset(_G,k,v)
-		runtime_logger:WARN(string.format("%s:%s add to _G",k,v))
+		print(string.format("%s:%s add to _G",k,v))
 	end
 	setmetatable(_G,_G_protect)
 

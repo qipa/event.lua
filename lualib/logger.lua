@@ -1,4 +1,6 @@
+local event = require "event"
 local util = require "util"
+local channel = require "channel"
 
 local LOG_LV_ERROR = 0
 local LOG_LV_WARN = 1
@@ -12,33 +14,51 @@ local LOG_TAG = {
 	[LOG_LV_DEBUG] 	= "D",
 }
 
+
+local channel_container = {}
+local logger_container = {}
+local logger_FILE = nil
+
+local log_channel = channel:inherit()
+
+function log_channel:disconnect()
+	channel.disconnect(self)
+	channel_container[self.addr] = nil
+end
+
 local _M = {}
 
-_M.LOG_LV_ERROR = LOG_LV_ERROR
-_M.LOG_LV_WARN = LOG_LV_WARN
-_M.LOG_LV_INFO = LOG_LV_INFO
-_M.LOG_LV_DEBUG = LOG_LV_DEBUG
+function _M:create(log_type,log_conf,depth)
+	log_type = log_type or "unknown"
+	log_conf = log_conf or {}
+	depth = depth or 4
 
-function _M:create(log_type,log_level,log_file,depth)
-	local ctx = setmetatable({},{__index = self})
-	if log_file then
-		if type(log_file) == "string" then
-			ctx.FILE = assert(io.open(log_file,"a+"))
-			ctx.log_file = log_file
-		else
-			ctx.log_channel = log_file
-		end
+	local logger = logger_container[log_type]
+	if logger then
+		return logger
 	end
-	ctx.log_level = log_level or LOG_LV_DEBUG
-	ctx.log_type = log_type or "unknown"
-	ctx.depth = depth or 4
+
+	local ctx = setmetatable({},{__index = self})
+	if log_conf.file then
+		if not logger_FILE then
+			logger_FILE  = assert(io.open(log_conf.file,"a+"))
+		end
+	elseif log_conf.addr then
+		ctx.log_addr = log_conf.addr
+	end
+	ctx.log_level = log_conf.level or LOG_LV_DEBUG
+	ctx.log_type = log_type
+	ctx.depth = depth
+
+	logger_container[log_type] = ctx
+
 	return ctx
 end
 
 function _M:close()
-	if self.FILE then
-		self.FILE:flush()
-		self.FILE:close()
+	if logger_FILE then
+		logger_FILE:flush()
+		logger_FILE:close()
 	end
 end
 
@@ -54,12 +74,23 @@ local function append_log(logger,log_lv,...)
 
 	local content = string.format("[%s:%s][%s %s:%s] %s",LOG_TAG[log_lv],logger.log_type,os.date("%Y-%m-%d %H:%M:%S",now),source,tostring(line),log)
 
-	if logger.FILE then
-		logger.FILE:write(content.."\n")
-		logger.FILE:flush()
+	if logger_FILE then
+		logger_FILE:write(content.."\n")
+		logger_FILE:flush()
 	else
-		if logger.log_channel then
-			logger.log_channel:send("handler.logger_handler","log",logger.log_type,content)
+		if logger.log_addr then
+			local reason
+			local channel = channel_container[logger.log_addr]
+			if not channel then
+				channel,reason = event.connect(logger.log_addr,4,true,log_channel)
+				if not channel then
+					print(string.format("connect logger server failed,addr:%s,reason:%s",logger.log_addr,reason))
+					return
+				end
+				channel.addr = logger.log_addr
+				channel_container[logger.log_addr] = channel
+			end
+			channel:send("handler.logger_handler","log",logger.log_type,content)
 		else
 			util.print(log_lv,content)
 		end
