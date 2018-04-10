@@ -32,6 +32,7 @@
 #define HEADER_TYPE_DWORD 	4
 
 #define THREAD_CACHED_SIZE 1024 * 1024
+#define MAX_PACKET_SIZE 16 * 1024 * 1024
 
 __thread char THREAD_CACHED_BUFFER[THREAD_CACHED_SIZE];
 
@@ -191,6 +192,16 @@ read_complete(struct ev_session* ev_session, void* ud) {
 					if (len < lev_session->need)
 						return;
 
+					if (lev_session->need > MAX_PACKET_SIZE) {
+						lua_rawgeti(lev->main, LUA_REGISTRYINDEX, lev->callback);
+						lua_pushinteger(lev->main, LUA_EV_ERROR);
+						lua_rawgeti(lev->main, LUA_REGISTRYINDEX, lev_session->ref);
+						lua_pcall(lev->main, 2, 0, 0);
+						lev_session->closed = 1;
+						session_destroy(lev_session);
+						return;
+					}
+					
 					char* data = THREAD_CACHED_BUFFER;
 					if (lev_session->need > THREAD_CACHED_SIZE)
 						data = malloc(lev_session->need);
