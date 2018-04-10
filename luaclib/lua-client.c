@@ -88,7 +88,7 @@ read_complete(struct ev_session* ev_session, void* ud) {
 			    } else {
 			    	client->order++;
 			    }
-			    client->manager->data_func(client->manager->ud,client->id,id,&data[3],client->need - 4);
+			    client->manager->data_func(client->manager->ud,client->id,id,&data[4],client->need - 4);
 
 			    if (data != CACHED_BUFFER)
 			    	free(data);
