@@ -17,7 +17,7 @@
 
 #define CACHED_SIZE 1024 * 1024
 
-typedef void (*accept_callback)(void* ud,int id);
+typedef void (*accept_callback)(void* ud,int id,const char* addr);
 typedef void (*close_callback)(void* ud,int id);
 typedef void (*data_callback)(void* ud,int client_id,int message_id,void* data,size_t size);
 
@@ -101,10 +101,10 @@ error_happen(struct ev_session* session,void* ud) {
 }
 
 static void 
-accept_client(struct ev_listener *listener, int fd, char* info, void *ud) {
+accept_client(struct ev_listener *listener, int fd, const char* addr, void *ud) {
 	struct client_manager* manager = ud;
 	if (fd < 0) {
-		fprintf(stderr,"accept fd error:%s\n",info);
+		fprintf(stderr,"accept fd error:%s\n",addr);
 		return;
 	}
 
@@ -125,7 +125,7 @@ accept_client(struct ev_listener *listener, int fd, char* info, void *ud) {
 	client->seed = 0;
 	ev_session_setcb(client->session,read_complete,NULL,error_happen,client);
 	ev_session_enable(client->session,EV_READ);
-	manager->accept_func(manager->ud,client->id);
+	manager->accept_func(manager->ud,client->id,addr);
 }
 
 struct client_manager*
@@ -223,11 +223,12 @@ struct lclient_manager {
 };
 
 static void 
-laccept(void* ud,int id) {
+laccept(void* ud,int id,const char* addr) {
 	struct lclient_manager* client_manager = ud;
 	lua_rawgeti(client_manager->L, LUA_REGISTRYINDEX, client_manager->accept_ref);
 	lua_pushinteger(client_manager->L, id);
-	lua_pcall(client_manager->L, 1, 0, 0);
+	lua_pushstring(client_manager->L, addr);
+	lua_pcall(client_manager->L, 2, 0, 0);
 }
 
 static void 
@@ -332,19 +333,13 @@ lclient_manager_send(lua_State* L) {
 static int
 lclient_manager_set_callback(lua_State* L) {
 	struct lclient_manager* client_manager = lua_touserdata(L, 1);
-	luaL_checktype(L, 2, LUA_TTABLE);
+	luaL_checktype(L, 2, LUA_TFUNCTION);
+	luaL_checktype(L, 3, LUA_TFUNCTION);
+	luaL_checktype(L, 4, LUA_TFUNCTION);
 
-	lua_getfield(L, 2, "accept");
-	luaL_checktype(L, -1, LUA_TFUNCTION);
-	client_manager->accept_ref = luaL_ref(L, LUA_REGISTRYINDEX);
-
-	lua_getfield(L, 2, "close");
-	luaL_checktype(L, -1, LUA_TFUNCTION);
-	client_manager->close_ref = luaL_ref(L, LUA_REGISTRYINDEX);
-
-	lua_getfield(L, 2, "data");
-	luaL_checktype(L, -1, LUA_TFUNCTION);
 	client_manager->data_ref = luaL_ref(L, LUA_REGISTRYINDEX);
+	client_manager->close_ref = luaL_ref(L, LUA_REGISTRYINDEX);
+	client_manager->accept_ref = luaL_ref(L, LUA_REGISTRYINDEX);
 
 	client_manager_callback(client_manager->manager,laccept,lclose,ldata);
 	return 0;

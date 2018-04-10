@@ -43,11 +43,6 @@ event.fork(function ()
 	-- model.set_mongodb(mongodb)
 
 	client_manager = event.client_manager(1024)
-	local callback = {
-		accept = client_accept,
-		close = client_close,
-		data = client_data,
-	}
-	client_manager:set_callback(callback)
+	client_manager:set_callback(client_accept,client_close,client_data)
 	client_manager:start("0.0.0.0",1989)
 end)

@@ -105,8 +105,8 @@ static void
 _ev_accept_cb(struct ev_loop* loop,struct ev_io* io,int revents) {
 	ev_listener_t* listener = io->data;
 
-	char info[HOST_SIZE] = {0};
-	int accept_fd = socket_accept(listener->fd,info);
+	const char info[HOST_SIZE] = {0};
+	int accept_fd = socket_accept(listener->fd,(char*)info);
 	listener->accept_cb(listener,accept_fd,info,listener->userdata);
 }
 

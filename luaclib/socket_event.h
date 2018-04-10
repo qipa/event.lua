@@ -11,7 +11,7 @@
 struct ev_listener;
 struct ev_session;
 
-typedef void (*listener_callback)(struct ev_listener*,int fd,char* info, void *userdata);
+typedef void (*listener_callback)(struct ev_listener*,int fd,const char* addr, void *userdata);
 typedef void (*ev_session_callback)(struct ev_session*,void *userdata);
 
 struct ev_listener* ev_listener_bind(struct ev_loop* loop,struct sockaddr* addr, int addrlen,int backlog,int flag,listener_callback accept_cb,void* userdata);

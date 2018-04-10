@@ -271,12 +271,12 @@ connect_complete(struct ev_session* session,void *userdata) {
 }
 
 static void 
-accept_socket(struct ev_listener *listener, int fd, char* info, void *ud) {
+accept_socket(struct ev_listener *listener, int fd, const char* addr, void *ud) {
 	struct lua_ev_listener* lev_listener = ud;
 	struct lua_ev* lev = lev_listener->lev;
 
 	if (fd < 0) {
-		fprintf(stderr,"accept fd error:%s\n",info);
+		fprintf(stderr,"accept fd error:%s\n",addr);
 		return;
 	}
 
@@ -293,7 +293,7 @@ accept_socket(struct ev_listener *listener, int fd, char* info, void *ud) {
 	lua_pushinteger(lev->main, LUA_EV_ACCEPT);
 	lua_rawgeti(lev->main, LUA_REGISTRYINDEX, lev_listener->ref);
 	lua_pushvalue(lev->main,-4);
-	lua_pushstring(lev->main,info);
+	lua_pushstring(lev->main,addr);
 
 	lua_pcall(lev->main, 4, 0, 0);
 }
@@ -472,7 +472,8 @@ _session_write(lua_State* L) {
 
 static int
 _session_close(lua_State* L) {
-	int immediately = luaL_checkboolean(L, 1, 1);
+	luaL_checktype(L, 1, LUA_TBOOLEAN);
+	int immediately = lua_toboolean(L, 1);
 
 	struct lua_ev_session* lev_session = (struct lua_ev_session*)lua_touserdata(L, 1);
 	if (lev_session->closed == 1)
