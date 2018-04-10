@@ -416,7 +416,9 @@ lclone_string(lua_State* L) {
 
 struct packet {
     uint8_t rseed;
+    uint16_t rorder;
     uint8_t wseed;
+    uint16_t worder;
 };
 
 static int
@@ -458,13 +460,16 @@ lpacket_pack(lua_State* L) {
             luaL_error(L,"unkown type:%s",lua_typename(L,lua_type(L,3)));
     }
 
-    size_t total = size + sizeof(short) * 2;
+    size_t total = size + sizeof(short) * 3;
 
     uint8_t* mb = malloc(total);
     memset(mb,0,total);
     memcpy(mb,&total,2);
-    memcpy(mb+2,&id,2);
-    memcpy(mb+4,data,size);
+    memcpy(mb+2,&packet->worder,2);
+    memcpy(mb+4,&id,2);
+    memcpy(mb+6,data,size);
+
+    packet->worder++;
 
     int i;
     for (i = 2; i < total; ++i) {
@@ -480,8 +485,7 @@ lpacket_pack(lua_State* L) {
 static int
 lpacket_new(lua_State* L) {
     struct packet* packet = lua_newuserdata(L, sizeof(*packet));
-    packet->rseed = 0;
-    packet->wseed = 0;
+    memset(packet,0,sizeof(*packet));
 
     if (luaL_newmetatable(L, "meta_packte")) {
         const luaL_Reg meta_packte[] = {

@@ -56,3 +56,5 @@
 [E:runtime][1970-06-26 15:31:52 @./script/server/agent.lua:56] error
 [E:runtime][1970-06-26 15:31:52 @./script/server/agent.lua:56] error
 [E:runtime][1970-06-26 15:31:52 @./script/server/agent.lua:56] error
+[E:runtime][1970-06-26 15:33:31 @./lualib/import.lua:24] handler.agent_handler local var:protocol:4,
+[E:runtime][1970-06-26 15:33:31 @lualib/bootstrap.lua:103] thread:31328 start,command:event@server/agent@101,lua mem:203.416016kb,c mem:297.156250kb
