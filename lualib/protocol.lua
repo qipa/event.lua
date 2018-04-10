@@ -50,7 +50,6 @@ local _protocol_raw = {}
 function _M.parse(file)
 	local fullfile = string.format("%s.protocol",file)
 	local tbl = parser.parse("./protocol/",fullfile)
-	table.print(tbl)
 	remake_field(tbl.root.children)
 	replace_sub_protocol(tbl.root.children,function (protocol)
 		for _,field in pairs(protocol.fields) do
@@ -85,26 +84,31 @@ function _M.load()
 	for _,raw in pairs(_protocol_raw) do
 		local info = load("return"..raw)()
 		for name,proto in pairs(info) do
-			meta[name] = proto
+			table.insert(meta,{name = name,proto = proto})
 		end
 	end
-
-	_ctx = protocolcore.load(meta)
-	local map = protocolcore.dump_all(_ctx)
+	table.sort(meta,function (l,r)
+		return l.name < r.name
+	end)
 
 	local encode = {}
 	local decode = {}
-	for name in pairs(meta) do
-		encode[name] = function (tbl)
-			local info = meta[name]
-			return protocolcore.encode(_ctx,map[name],tbl)
+
+	local name_map = {}
+	_ctx = protocolcore.new()
+	for i,info in ipairs(meta) do
+		_ctx:load(i,info.name,info.proto)
+		name_map[info.name] = i
+
+		encode[i] = function (tbl)
+			return _ctx:encode(_ctx,i,tbl)
 		end
 
-		decode[name] = function (...)
-			local info = meta[name]
-			return protocolcore.decode(_ctx,map[name],...)
+		decode[i] = function (...)
+			return _ctx:decode(_ctx,i,...)
 		end
 	end
+
 	_M.encode = encode
 	_M.decode = decode
 end
@@ -118,7 +122,6 @@ function _M.dump(name)
 		return
 	end
 	local map = protocolcore.dump_all(_ctx)
-	table.print(protocolcore.dump(_ctx,map[name]))
 end
 
 function _M.dumpfile(path)

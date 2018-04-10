@@ -10,7 +10,7 @@ event.fork(function ()
 		local count = 0
 		for i = 1,1000 do
 			event.fork(function ()
-				local channel,err  = event.connect("tcp://127.0.0.1:1989",4,true)
+				local channel,err  = event.connect("tcp://192.168.20.90:1989",4,true)
 			
 				-- local str = ""
 				-- for i = 1,1024 do

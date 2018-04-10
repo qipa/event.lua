@@ -2,5 +2,5 @@
 
 
 forward = {
-	[1] = "c2s_auth"
+	[1] = "c2s_auth",
 }

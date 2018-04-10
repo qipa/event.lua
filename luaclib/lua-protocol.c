@@ -54,7 +54,6 @@ struct protocol {
 
 struct context {
 	struct protocol** slots;
-	int offset;
 	int cap;
 	lua_State* L;
 };
@@ -587,13 +586,13 @@ unpack_one(lua_State* L,struct message_reader* reader,struct field* f,int index,
 }
 
 int
-_encode_protocol(lua_State* L) {
+lencode_protocol(lua_State* L) {
 	struct message_writer writer;
 	writer_init(&writer);
 
 	struct context* ctx = lua_touserdata(L,1);
 	int index = luaL_checkinteger(L,2);
-	if (index >= ctx->offset) {
+	if (index >= ctx->cap || ctx->slots[index] == NULL) {
 		luaL_error(L,"index:%d error",index);
 	}
 
@@ -617,10 +616,10 @@ _encode_protocol(lua_State* L) {
 }
 
 int
-_decode_protocol(lua_State* L) {
+ldecode_protocol(lua_State* L) {
 	struct context* ctx = lua_touserdata(L,1);
 	int index = luaL_checkinteger(L,2);
-	if (index >= ctx->offset) {
+	if (index >= ctx->cap || ctx->slots[index] == NULL) {
 		luaL_error(L,"index:%d error",index);
 	}
 	size_t size;
@@ -680,7 +679,7 @@ str_alloc(struct context* ctx,const char* str,size_t size) {
 }
 
 struct protocol* 
-create_protocol(struct context* ctx,char* name,size_t size) {
+create_protocol(struct context* ctx,int id,char* name,size_t size) {
 	struct protocol* ptl = malloc(sizeof(*ptl));
 	memset(ptl,0,sizeof(*ptl));
 	ptl->name = str_alloc(ctx,name,size);
@@ -689,8 +688,10 @@ create_protocol(struct context* ctx,char* name,size_t size) {
 	ptl->field = malloc(sizeof(*ptl->field) * ptl->cap);
 	memset(ptl->field,0,sizeof(*ptl->field) * ptl->cap);
 
-	if (ctx->offset >= ctx->cap) {
+	if (id >= ctx->cap) {
 		int ncap = ctx->cap * 2;
+		if (id >= ncap)
+			ncap = id + 1;
 		struct protocol** nslots = malloc(sizeof(*nslots) * ncap);
 		memset(nslots,0,sizeof(*nslots) * ncap);
 		memcpy(nslots,ctx->slots,sizeof(*ctx->slots) * ctx->cap);
@@ -699,7 +700,7 @@ create_protocol(struct context* ctx,char* name,size_t size) {
 		ctx->cap = ncap;
 	}
 
-	ctx->slots[ctx->offset++] = ptl;
+	ctx->slots[id] = ptl;
 	return ptl;
 }
 
@@ -822,41 +823,27 @@ import_field(lua_State* L,struct context* ctx,struct protocol* ptl,int index,int
 	}
 }
 
-void
-import_protocol(lua_State* L,struct context* ctx,int index) {
-	lua_pushnil(L);
-	while (lua_next(L, index) != 0) {
-		size_t size;
-		const char* name = lua_tolstring(L,-2,&size);
-		struct protocol* ptl = create_protocol(ctx,(char*)name,size+1);
-		int depth = 0;
-		lua_getfield(L,-1,"fields");
-		if (!lua_isnil(L,-1))
-			import_field(L,ctx,ptl,lua_gettop(L),++depth);
-
-		lua_pop(L, 2);
-	}
-}
-
 int
-_load_protocol(lua_State* L) {
-	struct context* ctx = malloc(sizeof(*ctx));
-	memset(ctx,0,sizeof(*ctx));
-	ctx->cap = 64;
-	ctx->offset = 0;
-	ctx->slots = malloc(sizeof(*ctx->slots) * ctx->cap);
-	memset(ctx->slots,0,sizeof(*ctx->slots) * ctx->cap);
+lload_protocol(lua_State* L) {
+	struct context* ctx = lua_touserdata(L, 1);
+	int id = lua_tointeger(L, 2);
+	size_t size;
+	const char* name = lua_tolstring(L, 3, &size);
+	luaL_checktype(L, 4, LUA_TTABLE);
 
-	ctx->L = luaL_newstate();
-	lua_settop(ctx->L,0);
-	lua_newtable(ctx->L);
+	if (id < ctx->cap && ctx->slots[id] != NULL) {
+		luaL_error(L, "id:%d already load", id);
+	}
 
-	luaL_checkstack(L, MAX_DEPTH*2 + 8, NULL);
+	luaL_checkstack(L, MAX_DEPTH * 2 + 8, NULL);
 
-	import_protocol(L,ctx,1);
+	struct protocol* ptl = create_protocol(ctx, id, (char*)name, size + 1);
+	int depth = 0;
+	lua_getfield(L,-1,"fields");
+	if (!lua_isnil(L,-1))
+		import_field(L,ctx,ptl,lua_gettop(L),++depth);
 
-	lua_pushlightuserdata(L,ctx);
-	return 1;
+	return 0;
 }
 
 void
@@ -867,24 +854,26 @@ free_nest(struct field* f) {
 }
 
 int
-_release_protocol(lua_State* L) {
+lprotocol_ctx_release(lua_State* L) {
 	struct context* ctx = lua_touserdata(L,1);
 	int i;
-	for(i=0;i<ctx->offset;i++) {
+	for(i=0;i<ctx->cap;i++) {
 		struct protocol* ptl = ctx->slots[i];
-		int j;
-		for(j=0;j< ptl->size;j++) {
-			struct field* f = &ptl->field[j];
-			if (f->nest != NULL) {
-				free_nest(f->nest);
+		if (ptl) {
+			int j;
+			for(j=0;j< ptl->size;j++) {
+				struct field* f = &ptl->field[j];
+				if (f->nest != NULL) {
+					free_nest(f->nest);
+				}
 			}
+			free(ptl->field);
+			free(ptl);
 		}
-		free(ptl->field);
-		free(ptl);
 	}
 	free(ctx->slots);
 	lua_close(ctx->L);
-	free(ctx);
+
 	return 0;
 }
 
@@ -893,11 +882,13 @@ _dump_all_protocol(lua_State* L) {
 	struct context* ctx = lua_touserdata(L,1);
 	lua_newtable(L);
 	int i;
-	for(i=0;i<ctx->offset;i++) {
+	for(i=0;i<ctx->cap;i++) {
 		struct protocol* ptl = ctx->slots[i];
-		lua_pushstring(L,ptl->name);
-		lua_pushinteger(L,i);
-		lua_settable(L,-3);
+		if (ptl) {
+			lua_pushstring(L,ptl->name);
+			lua_pushinteger(L,i);
+			lua_settable(L,-3);
+		}
 	}
 	return 1;
 }
@@ -929,11 +920,14 @@ int
 _dump_protocol(lua_State* L) {
 	struct context* ctx = lua_touserdata(L,1);
 	int index = lua_tointeger(L,2);
-	if (index >= ctx->offset) {
+	if (index >= ctx->cap) {
 		return 0;
 	}
 
 	struct protocol* ptl = ctx->slots[index];
+	if (!ptl)
+		return 0;
+
 	lua_newtable(L);
 
 	lua_pushstring(L,ptl->name);
@@ -966,14 +960,41 @@ _dump_protocol(lua_State* L) {
 }
 
 int
-luaopen_protocolcore(lua_State* L){
+lprotocol_ctx_new(lua_State* L) {
+	struct context* ctx = lua_newuserdata(L, sizeof(*ctx));
+	memset(ctx,0,sizeof(*ctx));
+	ctx->cap = 64;
+	ctx->slots = malloc(sizeof(*ctx->slots) * ctx->cap);
+	memset(ctx->slots,0,sizeof(*ctx->slots) * ctx->cap);
+
+	ctx->L = luaL_newstate();
+	lua_settop(ctx->L,0);
+	lua_newtable(ctx->L);
+
+	if (luaL_newmetatable(L, "meta_protocol")) {
+        const luaL_Reg meta_protocol[] = {
+            { "load", lload_protocol },
+            { "encode", lencode_protocol },
+			{ "decode", ldecode_protocol },
+			{ "dump_all", _dump_all_protocol },
+			{ "dump", _dump_protocol },
+            { NULL, NULL },
+        };
+        luaL_newlib(L,meta_protocol);
+        lua_setfield(L, -2, "__index");
+
+        lua_pushcfunction(L, lprotocol_ctx_release);
+        lua_setfield(L, -2, "__gc");
+    }
+    lua_setmetatable(L, -2);
+    return 1;
+}
+
+int
+luaopen_protocolcore(lua_State* L) {
+	luaL_checkversion(L);
 	luaL_Reg l[] = {
-		{ "load", _load_protocol },
-		{ "release", _release_protocol },
-		{ "dump_all", _dump_all_protocol },
-		{ "dump", _dump_protocol },
-		{ "encode", _encode_protocol },
-		{ "decode", _decode_protocol },
+		{ "new", lprotocol_ctx_new },
 		{ NULL, NULL },
 	};
 	luaL_newlib(L,l);

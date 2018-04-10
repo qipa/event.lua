@@ -3,6 +3,7 @@ local util = require "util"
 local model = require "model"
 local protocol = require "protocol"
 local mongo = require "mongo"
+local route = require "route"
 local protocol_forward = import "server.protocol_forward"
 
 local rpc = import "server.rpc"
@@ -17,8 +18,8 @@ local function client_data(client_id,message_id,data,size)
 	if not client_info.login then
 		rpc.send_login("handler.login_handler","client_forward",{client_id = client_id,message_id = message_id,data = string.copy(data,size)},true)
 	else
-		local name = protocol_forward.forward[message_id]
-		local message = protocol.decode[name](data,size)
+		local agent_user = model.fetch_agent_user_with_client_id(client_id)
+		route.dispatch_client(agent_user,message_id,data,size)
 	end
 end
 
