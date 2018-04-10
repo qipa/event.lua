@@ -1,6 +1,6 @@
 local event = require "event"
 local util = require "util"
-local object_mgr = import "object_manager"
+local object_mgr = require "model"
 
 class_ctx = class_ctx or {}
 
@@ -79,7 +79,7 @@ function cls_base:inherit(name,...)
 		reset_object_meta(name)
 	else
 		if select("#",...) > 0 then
-			object_mgr.register(name,...)
+			model.register_binder(name,...)
 		end
 	end
 	parent.__childs[name] = true

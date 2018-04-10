@@ -66,7 +66,6 @@ env.tid = util.thread_id()
 local command = string.format("event@%s@%d",name,env.uid)
 util.thread_name(command)
 
-print("main",main)
 if main then
 	local log_path
 	if env.log_path then

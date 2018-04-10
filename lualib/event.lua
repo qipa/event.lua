@@ -116,49 +116,39 @@ function _M.listen(addr,header,callback,channel_class,multi)
 	return listener
 end
 
-function _M.connect(addr,header,channel_class)
-	local co = co_running()
-	assert(co ~= _main_co,string.format("cannot connect in main co"))
-	local session = _M.gen_session()
-
+function _M.connect(addr,header,sync,channel_class)
 	local info = resolve_addr(addr)
 	if not info then
 		return false,string.format("error addr:%s",addr)
 	end
-	local ok,err
-	if info.file then
-		ok,err = _event:connect(header,session,info)
-	else
-		ok,err = _event:connect(header,session,info)
+
+	local session = 0
+	if not sync then
+		session = _M.gen_session()
+		local co = co_running()
+		assert(co ~= _main_co,string.format("cannot async connect in main co"))
 	end
 
-	if not ok then
-		return false,err
-	end
-	local result,error_or_buffer = _M.wait(session)
-	if result then
-		return create_channel(channel_class,error_or_buffer,info.file or string.format("%s:%s",info.ip,info.port))
-	else
-		return false,error_or_buffer
-	end
-end
+	if sync then
+		local buffer,reason
+		if info.file then
+			buffer,reason = _event:connect(header,session,info)
+		else
+			buffer,reason = _event:connect(header,session,info)
+		end
 
-function _M.block_connect(addr,header,channel_class)
-	local info = resolve_addr(addr)
-	if not info then
-		return false,string.format("error addr:%s",addr)
-	end
-	local buffer,reason
-	if info.file then
-		buffer,reason = _event:connect(header,0,info)
-	else
-		buffer,reason = _event:connect(header,0,info)
+		if not buffer then
+			return false,reason
+		end
+		return create_channel(channel_class,buffer,info.file or string.format("%s:%s",info.ip,info.port))
 	end
 
-	if not buffer then
-		return false,reason
+	local ok,buffer = _M.wait(session)
+	if ok then
+		return create_channel(channel_class,buffer,info.file or string.format("%s:%s",info.ip,info.port))
+	else
+		return false,buffer
 	end
-	return create_channel(channel_class,buffer,info.file or string.format("%s:%s",info.ip,info.port))
 end
 
 function _M.bind(fd,channel_class)

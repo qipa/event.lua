@@ -13,21 +13,25 @@ function _M.register_binder(name,...)
 	assert(_binder_ctx[name] == nil,string.format("name:%s already register",name))
 	_binder_ctx[name] = {}
 	
-	_M[string.format("unbind_%s",name)] = function ()
-		_binder_ctx[name] = {}		
+	_M[string.format("fetch_%s",name)] = function ()
+		local same_name = _binder_ctx[name]
+		if same_name and same_name[keys[1]] then
+			local result = {}
+			for _,info in pairs(same_name[keys[1]]) do
+				table.insert(result,info.value)
+			end
+			return result
+		end	
 	end
 
 	local binder_map = {}
 
 	for _,key in pairs(keys) do
-		local map = {}
-		binder_map[key] = map
-
 		_M[string.format("fetch_%s_with_%s",name,key)] = function (k)
 			local same_name = _binder_ctx[name]
 			local same_k = same_name[key]
-			if not k then
-				return map
+			if not same_k[k] then
+				return
 			end
 			return same_k[k].value
 		end
@@ -40,14 +44,12 @@ function _M.register_binder(name,...)
 				same_k = same_name[key]
 			end
 			same_k[k] = {time = os.time(),value = value}
-			map[k] = value
 		end
 
 		_M[string.format("unbind_%s_with_%s",name,key)] = function (k)
 			local same_name = _binder_ctx[name]
 			local same_k = same_name[key]
 			same_k[k] = nil
-			map[k] = nil
 		end
 	end
 end
