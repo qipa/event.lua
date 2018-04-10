@@ -436,13 +436,16 @@ ev_session_read(struct ev_session* ev_session,char* result,size_t size) {
 	return size;
 }
 
-char* ev_session_read_util(ev_session_t* ev_session,const char* sep,size_t size,size_t* length) {
+char* ev_session_read_util(ev_session_t* ev_session,const char* sep,size_t size,char* out,size_t out_size,size_t* length) {
 	int offset = search_eol(ev_session,sep,size);
 	if (offset < 0) {
 		return NULL;
 	}
 	*length = offset;
-	char* result = malloc(offset);
+	char* result = out;
+	if (offset > out_size) {
+		result = malloc(offset);
+	}
 	ev_session_read(ev_session,result,offset);
 	return result;
 }

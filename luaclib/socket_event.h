@@ -28,7 +28,7 @@ int ev_session_fd(struct ev_session* ev_session);
 size_t ev_session_input_size(struct ev_session* ev_session);
 size_t ev_session_output_size(struct ev_session* ev_session);
 size_t ev_session_read(struct ev_session* ev_session,char* data,size_t size);
-char* ev_session_read_util(struct ev_session* ev_session,const char* sep,size_t size,size_t* length);
+char* ev_session_read_util(struct ev_session* ev_session,const char* sep,size_t size,char* out,size_t out_size,size_t* length);
 int ev_session_write(struct ev_session* ev_session,char* data,size_t size);
 
 #endif

@@ -396,9 +396,7 @@ _session_read(lua_State* L) {
 		size = len;
 
 	char* data = THREAD_CACHED_BUFFER;
-	int needfree = 0;
 	if (size > THREAD_CACHED_SIZE) {
-		needfree = 1;
 		data = malloc(size);
 	}
 			
@@ -406,7 +404,7 @@ _session_read(lua_State* L) {
 
 	lua_pushlstring(L, data, size);
 	
-	if (needfree)
+	if (data != THREAD_CACHED_BUFFER)
 		free(data);
 
 	return 1;
@@ -419,12 +417,13 @@ _session_read_util(lua_State* L) {
 	const char* sep = lua_tolstring(L,2,&size);
 
 	size_t length;
-	char* data = ev_session_read_util(lev_session->session,sep,size,&length);
+	char* data = ev_session_read_util(lev_session->session,sep,size,THREAD_CACHED_BUFFER,THREAD_CACHED_SIZE,&length);
 	if (!data) {
 		return 0;
 	}
 	lua_pushlstring(L, data, length);
-	free(data);
+	if (data != THREAD_CACHED_BUFFER)
+		free(data);
 	return 1;
 }
 
