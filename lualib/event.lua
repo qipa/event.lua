@@ -121,33 +121,38 @@ function _M.connect(addr,header,sync,channel_class)
 	if not info then
 		return false,string.format("error addr:%s",addr)
 	end
-
-	local session = 0
-	if not sync then
-		session = _M.gen_session()
-		local co = co_running()
-		assert(co ~= _main_co,string.format("cannot async connect in main co"))
-	end
-
 	if sync then
 		local buffer,reason
 		if info.file then
-			buffer,reason = _event:connect(header,session,info)
+			buffer,reason = _event:connect(header,0,info)
 		else
-			buffer,reason = _event:connect(header,session,info)
+			buffer,reason = _event:connect(header,0,info)
 		end
 
 		if not buffer then
 			return false,reason
 		end
 		return create_channel(channel_class,buffer,info.file or string.format("%s:%s",info.ip,info.port))
-	end
-
-	local ok,buffer = _M.wait(session)
-	if ok then
-		return create_channel(channel_class,buffer,info.file or string.format("%s:%s",info.ip,info.port))
 	else
-		return false,buffer
+		local session = _M.gen_session()
+		local co = co_running()
+		assert(co ~= _main_co,string.format("cannot async connect in main co"))
+
+		local ok,reason
+		if info.file then
+			ok,reason = _event:connect(header,session,info)
+		else
+			ok,reason = _event:connect(header,session,info)
+		end
+		if not ok then
+			return false,reason
+		end
+		local ok,buffer = _M.wait(session)
+		if ok then
+			return create_channel(channel_class,buffer,info.file or string.format("%s:%s",info.ip,info.port))
+		else
+			return false,buffer
+		end
 	end
 end
 
