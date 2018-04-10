@@ -123,7 +123,7 @@ _ev_read_cb(struct ev_loop* loop,struct ev_io* io,int revents) {
 	rdb->size = ev_session->threshold;
 
 	int fail = 0;
-	//理论上应该一次性接完数据，再回调，但为了预防恶意流，接一次回调一次，在上层判断数据合法性
+	//一次性接完数据，再回调(为了预防恶意流，理论上应该接一次回调一次，在上层判断数据合法性)
 	for(;;) {
 		int n = (int)read(ev_session->fd, rdb->data + rdb->wpos, rdb->size - rdb->wpos);
 		if (n < 0) {
