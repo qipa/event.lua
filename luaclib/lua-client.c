@@ -82,7 +82,7 @@ read_complete(struct ev_session* ev_session, void* ud) {
 			    if (order != client->order) {
 			    	ev_session_free(client->session);
 					container_remove(client->manager->container,client->id);
-					client->manager->close_func(client->manager->ud,id);
+					client->manager->close_func(client->manager->ud,client->id);
 					free(client);
 					return;
 			    } else {
