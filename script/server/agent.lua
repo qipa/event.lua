@@ -4,6 +4,7 @@ local model = require "model"
 local protocol = require "protocol"
 local mongo = require "mongo"
 local route = require "route"
+local startup = import "server.startup"
 local protocol_forward = import "server.protocol_forward"
 
 local rpc = import "server.rpc"
@@ -33,6 +34,7 @@ local function client_close(id)
 end
 
 event.fork(function ()
+	startup.run()
 	protocol.parse("login")
 	protocol.load()
 	protocol.dumpfile()

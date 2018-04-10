@@ -13,6 +13,7 @@ function log(log_type,log)
 	end
 	FILE:write(log.."\r\n")
 	FILE:flush()
+	print(log)
 end
 
 function log_worker(args)

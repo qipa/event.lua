@@ -4,3 +4,55 @@
 [E:runtime][1970-06-26 15:31:35 @./lualib/import.lua:24] server.rpc local var:connect_channel:18,do_send:61,CONNECT_STATUS:10,event:2,channel:5,
 [E:runtime][1970-06-26 15:31:35 @./lualib/import.lua:24] handler.agent_handler local var:protocol:4,
 [E:runtime][1970-06-26 15:31:35 @lualib/bootstrap.lua:118] thread:6569 start,command:event@server/agent@101,lua mem:202.244141kb,c mem:295.554688kb
+[E:runtime][1970-06-26 15:31:44 @./lualib/import.lua:24] handler.agent_handler local var:protocol:4,
+[E:runtime][1970-06-26 15:31:44 @lualib/bootstrap.lua:103] thread:21005 start,command:event@server/agent@101,lua mem:202.840820kb,c mem:296.468750kb
+[E:runtime][1970-06-26 15:31:45 @./lualib/import.lua:24] handler.agent_handler local var:protocol:4,
+[E:runtime][1970-06-26 15:31:45 @lualib/bootstrap.lua:103] thread:21022 start,command:event@server/agent@101,lua mem:202.840820kb,c mem:296.468750kb
+[E:runtime][1970-06-26 15:31:45 @./lualib/import.lua:24] handler.agent_handler local var:protocol:4,
+[E:runtime][1970-06-26 15:31:45 @lualib/bootstrap.lua:103] thread:21039 start,command:event@server/agent@101,lua mem:203.309570kb,c mem:296.984375kb
+[E:runtime][1970-06-26 15:31:45 @./script/server/agent.lua:56] error
+[E:runtime][1970-06-26 15:31:45 @./script/server/agent.lua:56] error
+[E:runtime][1970-06-26 15:31:45 @./script/server/agent.lua:56] error
+[E:runtime][1970-06-26 15:31:46 @./lualib/import.lua:24] handler.agent_handler local var:protocol:4,
+[E:runtime][1970-06-26 15:31:46 @lualib/bootstrap.lua:103] thread:21057 start,command:event@server/agent@101,lua mem:203.421875kb,c mem:297.171875kb
+[E:runtime][1970-06-26 15:31:46 @./script/server/agent.lua:56] error
+[E:runtime][1970-06-26 15:31:46 @./script/server/agent.lua:56] error
+[E:runtime][1970-06-26 15:31:46 @./script/server/agent.lua:56] error
+[E:runtime][1970-06-26 15:31:46 @./script/server/agent.lua:56] error
+[E:runtime][1970-06-26 15:31:46 @./script/server/agent.lua:56] error
+[E:runtime][1970-06-26 15:31:46 @./script/server/agent.lua:56] error
+[E:runtime][1970-06-26 15:31:46 @./script/server/agent.lua:56] error
+[E:runtime][1970-06-26 15:31:47 @./script/server/agent.lua:56] error
+[E:runtime][1970-06-26 15:31:47 @./script/server/agent.lua:56] error
+[E:runtime][1970-06-26 15:31:47 @./script/server/agent.lua:56] error
+[E:runtime][1970-06-26 15:31:48 @./script/server/agent.lua:56] error
+[E:runtime][1970-06-26 15:31:48 @./script/server/agent.lua:56] error
+[E:runtime][1970-06-26 15:31:48 @./script/server/agent.lua:56] error
+[E:runtime][1970-06-26 15:31:48 @./script/server/agent.lua:56] error
+[E:runtime][1970-06-26 15:31:49 @./lualib/import.lua:24] handler.agent_handler local var:protocol:4,
+[E:runtime][1970-06-26 15:31:49 @lualib/bootstrap.lua:103] thread:21216 start,command:event@server/agent@101,lua mem:203.994141kb,c mem:298.015625kb
+[E:runtime][1970-06-26 15:31:49 @./script/server/agent.lua:56] error
+[E:runtime][1970-06-26 15:31:50 @./lualib/import.lua:24] handler.agent_handler local var:protocol:4,
+[E:runtime][1970-06-26 15:31:50 @lualib/bootstrap.lua:103] thread:21236 start,command:event@server/agent@101,lua mem:203.998047kb,c mem:298.015625kb
+[E:runtime][1970-06-26 15:31:50 @./script/server/agent.lua:56] error
+[E:runtime][1970-06-26 15:31:50 @./script/server/agent.lua:56] error
+[E:runtime][1970-06-26 15:31:51 @./script/server/agent.lua:56] error
+[E:runtime][1970-06-26 15:31:51 @./script/server/agent.lua:56] error
+[E:runtime][1970-06-26 15:31:51 @./script/server/agent.lua:56] error
+[E:runtime][1970-06-26 15:31:51 @./script/server/agent.lua:56] error
+[E:runtime][1970-06-26 15:31:51 @./script/server/agent.lua:56] error
+[E:runtime][1970-06-26 15:31:51 @./script/server/agent.lua:56] error
+[E:runtime][1970-06-26 15:31:51 @./script/server/agent.lua:56] error
+[E:runtime][1970-06-26 15:31:51 @./script/server/agent.lua:56] error
+[E:runtime][1970-06-26 15:31:52 @./script/server/agent.lua:56] error
+[E:runtime][1970-06-26 15:31:52 @./script/server/agent.lua:56] error
+[E:runtime][1970-06-26 15:31:52 @./script/server/agent.lua:56] error
+[E:runtime][1970-06-26 15:31:52 @./script/server/agent.lua:56] error
+[E:runtime][1970-06-26 15:31:52 @./script/server/agent.lua:56] error
+[E:runtime][1970-06-26 15:31:52 @./script/server/agent.lua:56] error
+[E:runtime][1970-06-26 15:31:52 @./script/server/agent.lua:56] error
+[E:runtime][1970-06-26 15:31:52 @./script/server/agent.lua:56] error
+[E:runtime][1970-06-26 15:31:52 @./script/server/agent.lua:56] error
+[E:runtime][1970-06-26 15:31:52 @./script/server/agent.lua:56] error
+[E:runtime][1970-06-26 15:31:52 @./script/server/agent.lua:56] error
+[E:runtime][1970-06-26 15:31:52 @./script/server/agent.lua:56] error

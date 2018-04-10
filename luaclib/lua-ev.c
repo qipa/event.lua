@@ -467,12 +467,12 @@ _session_write(lua_State* L) {
 
 static int
 _session_close(lua_State* L) {
-	luaL_checktype(L, 1, LUA_TBOOLEAN);
-	int immediately = lua_toboolean(L, 1);
-
 	struct lua_ev_session* lev_session = (struct lua_ev_session*)lua_touserdata(L, 1);
 	if (lev_session->closed == 1)
 		luaL_error(L, "session already closed");
+	
+	luaL_checktype(L, 2, LUA_TBOOLEAN);
+	int immediately = lua_toboolean(L, 2);
 
 	lev_session->closed = 1;
 
@@ -639,7 +639,10 @@ _connect(lua_State* L) {
 		ev_session_setcb(lev_session->session,NULL,connect_complete,NULL,lev_session);
 		ev_session_enable(lev_session->session,EV_WRITE);
 		lua_pushboolean(L,1);
-	} 
+	} else {
+		ev_session_setcb(lev_session->session, read_complete, NULL, error_occur, lev_session);
+		ev_session_enable(lev_session->session, EV_READ);
+	}
 	
 	return 1;
 }

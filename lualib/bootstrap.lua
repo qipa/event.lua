@@ -12,7 +12,6 @@ local model = require "model"
 local route = require "route"
 local debugger = require "debugger"
 local helper = require "helper"
-local logger = require "logger"
 local profiler = require "profiler.core"
 local worker = require "worker"
 
@@ -67,20 +66,6 @@ local command = string.format("event@%s@%d",name,env.uid)
 util.thread_name(command)
 
 if main then
-	local log_path
-	if env.log_path then
-		local attr = lfs.attributes(env.log_path)
-		if not attr then
-			lfs.mkdir(env.log_path)
-		end
-		log_path = string.format("%s/error@%s@%s.log",env.log_path,env.name,env.uid)
-	end
-
-	local runtime_logger = logger:create("runtime",{level = env.log_lv,addr = "ipc://log.ipc"},5)
-	event.error = function (...)
-		runtime_logger:ERROR(...)
-	end
-
 	local _G_protect = {}
 	function _G_protect.__newindex(self,k,v)
 		rawset(_G,k,v)
