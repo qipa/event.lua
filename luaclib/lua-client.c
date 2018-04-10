@@ -84,6 +84,10 @@ read_complete(struct ev_session* ev_session, void* ud) {
 					container_remove(client->manager->container,client->id);
 					client->manager->close_func(client->manager->ud,client->id);
 					free(client);
+
+				    if (data != CACHED_BUFFER)
+				    	free(data);
+				    
 					return;
 			    } else {
 			    	client->order++;

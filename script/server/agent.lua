@@ -11,6 +11,7 @@ local rpc = import "server.rpc"
 
 model.register_value("mongodb")
 model.register_binder("client","id")
+model.register_value("client_manager")
 
 
 local function client_data(client_id,message_id,data,size)
@@ -47,7 +48,8 @@ event.fork(function ()
 	-- mongodb:init("sunset")
 	-- model.set_mongodb(mongodb)
 
-	client_manager = event.client_manager(1024)
+	local client_manager = event.client_manager(1024)
 	client_manager:set_callback(client_accept,client_close,client_data)
 	client_manager:start("0.0.0.0",1989)
+	model.set_client_manager(client_manager)
 end)
