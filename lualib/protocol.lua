@@ -78,7 +78,7 @@ end
 function _M.load()
 	local meta = {}
 	for _,raw in pairs(_protocol_raw) do
-		local info = load("return"..raw)()
+		local info = dump.unpack(raw)
 		for name,proto in pairs(info) do
 			table.insert(meta,{name = name,proto = proto})
 		end
