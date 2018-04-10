@@ -110,7 +110,13 @@ function _M.load()
 
 	_M.encode = encode
 	_M.decode = decode
-	_M.handler = {}
+	_M.handler = setmetatable({},{__newindex = function (self,proto,func)
+		if not name_map[proto] then
+			print(string.format("no such protocol:%s",proto))
+			return
+		end
+		rawset(self,proto,func)
+	end})
 end
 
 function _M.dump(id)

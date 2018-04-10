@@ -40,6 +40,11 @@ function _M.import(file)
 	ctx.fullfile = fullfile
 	ctx.name = file
 	_script_ctx[file] = ctx
+
+	if ctx.env["__init__"] then
+		ctx.env["__init__"](ctx.env)
+	end
+
 	return ctx.env
 end
 
@@ -50,6 +55,9 @@ function _M.reload(file)
 	end
 
 	ctx.change = loadfile(file,ctx.fullfile,ctx.env)
+	if ctx.env["__reload__"] then
+		ctx.env["__reload__"](ctx.env)
+	end
 end
 
 function _M.auto_reload()

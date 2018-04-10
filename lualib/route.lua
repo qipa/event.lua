@@ -21,8 +21,6 @@ function _M.dispatch(file,method,...)
 	return func(...)
 end
 
-_G.protocol_forward = {}
-
 function _M.dispatch_client(user,message_id,data,size)
 	local name,message = protocol.decode[message_id](data,size)
 	protocol.handler[name](user,message)

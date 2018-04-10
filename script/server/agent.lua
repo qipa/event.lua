@@ -36,6 +36,7 @@ event.fork(function ()
 	protocol.parse("login")
 	protocol.load()
 	protocol.dumpfile()
+	import "handler.agent_handler"
 	-- local mongodb,reason = event.connect("tcp://127.0.0.1:10105",4,mongo)
 	-- if not mongodb then
 	-- 	print(reason)
