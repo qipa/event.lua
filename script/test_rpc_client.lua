@@ -16,7 +16,7 @@ end
 event.fork(function ()
 	local channel_session,err
 	while not channel_session do
-		channel_session,err = event.connect("ipc://rpc.ipc",4,client_channel)
+		channel_session,err = event.connect("ipc://rpc.ipc",4,true,client_channel)
 		if channel_session then
 			
 			local now = util.time()

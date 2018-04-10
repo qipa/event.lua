@@ -1,5 +1,5 @@
 local route = require "route"
-
+local event = require "event"
 
 local channel = {}
 
@@ -25,7 +25,6 @@ function channel:attach(buffer)
 end
 
 function channel:disconnect()
-	local event = require "event"
 	local list = {}
 	for session,ctx in pairs(self.session_ctx) do
 		if not ctx.callback then
@@ -56,7 +55,6 @@ function channel:read_util(sep)
 end
 
 local function call_method(channel,session,file,method,args)
-	local event = require "event"
 	local ok,result = xpcall(route.dispatch,debug.traceback,file,method,table.unpack(args))
 	if not ok then
 		event.error(result)
@@ -71,7 +69,6 @@ local function call_method(channel,session,file,method,args)
 end
 
 function channel:dispatch(message)
-	local event = require "event"
 	if message.ret then
 		local call_ctx = self.session_ctx[message.session]
 		if call_ctx.callback then
@@ -106,8 +103,6 @@ function channel:send(file,method,...)
 end
 
 function channel:call(file,method,...)
-	local event = require "event"
-	
 	local session = event.gen_session()
 	self.session_ctx[session] = {}
 	local str = pack_table({file = file,method = method,session = session,args = {...}})
@@ -121,8 +116,6 @@ function channel:call(file,method,...)
 end
 
 function channel:send_callback(file,method,args,callback)
-	local event = require "event"
-	
 	local session = event.gen_session()
 	self.session_ctx[session] = {callback = callback}
 	local str = pack_table({file = file,method = method,session = session,args = args})

@@ -1,7 +1,5 @@
 local event_core = require "ev.core"
-local channel = require "channel"
-local stream = require "stream"
-local profiler = require "profiler.core"
+local profiler_core = require "profiler.core"
 
 local _event
 
@@ -24,9 +22,12 @@ local _udp_ctx = setmetatable({},{__mode = "k"})
 local _mailbox_ctx = setmetatable({},{__mode = "k"})
 local _client_manager_ctx = setmetatable({},{__mode = "k"})
 
+local _channel_base
+local _stream_base
+
 local co_running = coroutine.running
 local co_yield = coroutine.yield
-local co_resume = profiler.resume
+local co_resume = profiler_core.resume
 
 local tinsert = table.insert
 local tremove = table.remove
@@ -76,7 +77,10 @@ local function create_channel(channel_class,buffer,addr)
 	if channel_class then
 		channel_obj = channel_class:new(buffer,addr)
 	else
-		channel_obj = channel:new(buffer,addr)
+		if not _channel_base then
+			_channel_base = require "channel"
+		end
+		channel_obj = _channel_base:new(buffer,addr)
 	end
 	channel_obj:init()
 	_channel_ctx[buffer] = channel_obj
@@ -201,7 +205,10 @@ end
 function _M.run_process(cmd,line)
     local FILE = io.popen(cmd)
     local fd = FILE:fd()
-    local ch = _M.bind(fd,stream)
+    if not _stream_base then
+    	_stream_base = require "stream"
+    end
+    local ch = _M.bind(fd,_stream_base)
     local result
     if line then
     	result = ch:wait_lines()
