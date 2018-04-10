@@ -128,11 +128,11 @@ function channel:ret(session,...)
 end
 
 function channel:close()
-	self.buffer:close()
+	self.buffer:close(false)
 end
 
 function channel:close_immediately()
-	self.buffer:close_immediately()
+	self.buffer:close(true)
 end
 
 return channel

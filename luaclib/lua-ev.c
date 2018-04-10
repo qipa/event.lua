@@ -472,25 +472,22 @@ _session_write(lua_State* L) {
 
 static int
 _session_close(lua_State* L) {
+	int immediately = luaL_checkboolean(L, 1, 1);
+
 	struct lua_ev_session* lev_session = (struct lua_ev_session*)lua_touserdata(L, 1);
 	if (lev_session->closed == 1)
 		luaL_error(L, "session already closed");
 
 	lev_session->closed = 1;
-	ev_session_setcb(lev_session->session, NULL, close_complete, error_occur, lev_session);
-	ev_session_disable(lev_session->session,EV_READ);
-	ev_session_enable(lev_session->session, EV_WRITE);
-	return 0;
-}
 
-static int
-_session_close_immediately(lua_State* L) {
-	struct lua_ev_session* lev_session = (struct lua_ev_session*)lua_touserdata(L, 1);
-	if (lev_session->closed == 1) {
-		luaL_error(L, "session already closed");
+	if (!immediately) {
+		ev_session_setcb(lev_session->session, NULL, close_complete, error_occur, lev_session);
+		ev_session_disable(lev_session->session,EV_READ);
+		ev_session_enable(lev_session->session, EV_WRITE);
+	} else {
+		session_destroy(lev_session);
 	}
-	lev_session->closed = 1;
-	session_destroy(lev_session);
+
 	return 0;
 }
 
@@ -983,7 +980,6 @@ luaopen_ev_core(lua_State* L) {
 		{ "read_util", _session_read_util },
 		{ "alive", _session_alive },
 		{ "close", _session_close },
-		{ "close_immediately", _session_close_immediately },
 		{ NULL, NULL },
 	};
 	luaL_newlib(L,meta_buffer);

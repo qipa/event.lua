@@ -276,7 +276,7 @@ function _M.dispatch()
 
 	for buffer in pairs(_channel_ctx) do
 		if buffer:alive() then
-			buffer:close_immediately()
+			buffer:close(true)
 		end
 	end
 
