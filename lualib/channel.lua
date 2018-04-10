@@ -133,6 +133,7 @@ end
 
 function channel:close_immediately()
 	self.buffer:close(true)
+	self:disconnect()
 end
 
 return channel
