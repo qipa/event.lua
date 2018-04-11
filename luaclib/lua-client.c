@@ -145,7 +145,7 @@ accept_client(struct ev_listener *listener, int fd, const char* addr, void *ud) 
 	socket_closeonexec(fd);
 
 	struct ev_client* client = malloc(sizeof(*client));
-	memcpy(client,0,sizeof(*client));
+	memset(client,0,sizeof(*client));
 	client->manager = manager;
 	client->session = ev_session_bind(manager->loop,fd);
 	client->id = container_add(manager->container,client->session);

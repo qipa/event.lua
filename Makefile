@@ -34,8 +34,8 @@ MAIN_OBJ = $(patsubst %.c,%.o,$(patsubst %.cc,%.o,$(MAIN_SRC)))
 
 TARGET ?= event
 
-CC=gcc  
-CFLAGS=-g -Wall -Wno-unused-value -fno-omit-frame-pointer $(DEFINE)
+CC=gcc
+CFLAGS=-g -Wall -O3 -fno-omit-frame-pointer $(DEFINE)
 
 LDFLAGS=-lrt -lm -ldl -lpthread -lssl -lunwind -lstdc++
 STATIC_LIBS=$(LUA_STATIC_LIB) $(TC_STATIC_LIB) 
@@ -115,7 +115,7 @@ $(LUA_CLIB_PATH)/mongo.so : $(LUA_CLIB_SRC)/lua-mongo.c | $(LUA_CLIB_PATH)
 	$(CC) $(CFLAGS) $(SHARED) $^ -o $@ -I$(LUA_INC)
 
 $(LUA_CLIB_PATH)/util.so : $(LUA_CLIB_SRC)/lua-util.c $(LUA_CLIB_SRC)/common.c $(CONVERT_OBJ) ./3rd/linenoise/linenoise.c  | $(LUA_CLIB_PATH)
-	$(CC) $(CFLAGS) $(SHARED) $^ -o $@ -I$(LUA_INC) -I$(CONVERT_PATH) -I./3rd/linenoise
+	$(CC) $(CFLAGS) -Wno-unused-value $(SHARED) $^ -o $@ -I$(LUA_INC) -I$(CONVERT_PATH) -I./3rd/linenoise
 
 $(LUA_CLIB_PATH)/lfs.so : ./3rd/luafilesystem/src/lfs.c | $(LUA_CLIB_PATH)
 	$(CC) $(CFLAGS) $(SHARED) $^ -o $@ -I$(LUA_INC)

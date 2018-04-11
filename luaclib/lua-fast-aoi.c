@@ -146,7 +146,8 @@ aoi_enter(lua_State *L,struct aoi_context *ctx,struct object *obj) {
 	if (tl == NULL)
 		luaL_error(L,"[aoi_enter]invalid pos[%d:%d]",obj->cur.x,obj->cur.z);
 
-	struct location bl,tr;
+	struct location bl = {0,0};
+	struct location tr = {0,0};
 	if (calc_rect(ctx,&obj->cur,ctx->range,&bl,&tr) < 0)
 		luaL_error(L,"[aoi_enter]invalid pos[%d:%d],range[%d]",obj->cur.x,obj->cur.z,ctx->range);
 
@@ -179,7 +180,8 @@ aoi_leave(lua_State *L,struct aoi_context* ctx,struct object *obj) {
 		luaL_error(L,"[aoi_leave]invalid pos[%d:%d]",obj->cur.x,obj->cur.z);
 
 
-	struct location bl,tr;
+	struct location bl = {0,0};
+	struct location tr = {0,0};
 	if (calc_rect(ctx,&obj->cur,ctx->range,&bl,&tr) < 0)
 		luaL_error(L,"[aoi_leave]invalid pos[%d:%d],range[%d]",obj->cur.x,obj->cur.z,ctx->range);
 
@@ -416,7 +418,8 @@ laoi_viewlist(lua_State *L) {
 	if (tl == NULL)
 		luaL_error(L,"[_aoi_viewlist]invalid pos[%d:%d]",obj->cur.x,obj->cur.z);
 
-	struct location bl,tr;
+	struct location bl = {0,0};
+	struct location tr = {0,0};
 	if (calc_rect(aoi,&obj->cur,aoi->range,&bl,&tr) < 0)
 		luaL_error(L,"[_aoi_viewlist]invalid pos[%d:%d],range[%d]",obj->cur.x,obj->cur.z,aoi->range);
 

@@ -119,7 +119,7 @@ lexecute(lua_State* L) {
 	for(r = 0;r < nrows;r++) {
 		lua_createtable(L,0,ncols);
 		MYSQL_ROW row = mysql_fetch_row(res);
-		int* lengths = mysql_fetch_lengths(res);
+		unsigned long* lengths = mysql_fetch_lengths(res);
 		for(c = 0;c < ncols;c++) {
 			lua_pushlstring(L,fields[c].name,fields[c].name_length);
 			pushvalue(L,row[c],lengths[c],fields[c].type);
