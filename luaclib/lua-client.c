@@ -19,6 +19,7 @@
 #define CACHED_SIZE 1024 * 1024
 #define MAX_FREQ 100
 #define ALIVE_TIME 60 * 5
+#define WARN_OUTPUT_FLOW 10 * 1024
 
 typedef void (*accept_callback)(void* ud,int id,const char* addr);
 typedef void (*close_callback)(void* ud,int id);
@@ -229,6 +230,9 @@ client_manager_send(struct client_manager* manager,int client_id,int message_id,
     memcpy(mb+4,data,size);
 
 	ev_session_write(client->session,(char*)mb,total);
+	if (ev_session_output_size(client->session) > WARN_OUTPUT_FLOW) {
+		fprintf(stderr,"client:%d more then %skb flow need to send out",client_id,WARN_OUTPUT_FLOW/1024);
+	}
 }
 
 static void 
