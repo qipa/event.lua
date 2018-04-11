@@ -14,6 +14,7 @@
 #include "socket_event.h"
 #include "socket_util.h"
 #include "object_container.h"
+#include "common.h"
 
 #define CACHED_SIZE 1024 * 1024
 
@@ -76,8 +77,10 @@ read_complete(struct ev_session* ev_session, void* ud) {
 			        data[i] = data[i] ^ client->seed;
 			        client->seed += data[i];
 			    }
-			    ushort order = data[0] | data[1] << 8;
-			    ushort id = data[2] | data[3] << 8;
+
+			    uint16_t sum = checksum((uint16_t*)data,client->need);
+			    uint16_t order = data[2] | data[3] << 8;
+			    uint16_t id = data[4] | data[5] << 8;
 
 			    if (order != client->order) {
 			    	ev_session_free(client->session);
@@ -92,7 +95,7 @@ read_complete(struct ev_session* ev_session, void* ud) {
 			    } else {
 			    	client->order++;
 			    }
-			    client->manager->data_func(client->manager->ud,client->id,id,&data[4],client->need - 4);
+			    client->manager->data_func(client->manager->ud,client->id,id,&data[6],client->need - 6);
 
 			    if (data != CACHED_BUFFER)
 			    	free(data);

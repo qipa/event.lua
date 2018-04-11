@@ -32,6 +32,7 @@
 
 #include "convert.h"
 #include "linenoise.h"
+#include "common.h"
 
 
 #define LOG_ERROR   "\033[40;31m%s\033[0m\r\n"
@@ -460,14 +461,18 @@ lpacket_pack(lua_State* L) {
             luaL_error(L,"unkown type:%s",lua_typename(L,lua_type(L,3)));
     }
 
-    size_t total = size + sizeof(short) * 3;
+    size_t total = size + sizeof(short) * 4;
 
     uint8_t* mb = malloc(total);
     memset(mb,0,total);
     memcpy(mb,&total,2);
-    memcpy(mb+2,&packet->worder,2);
-    memcpy(mb+4,&id,2);
-    memcpy(mb+6,data,size);
+
+    memcpy(mb+4,&packet->worder,2);
+    memcpy(mb+6,&id,2);
+    memcpy(mb+8,data,size);
+
+    uint16_t sum = checksum((uint16_t*)(mb + 4),total - 4);
+    memcpy(mb + 2,&sum,2);
 
     packet->worder++;
 

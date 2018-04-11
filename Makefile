@@ -90,7 +90,7 @@ efence :
 $(TARGET) : $(MAIN_OBJ) $(STATIC_LIBS)
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS) -Wl,-E
 
-$(LUA_CLIB_PATH)/ev.so : $(LUA_CLIB_SRC)/lua-ev.c $(LUA_CLIB_SRC)/lua-client.c $(LUA_CLIB_SRC)/socket_event.c $(LUA_CLIB_SRC)/socket_util.c $(LUA_CLIB_SRC)/object_container.c $(LIBEV_SHARE_LIB) | $(LUA_CLIB_PATH)
+$(LUA_CLIB_PATH)/ev.so : $(LUA_CLIB_SRC)/lua-ev.c $(LUA_CLIB_SRC)/lua-client.c $(LUA_CLIB_SRC)/common.c $(LUA_CLIB_SRC)/socket_event.c $(LUA_CLIB_SRC)/socket_util.c $(LUA_CLIB_SRC)/object_container.c $(LIBEV_SHARE_LIB) | $(LUA_CLIB_PATH)
 	$(CC) $(CFLAGS) -Wno-strict-aliasing $(SHARED) $^ -o $@ -I$(LUA_INC) -I$(LIBEV_INC)
 
 $(LUA_CLIB_PATH)/worker.so : $(LUA_CLIB_SRC)/lua-worker.c $(LUA_CLIB_SRC)/message_queue.c | $(LUA_CLIB_PATH)
@@ -114,7 +114,7 @@ $(LUA_CLIB_PATH)/bson.so : $(LUA_CLIB_SRC)/lua-bson.c | $(LUA_CLIB_PATH)
 $(LUA_CLIB_PATH)/mongo.so : $(LUA_CLIB_SRC)/lua-mongo.c | $(LUA_CLIB_PATH)
 	$(CC) $(CFLAGS) $(SHARED) $^ -o $@ -I$(LUA_INC)
 
-$(LUA_CLIB_PATH)/util.so : $(LUA_CLIB_SRC)/lua-util.c $(CONVERT_OBJ) ./3rd/linenoise/linenoise.c  | $(LUA_CLIB_PATH)
+$(LUA_CLIB_PATH)/util.so : $(LUA_CLIB_SRC)/lua-util.c $(LUA_CLIB_SRC)/common.c $(CONVERT_OBJ) ./3rd/linenoise/linenoise.c  | $(LUA_CLIB_PATH)
 	$(CC) $(CFLAGS) $(SHARED) $^ -o $@ -I$(LUA_INC) -I$(CONVERT_PATH) -I./3rd/linenoise
 
 $(LUA_CLIB_PATH)/lfs.so : ./3rd/luafilesystem/src/lfs.c | $(LUA_CLIB_PATH)
