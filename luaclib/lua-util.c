@@ -170,10 +170,16 @@ lrc4(lua_State* L) {
     RC4_KEY rc4_key;
     RC4_set_key(&rc4_key,key_size,(unsigned char*)key);
 
-    char* result = malloc(source_size);
-    RC4(&rc4_key,source_size,(unsigned char*)source,(unsigned char*)result);
+    char out[512] = {0};
+    char* result = out;
+    if (source_size > 512)
+        result = malloc(source_size);
+
+    RC4(&rc4_key,key_size,(unsigned char*)source,(unsigned char*)result);
     lua_pushlstring(L,result,source_size);
-    free(result);
+    if (result != out)
+        free(result);
+
     return 1;
 }
 
