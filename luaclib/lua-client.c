@@ -145,19 +145,15 @@ accept_client(struct ev_listener *listener, int fd, const char* addr, void *ud) 
 	socket_closeonexec(fd);
 
 	struct ev_client* client = malloc(sizeof(*client));
+	memcpy(client,0,sizeof(*client));
 	client->manager = manager;
 	client->session = ev_session_bind(manager->loop,fd);
 	client->id = container_add(manager->container,client->session);
-	client->need = 0;
 	if (client->id == -1) {
 		ev_session_free(client->session);
 		free(client);
 		return;
 	}
-	client->freq = 0;
-	client->seed = 0;
-	client->order = 0;
-	client->tick = 0;
 	ev_session_setcb(client->session,read_complete,NULL,error_happen,client);
 	ev_session_enable(client->session,EV_READ);
 
