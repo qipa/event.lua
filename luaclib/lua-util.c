@@ -529,8 +529,10 @@ lauthcode(lua_State* L) {
     unsigned char cmd5[16] = {0};
     MD5((const unsigned char*)block+16,source_size-16,cmd5);
 
-    if (memcmp(omd5,cmd5,16) != 0)
+    if (memcmp(omd5,cmd5,16) != 0) {
+        free(block);
         luaL_error(L,"authcode decode error");
+    }
 
     lua_pushlstring(L, block+16,source_size-16);
     free(block);
@@ -565,6 +567,7 @@ luaopen_util_core(lua_State* L){
         { "md5", lmd5 },
         { "sha1", lsha1 },
         { "rc4", lrc4 },
+        { "authcode", lauthcode },
         { "load_script", lload_script },
         { "thread_name", lthread_name },
         { "thread_id", lthread_id },

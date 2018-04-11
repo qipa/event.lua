@@ -1,5 +1,5 @@
 local util = require "util"
 
 
-local code = util.rc4("mrq","fuck")
-print(util.rc4(code,"fuc2k"))
+local code = util.authcode("mrq","fuck",1)
+print(util.authcode(code.."1","fuck",0))
