@@ -1,4 +1,6 @@
 local protocol = require "protocol"
+local cjson = require "cjson"
+local util = require "util"
 local protocol_forward = import "server.protocol_forward"
 
 function client_forward(args)
@@ -8,4 +10,15 @@ function client_forward(args)
 	local name = protocol_forward.forward[message_id]
 	local message = protocol.decode[name](data)
 	table.print(message,"client_forward")
+end
+
+function auth(client_id,args)
+	local account = args.account
+
+end
+
+function enter(client_id,args)
+	local account = args.account
+	local user_id = args.user_id
+
 end
