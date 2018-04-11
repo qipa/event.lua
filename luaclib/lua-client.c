@@ -17,12 +17,12 @@
 #include "common.h"
 
 #define CACHED_SIZE 1024 * 1024
+#define MAX_FREQ 100
+#define ALIVE_TIME 60 * 5
 
 typedef void (*accept_callback)(void* ud,int id,const char* addr);
 typedef void (*close_callback)(void* ud,int id);
 typedef void (*data_callback)(void* ud,int client_id,int message_id,void* data,size_t size);
-
-
 
 __thread char CACHED_BUFFER[CACHED_SIZE];
 
@@ -39,11 +39,24 @@ struct client_manager {
 struct ev_client {
 	struct client_manager* manager;
 	struct ev_session* session;
+	struct ev_timer timer;
 	int id;
 	int need;
+	int freq;
 	uint8_t seed;
 	uint16_t order;
+	double message_tick;
 };
+
+static void
+error_happen(struct ev_session* session,void* ud) {
+	struct ev_client* client = ud;
+	ev_session_free(client->session);
+	container_remove(client->manager->container,client->id);
+	ev_timer_stop(client->manager->loop,(struct ev_timer*)&client->timer);
+	client->manager->close_func(client->manager->ud,client->id);
+	free(client);
+}
 
 static void
 read_complete(struct ev_session* ev_session, void* ud) {
@@ -83,18 +96,15 @@ read_complete(struct ev_session* ev_session, void* ud) {
 			    uint16_t id = data[4] | data[5] << 8;
 
 			    if (sum != 0 || order != client->order) {
-			    	ev_session_free(client->session);
-					container_remove(client->manager->container,client->id);
-					client->manager->close_func(client->manager->ud,client->id);
-					free(client);
-
+			    	error_happen(ev_session, client);
 				    if (data != CACHED_BUFFER)
 				    	free(data);
-				    
 					return;
 			    } else {
 			    	client->order++;
 			    }
+			    client->freq++;
+			    client->message_tick = ev_now(client->manager->loop);
 			    client->manager->data_func(client->manager->ud,client->id,id,&data[6],client->need - 6);
 
 			    if (data != CACHED_BUFFER)
@@ -109,13 +119,15 @@ read_complete(struct ev_session* ev_session, void* ud) {
 }	
 
 static void
-error_happen(struct ev_session* session,void* ud) {
-	struct ev_client* client = ud;
-	int id = client->id;
-	ev_session_free(client->session);
-	container_remove(client->manager->container,client->id);
-	client->manager->close_func(client->manager->ud,id);
-	free(client);
+timeout(struct ev_loop* loop,struct ev_timer* io,int revents) {
+	struct ev_client* client = io->data;
+	if (client->freq > MAX_FREQ) {
+		error_happen(NULL, client);
+	}
+	client->freq = 0;
+	if (ev_now(client->manager->loop) - client->message_tick > ALIVE_TIME) {
+		error_happen(NULL, client);
+	}
 }
 
 static void 
@@ -136,10 +148,17 @@ accept_client(struct ev_listener *listener, int fd, const char* addr, void *ud) 
 		free(client);
 		return;
 	}
+	client->freq = 0;
 	client->seed = 0;
 	client->order = 0;
+	client->message_tick = 0;
 	ev_session_setcb(client->session,read_complete,NULL,error_happen,client);
 	ev_session_enable(client->session,EV_READ);
+
+	client->timer.data = client;
+	ev_timer_init(&client->timer,timeout,1,1);
+	ev_timer_start(manager->loop,&client->timer);
+
 	manager->accept_func(manager->ud,client->id,addr);
 }
 
