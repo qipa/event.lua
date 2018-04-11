@@ -82,7 +82,7 @@ read_complete(struct ev_session* ev_session, void* ud) {
 			    uint16_t order = data[2] | data[3] << 8;
 			    uint16_t id = data[4] | data[5] << 8;
 
-			    if (order != client->order) {
+			    if (sum != 0 || order != client->order) {
 			    	ev_session_free(client->session);
 					container_remove(client->manager->container,client->id);
 					client->manager->close_func(client->manager->ud,client->id);
