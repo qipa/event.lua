@@ -213,6 +213,7 @@ client_manager_close(struct client_manager* manager,int client_id) {
 	}
 	ev_session_free(client->session);
 	container_remove(manager->container,client_id);
+	ev_timer_stop(manager->loop,(struct ev_timer*)&client->timer);
 	free(client);
 	return 0;
 }

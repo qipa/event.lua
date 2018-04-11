@@ -21,14 +21,9 @@ local logger_FILE = nil
 
 local log_channel = channel:inherit()
 
-function log_channel:init()
-	print("@@@@init@@@@@@")
-end
-
 function log_channel:disconnect()
 	channel.disconnect(self)
 	channel_container[self.addr] = nil
-	print("@@@@@@@@@@")
 end
 
 local _M = {}
@@ -87,7 +82,6 @@ local function append_log(logger,log_lv,...)
 			local reason
 			local channel = channel_container[logger.log_addr]
 			if not channel then
-				print("no channel")
 				channel,reason = event.connect(logger.log_addr,4,true,log_channel)
 				if not channel then
 					print(string.format("connect logger server failed,addr:%s,reason:%s",logger.log_addr,reason))
