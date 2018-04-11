@@ -20,5 +20,9 @@ end
 function enter(client_id,args)
 	local account = args.account
 	local user_id = args.user_id
+	local json = cjson.encode({account = account,user_id = user_id})
+	local md5 = util.md5(json)
+	local now = util.time()
+	local token = util.rc4(json,now)
 
 end

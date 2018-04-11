@@ -46,17 +46,22 @@ struct ev_client {
 	int freq;
 	uint8_t seed;
 	uint16_t order;
-	double message_tick;
+	double tick;
 };
+
+static void 
+close_client(int id,void* data) {
+	struct ev_client* client = data;
+	ev_session_free(client->session);
+	ev_timer_stop(client->manager->loop,(struct ev_timer*)&client->timer);
+	free(client);
+}
 
 static void
 error_happen(struct ev_session* session,void* ud) {
 	struct ev_client* client = ud;
-	ev_session_free(client->session);
-	container_remove(client->manager->container,client->id);
-	ev_timer_stop(client->manager->loop,(struct ev_timer*)&client->timer);
 	client->manager->close_func(client->manager->ud,client->id);
-	free(client);
+	close_client(0,client);
 }
 
 static void
@@ -105,7 +110,7 @@ read_complete(struct ev_session* ev_session, void* ud) {
 			    	client->order++;
 			    }
 			    client->freq++;
-			    client->message_tick = ev_now(client->manager->loop);
+			    client->tick = ev_now(client->manager->loop);
 			    client->manager->data_func(client->manager->ud,client->id,id,&data[6],client->need - 6);
 
 			    if (data != CACHED_BUFFER)
@@ -126,7 +131,7 @@ timeout(struct ev_loop* loop,struct ev_timer* io,int revents) {
 		error_happen(NULL, client);
 	}
 	client->freq = 0;
-	if (ev_now(client->manager->loop) - client->message_tick > ALIVE_TIME) {
+	if (ev_now(client->manager->loop) - client->tick > ALIVE_TIME) {
 		error_happen(NULL, client);
 	}
 }
@@ -152,7 +157,7 @@ accept_client(struct ev_listener *listener, int fd, const char* addr, void *ud) 
 	client->freq = 0;
 	client->seed = 0;
 	client->order = 0;
-	client->message_tick = 0;
+	client->tick = 0;
 	ev_session_setcb(client->session,read_complete,NULL,error_happen,client);
 	ev_session_enable(client->session,EV_READ);
 
@@ -214,10 +219,7 @@ client_manager_close(struct client_manager* manager,int client_id) {
 	if (!client) {
 		return -1;
 	}
-	ev_session_free(client->session);
-	container_remove(manager->container,client_id);
-	ev_timer_stop(manager->loop,(struct ev_timer*)&client->timer);
-	free(client);
+	close_client(0,client);
 	return 0;
 }
 
@@ -237,13 +239,6 @@ client_manager_send(struct client_manager* manager,int client_id,int message_id,
 	if (ev_session_output_size(client->session) > WARN_OUTPUT_FLOW) {
 		fprintf(stderr,"client:%d more then %dkb flow need to send out",client_id,WARN_OUTPUT_FLOW/1024);
 	}
-}
-
-static void 
-close_client(int id,void* data) {
-	struct ev_client* client = data;
-	ev_session_free(client->session);
-	free(client);
 }
 
 void
