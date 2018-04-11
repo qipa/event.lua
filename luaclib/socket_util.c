@@ -241,12 +241,12 @@ socket_udp_write(int fd,char* data,size_t size,struct sockaddr* addr,size_t addr
 }
 
 int
-socket_accept(int listen_fd,char* info) {
+socket_accept(int listen_fd,char* info,size_t length) {
     union sockaddr_all u;
     socklen_t len = sizeof(u);
     int client_fd = accept(listen_fd, &u.s, &len);
     if (client_fd < 0) {
-        snprintf(info, HOST_SIZE, "%s", strerror(errno));
+        snprintf(info, length, "%s", strerror(errno));
         return -1;
     }
 
@@ -258,31 +258,47 @@ socket_accept(int listen_fd,char* info) {
         int sin_port = ntohs((u.s.sa_family == AF_INET) ? u.v4.sin_port : u.v6.sin6_port);
         char tmp[INET6_ADDRSTRLEN];
         if (inet_ntop(u.s.sa_family, sin_addr, tmp, sizeof(tmp))) {
-            snprintf(info, HOST_SIZE, "%s:%d", tmp, sin_port);
+            snprintf(info, length, "%s:%d", tmp, sin_port);
         }
     } else {
-        snprintf(info, HOST_SIZE, "ipc:unknown");
+        snprintf(info, length, "ipc:unknown");
     }
     
     return client_fd;
 }
 
-char* 
-get_peer_info(int fd) {
+int 
+get_peername(int fd,char* out,size_t out_len,int* port) {
     union sockaddr_all u;
     socklen_t slen = sizeof(u);
-    if (getpeername(fd, &u.s, &slen) == 0) {
-        void * sin_addr = (u.s.sa_family == AF_INET) ? (void*)&u.v4.sin_addr : (void *)&u.v6.sin6_addr;
-        int sin_port = ntohs((u.s.sa_family == AF_INET) ? u.v4.sin_port : u.v6.sin6_port);
-        char tmp[INET6_ADDRSTRLEN];
-        char* result = malloc(INET6_ADDRSTRLEN);
-        memset(result,0,INET6_ADDRSTRLEN);
-        if (inet_ntop(u.s.sa_family, sin_addr, tmp, INET6_ADDRSTRLEN)) {
-            snprintf(result, INET6_ADDRSTRLEN, "%s:%d", tmp, sin_port);
-            return result;
-        } else {
-            free(result);
-        }
-    }
-    return NULL;
+    if (getpeername(fd, &u.s, &slen) != 0)
+        return -1;
+
+    void * sin_addr = (u.s.sa_family == AF_INET) ? (void*)&u.v4.sin_addr : (void *)&u.v6.sin6_addr;
+    int sin_port = ntohs((u.s.sa_family == AF_INET) ? u.v4.sin_port : u.v6.sin6_port);
+    if (port)
+        *port = sin_port;
+    
+    if (inet_ntop(u.s.sa_family, sin_addr, out, out_len))
+        return 0;
+
+    return -1;
+}
+
+int
+get_sockname(int fd,char* out,size_t out_len,int* port) {
+    union sockaddr_all u;
+    socklen_t slen = sizeof(u);
+    if (getsockname(fd, &u.s, &slen) != 0)
+        return -1;
+
+    void * sin_addr = (u.s.sa_family == AF_INET) ? (void*)&u.v4.sin_addr : (void *)&u.v6.sin6_addr;
+    int sin_port = ntohs((u.s.sa_family == AF_INET) ? u.v4.sin_port : u.v6.sin6_port);
+    if (port)
+        *port = sin_port;
+
+    if (inet_ntop(u.s.sa_family, sin_addr, out, out_len))
+        return 0;
+
+    return -1;
 }

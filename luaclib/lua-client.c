@@ -185,7 +185,10 @@ client_manager_start(struct client_manager* manager,const char* ip,int port) {
 	if (!manager->listener) {
 		return -1;
 	}
-	return 0;
+	if (port == 0) {
+		return ev_listener_port(manager->listener);
+	}
+	return port;
 } 
 
 void
@@ -232,7 +235,7 @@ client_manager_send(struct client_manager* manager,int client_id,int message_id,
 
 	ev_session_write(client->session,(char*)mb,total);
 	if (ev_session_output_size(client->session) > WARN_OUTPUT_FLOW) {
-		fprintf(stderr,"client:%d more then %skb flow need to send out",client_id,WARN_OUTPUT_FLOW/1024);
+		fprintf(stderr,"client:%d more then %dkb flow need to send out",client_id,WARN_OUTPUT_FLOW/1024);
 	}
 }
 
@@ -304,12 +307,13 @@ lclient_manager_start(lua_State* L){
 		luaL_error(L,"client manager start error,should set data callback first");
 	}
 	client_manager_stop(client_manager->manager);
-	if (client_manager_start(client_manager->manager,ip,port) == -1) {
+	int real_port = client_manager_start(client_manager->manager,ip,port);
+	if (real_port == -1) {
 		lua_pushboolean(L, 0);
 		lua_pushstring(L, strerror(errno));
 		return 2;
 	}
-	lua_pushboolean(L, 1);
+	lua_pushinteger(L, real_port);
 	return 1;
 }
 

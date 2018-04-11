@@ -106,7 +106,7 @@ _ev_accept_cb(struct ev_loop* loop,struct ev_io* io,int revents) {
 	ev_listener_t* listener = io->data;
 
 	const char addr[HOST_SIZE] = {0};
-	int accept_fd = socket_accept(listener->fd,(char*)addr);
+	int accept_fd = socket_accept(listener->fd,(char*)addr,HOST_SIZE);
 	if (accept_fd < 0) {
 		fprintf(stderr,"accept fd error:%s\n",addr);
 		return;
@@ -240,6 +240,16 @@ ev_listener_bind(struct ev_loop* loop,struct sockaddr* addr, int addrlen,int bac
 int
 ev_listener_fd(ev_listener_t* listener) {
 	return listener->fd;
+}
+
+int
+ev_listener_port(ev_listener_t* listener) {
+	char addr[INET6_ADDRSTRLEN] = {0};
+	int port = 0;
+	if (get_sockname(listener->fd,addr,INET6_ADDRSTRLEN,&port) < 0) {
+		return -1;
+	}
+	return port;
 }
 
 void

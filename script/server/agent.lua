@@ -50,6 +50,6 @@ event.fork(function ()
 
 	local client_manager = event.client_manager(1024)
 	client_manager:set_callback(client_accept,client_close,client_data)
-	client_manager:start("0.0.0.0",1989)
+	print(client_manager:start("0.0.0.0",1989))
 	model.set_client_manager(client_manager)
 end)
