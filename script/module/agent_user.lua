@@ -44,9 +44,9 @@ function cls_agent_user:leave_game()
 	scene_master:call("handler.master_handler","leave_scene",{uid = self.uid})
 end
 
-function cls_agent_user:transfer_scene(scene_id)
+function cls_agent_user:enter_scene(scene_id,pos)
 	local scene_master = model.get_master_channel()
-	scene_master:send("handler.master_handler","transfer_scene",{scene_id = scene_id})
+	scene_master:send("handler.master_handler","enter_scene",{scene_id = scene_id,pos = pos})
 end
 
 function cls_agent_user:user_enter_scene(scene_id,scene_uid,server_id,server_addr)

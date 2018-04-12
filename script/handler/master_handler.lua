@@ -59,8 +59,4 @@ function leave_scene(channel,args)
 	end)
 end
 
-function transfer_scene(channel,args)
-
-end
-
 function 
