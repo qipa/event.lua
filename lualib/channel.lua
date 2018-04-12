@@ -97,15 +97,22 @@ function channel:write(...)
 	self.buffer:write(...)
 end
 
-function channel:send(file,method,...)
-	local str = pack_table({file = file,method = method,session = 0,args = {...}})
+function channel:send(file,method,args,callback)
+	local session = 0
+	if callback then
+		session = event.gen_session()
+	end
+	local str = pack_table({file = file,method = method,session = 0,args = args})
 	self:write(str)
+	if session ~= 0 then
+		self.session_ctx[session] = {callback = callback}
+	end
 end
 
-function channel:call(file,method,...)
+function channel:call(file,method,args)
 	local session = event.gen_session()
 	self.session_ctx[session] = {}
-	local str = pack_table({file = file,method = method,session = session,args = {...}})
+	local str = pack_table({file = file,method = method,session = session,args = args})
 	self:write(str)
 
 	local ok,err = event.wait(session)
@@ -113,13 +120,6 @@ function channel:call(file,method,...)
 		error(err)
 	end
 	return ok
-end
-
-function channel:send_callback(file,method,args,callback)
-	local session = event.gen_session()
-	self.session_ctx[session] = {callback = callback}
-	local str = pack_table({file = file,method = method,session = session,args = args})
-	self:write(str)
 end
 
 function channel:ret(session,...)
