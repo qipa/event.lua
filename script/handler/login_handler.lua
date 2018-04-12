@@ -14,6 +14,10 @@ end
 
 function leave(cid)
 	local info = _login_ctx[cid]
+	if not info then
+		return
+	end
+	
 	if info.account then
 		local login_user = model.fetch_login_user_with_account(account)
 		if login_user then
@@ -42,16 +46,24 @@ function auth(cid,args)
 				client_manager:close(cid)
 				leave(cid)
 			end
-
 			_account_queue[account] = nil
+			local info = _login_ctx[last_cid]
+			if info then
+				info.account = account
+				login_user:new(last_cid,account)
+				login_user:auth()
+			end
 		end)
 	else
 		assert(#queue == 1)
 		_account_queue[account] = nil
 
 		local info = _login_ctx[cid]
-		info.account = account
-		login_user:new(cid,account)
+		if info then
+			info.account = account
+			login_user:new(cid,account)
+			login_user:auth()
+		end
 	end
 end
 

@@ -1,8 +1,13 @@
+local event = require "event"
 local model = require "model"
 local object = import "object"
 local server_handler = import "handler.server_handler"
 
 cls_login_user = object.cls_base:inherit("login_user","account")
+
+function __init__(self)
+	self.cls_login_user:save_field("login_info")
+end
 
 local PHASE = {
 	LOGIN = 1,
@@ -14,10 +19,47 @@ function cls_login_user:create(cid,account)
 	self.cid = cid
 	self.phase = PHASE.LOGIN
 	self.account = account
+	self.timer = event.timer(1,function (timer)
+		local user = model.fetch_login_user_with_account(account)
+		if not user then
+			return
+		end
+		local db_channel = model.get_mongod
+		user:save(db_channel)
+	end)
+end
+
+function cls_login_user:db_index()
+	return {account = self.account}
+end
+
+function cls_login_user:auth()
+	local db_channel = model.get_mongodb()
+	self:load(db_channel)
+	local self = model.fetch_login_user_with_account(self.account)
+	if not self then
+		return
+	end
+end
+
+function cls_login_user:create_role(career,name)
+
+end
+
+function cls_login_user:delete_role(uid)
+
+end
+
+function cls_login_user:create_name(name)
+
+end
+
+function cls_login_user:random_name()
+
 end
 
 function cls_login_user:destroy()
-
+	self.timer:cancel()
 end
 
 function cls_login_user:leave(callback)
