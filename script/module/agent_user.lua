@@ -4,6 +4,7 @@ local model = require "model"
 local util = require "util"
 
 local database_object = import "database_object"
+local module_item_mgr = import "module.item_mgr"
 
 
 cls_agent_user = database_object.cls_database:inherit("agent_user","uid","cid")
@@ -34,6 +35,11 @@ function cls_agent_user:enter_game()
 
 	local scene_master = model.get_master_channel()
 	scene_master:send("handler.master_handler","enter_scene",{scene_id = self.scene_info.id,pos = self.scene_info.pos})
+
+	local item_mgr = self.item_mgr
+	if not item_mgr then
+		item_mgr = module_item_mgr.cls_item_mgr:new(self.uid)
+	end
 end
 
 function cls_agent_user:leave_game()

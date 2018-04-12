@@ -171,6 +171,9 @@ function cls_base:unpack(...)
 	return self:instance_from(data)
 end
 
+function cls_base:save_field(field)
+	self.__save_fields[field] = true
+end
 
 class = {}
 

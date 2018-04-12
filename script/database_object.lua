@@ -2,10 +2,6 @@ local object = import "object"
 
 cls_database = object.cls_base:inherit("database_object")
 
-function cls_database:save_field(field)
-	self.__save_fields[field] = true
-end
-
 function cls_database:dirty_field(field)
 	self.__dirty[field] = true
 end
@@ -34,7 +30,12 @@ function cls_database:save(db_channel)
 			local data = self[field]
 			if data then
 				local updater = {}
-				updater["$set"] = data
+				if data.save_data then
+					updater["$set"] = data:save_data()
+				else
+					updater["$set"] = data
+				end
+				
 				db_channel:update(field,self:db_index(),updater,true)
 			end
 		end
