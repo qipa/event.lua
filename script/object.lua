@@ -171,38 +171,6 @@ function cls_base:unpack(...)
 	return self:instance_from(data)
 end
 
-function cls_base:save_field(field)
-	self.__save_fields[field] = true
-end
-
-function cls_base:dirty_field(field)
-	self.__dirty[field] = true
-end
-
---子类重写,返回保存数据库的索引
-function cls_base:db_index()
-	return {id = self.__uid}
-end
-
-function cls_base:load(db_channel,query)
-	for field in pairs(self.__save_fields) do
-		local result = db_channel:findOne(field,{query = self:db_index()})
-		self[field] = result
-	end
-end
-
-function cls_base:save(db_channel,query)
-	for field in pairs(self.__dirty) do
-		if self.__save_fields[field] then
-			local data = self[field]
-			if data then
-				local updater = {}
-				updater["$set"] = data
-				db_channel:update(field,self:db_index(),updater,true)
-			end
-		end
-	end
-end
 
 class = {}
 

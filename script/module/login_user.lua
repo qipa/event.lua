@@ -1,9 +1,12 @@
 local event = require "event"
+local cjson = require "cjson"
 local model = require "model"
-local object = import "object"
+local util = require "util"
+
+local database_object = import "database_object"
 local server_handler = import "handler.server_handler"
 
-cls_login_user = object.cls_base:inherit("login_user","account")
+cls_login_user = database_object.cls_database:inherit("login_user","account")
 
 function __init__(self)
 	self.cls_login_user:save_field("login_info")
@@ -24,7 +27,7 @@ function cls_login_user:create(cid,account)
 		if not user then
 			return
 		end
-		local db_channel = model.get_mongod
+		local db_channel = model.get_mongod()
 		user:save(db_channel)
 	end)
 end
@@ -60,6 +63,7 @@ end
 
 function cls_login_user:destroy()
 	self.timer:cancel()
+	model.unbind_login_user_with_account(self.account)
 end
 
 function cls_login_user:leave(callback)
@@ -68,7 +72,6 @@ function cls_login_user:leave(callback)
 		client_manager:close(self.cid)
 		self.phase = PHASE.AGENT_LEAVING
 		server_handler:send_agent(self.agent,"handler.agent_handler","user_kick",{uid = uid},function ()
-			model.unbind_login_user_with_account(self.account)
 			self:release()
 			if callback then
 				callback()
@@ -78,7 +81,6 @@ function cls_login_user:leave(callback)
 	elseif self.phase == PHASE.AGENT_LEAVING then
 		return
 	end
-	model.unbind_login_user_with_account(self.account)
 	self:release()
 	if callback then
 		callback()
@@ -91,6 +93,10 @@ function cls_login_user:enter_agent(uid)
 	self.uid = uid
 	self.agent = agent
 	self.phase = PHASE.AGENT
-	server_handler:send_agent(agent,"handler.agent_handler","user_register",{uid = uid})
+
+	local time = util.time()
+	local json = cjson.encode({account = self.account,uid = uid})
+	local token = util.authcode(json,tostring(time),1)
+	server_handler:send_agent(agent,"handler.agent_handler","user_register",{token = token,time = time})
 end
 
