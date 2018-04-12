@@ -90,7 +90,7 @@ local function append_log(logger,log_lv,...)
 				channel.addr = logger.log_addr
 				channel_container[logger.log_addr] = channel
 			end
-			channel:send("handler.logger_handler","log",logger.log_type,content)
+			channel:send("handler.logger_handler","log",{logger.log_type,content})
 		else
 			util.print(log_lv,content)
 		end

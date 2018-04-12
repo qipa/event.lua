@@ -58,3 +58,54 @@
 [E:runtime][1970-06-26 15:31:52 @./script/server/agent.lua:56] error
 [E:runtime][1970-06-26 15:33:31 @./lualib/import.lua:24] handler.agent_handler local var:protocol:4,
 [E:runtime][1970-06-26 15:33:31 @lualib/bootstrap.lua:103] thread:31328 start,command:event@server/agent@101,lua mem:203.416016kb,c mem:297.156250kb
+[E:runtime][1970-06-26 16:00:41 @./lualib/event.lua:71] ./lualib/event.lua:92: attempt to index a nil value (local 'addr')
+stack traceback:
+	./lualib/event.lua:92: in upvalue 'resolve_addr'
+	./lualib/event.lua:124: in function 'event.connect'
+	./script/server/scene.lua:70: in upvalue 'func'
+	./lualib/event.lua:49: in function <./lualib/event.lua:48>
+[E:runtime][1970-06-26 16:00:41 @lualib/bootstrap.lua:103] thread:24245 start,command:event@server/scene@101,lua mem:200.612305kb,c mem:431.289062kb
+[E:runtime][1970-06-26 16:00:41 @./lualib/event.lua:71] ./lualib/event.lua:92: attempt to index a nil value (local 'addr')
+stack traceback:
+	./lualib/event.lua:92: in upvalue 'resolve_addr'
+	./lualib/event.lua:124: in function 'event.connect'
+	./script/server/scene.lua:34: in upvalue 'connect_server'
+	./script/server/scene.lua:78: in upvalue 'func'
+	./lualib/event.lua:49: in function <./lualib/event.lua:48>
+[E:runtime][1970-06-26 16:00:41 @lualib/bootstrap.lua:103] thread:24272 start,command:event@server/scene@101,lua mem:200.050781kb,c mem:439.406250kb
+[E:runtime][1970-06-26 16:00:41 @./lualib/event.lua:71] ./lualib/event.lua:92: attempt to index a nil value (local 'addr')
+stack traceback:
+	./lualib/event.lua:92: in upvalue 'resolve_addr'
+	./lualib/event.lua:110: in function 'event.listen'
+	./script/server/scene.lua:82: in upvalue 'func'
+	./lualib/event.lua:49: in function <./lualib/event.lua:48>
+[E:runtime][1970-06-26 16:00:41 @lualib/bootstrap.lua:103] thread:24276 start,command:event@server/scene@101,lua mem:199.957031kb,c mem:439.343750kb
+[E:runtime][1970-06-26 16:00:41 @./lualib/event.lua:71] ./script/server/scene.lua:93: attempt to index a nil value (local 'master_channel')
+stack traceback:
+	./script/server/scene.lua:93: in upvalue 'func'
+	./lualib/event.lua:49: in function <./lualib/event.lua:48>
+[E:runtime][1970-06-26 16:00:41 @lualib/bootstrap.lua:103] thread:24291 start,command:event@server/scene@101,lua mem:200.457031kb,c mem:437.445312kb
+[E:runtime][1970-06-26 16:00:42 @./lualib/event.lua:71] ./script/server/scene.lua:93: attempt to index a nil value (local 'master_channel')
+stack traceback:
+	./script/server/scene.lua:93: in upvalue 'func'
+	./lualib/event.lua:49: in function <./lualib/event.lua:48>
+[E:runtime][1970-06-26 16:00:42 @lualib/bootstrap.lua:103] thread:24317 start,command:event@server/scene@101,lua mem:200.457031kb,c mem:437.742188kb
+[E:runtime][1970-06-26 16:00:42 @lualib/bootstrap.lua:103] thread:24321 start,command:event@server/scene@101,lua mem:200.850586kb,c mem:430.320312kb
+[E:runtime][1970-06-26 16:00:42 @lualib/bootstrap.lua:103] thread:24324 start,command:event@server/scene@101,lua mem:200.855469kb,c mem:430.320312kb
+[E:runtime][1970-06-26 16:00:45 @lualib/bootstrap.lua:103] thread:24493 start,command:event@server/scene@101,lua mem:200.850586kb,c mem:430.507812kb
+[E:runtime][1970-06-26 16:00:45 @lualib/bootstrap.lua:103] thread:24516 start,command:event@server/scene@101,lua mem:200.850586kb,c mem:430.507812kb
+[E:runtime][1970-06-26 16:00:46 @./lualib/event.lua:71] ./lualib/event.lua:92: attempt to index a nil value (local 'addr')
+stack traceback:
+	./lualib/event.lua:92: in upvalue 'resolve_addr'
+	./lualib/event.lua:124: in function 'event.connect'
+	./script/server/scene.lua:70: in upvalue 'func'
+	./lualib/event.lua:49: in function <./lualib/event.lua:48>
+[E:runtime][1970-06-26 16:00:46 @lualib/bootstrap.lua:103] thread:24541 start,command:event@server/scene@101,lua mem:200.651367kb,c mem:431.132812kb
+[E:runtime][1970-06-26 16:00:48 @./lualib/event.lua:71] ./lualib/event.lua:92: attempt to index a nil value (local 'addr')
+stack traceback:
+	./lualib/event.lua:92: in upvalue 'resolve_addr'
+	./lualib/event.lua:124: in function 'event.connect'
+	./script/server/world.lua:29: in upvalue 'connect_server'
+	./script/server/world.lua:65: in upvalue 'func'
+	./lualib/event.lua:49: in function <./lualib/event.lua:48>
+[E:runtime][1970-06-26 16:00:48 @lualib/bootstrap.lua:103] thread:24820 start,command:event@server/world@101,lua mem:204.273438kb,c mem:274.492188kb

@@ -187,7 +187,10 @@ client_manager_start(struct client_manager* manager,const char* ip,int port) {
 		return -1;
 	}
 	if (port == 0) {
-		return ev_listener_port(manager->listener);
+		char addr[INET6_ADDRSTRLEN] = {0};
+		if (ev_listener_addr(manager->listener,addr,INET6_ADDRSTRLEN,&port) < 0) {
+			return port;
+		}
 	}
 	return port;
 } 

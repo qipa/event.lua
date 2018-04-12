@@ -94,8 +94,6 @@ event.fork(function ()
 	mongodb:init("sunset")
 	model.set_db_channel(mongodb)
 
-	connect_server("logger")
-
 	connect_server("login")
 
 	connect_server("world")
@@ -104,6 +102,13 @@ event.fork(function ()
 
 	local client_manager = event.client_manager(1024)
 	client_manager:set_callback(client_accept,client_close,client_data)
-	print(client_manager:start("192.168.100.55",0))
+	local port,reason = client_manager:start("0.0.0.0",0)
+	if not port then
+		print(string.format("agent listen client failed:%s",reason))
+		os.exit()
+	end
 	model.set_client_manager(client_manager)
+
+	local login_channel = model.get_login_channel()
+	login_channel:send("handler.server_handler","register_agent",{ip = "0.0.0.0",port = port})
 end)

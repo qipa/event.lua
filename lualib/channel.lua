@@ -55,7 +55,7 @@ function channel:read_util(sep)
 end
 
 local function call_method(channel,session,file,method,args)
-	local ok,result = xpcall(route.dispatch,debug.traceback,file,method,channel,table.unpack(args))
+	local ok,result = xpcall(route.dispatch,debug.traceback,file,method,channel,args)
 	if not ok then
 		event.error(result)
 	end
@@ -72,9 +72,9 @@ function channel:dispatch(message)
 	if message.ret then
 		local call_ctx = self.session_ctx[message.session]
 		if call_ctx.callback then
-			call_ctx.callback(table.unpack(message.args))
+			call_ctx.callback(message.args)
 		else
-			event.wakeup(message.session,table.unpack(message.args))
+			event.wakeup(message.session,message.args)
 		end
 		self.session_ctx[message.session] = nil
 	else

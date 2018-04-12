@@ -291,14 +291,19 @@ get_sockname(int fd,char* out,size_t out_len,int* port) {
     socklen_t slen = sizeof(u);
     if (getsockname(fd, &u.s, &slen) != 0)
         return -1;
+    if (u.s.sa_family == AF_INET || u.s.sa_family == AF_INET6) {
+        void * sin_addr = (u.s.sa_family == AF_INET) ? (void*)&u.v4.sin_addr : (void *)&u.v6.sin6_addr;
+        int sin_port = ntohs((u.s.sa_family == AF_INET) ? u.v4.sin_port : u.v6.sin6_port);
+        if (port)
+            *port = sin_port;
 
-    void * sin_addr = (u.s.sa_family == AF_INET) ? (void*)&u.v4.sin_addr : (void *)&u.v6.sin6_addr;
-    int sin_port = ntohs((u.s.sa_family == AF_INET) ? u.v4.sin_port : u.v6.sin6_port);
-    if (port)
-        *port = sin_port;
-
-    if (inet_ntop(u.s.sa_family, sin_addr, out, out_len))
+        if (inet_ntop(u.s.sa_family, sin_addr, out, out_len))
+            return 0;
+    } else if (u.s.sa_family == AF_UNIX) {
+        snprintf(out, out_len, "%s", u.un.sun_path);
+        *port = 0;
         return 0;
+    }
 
     return -1;
 }

@@ -16,7 +16,7 @@ typedef void (*ev_session_callback)(struct ev_session*,void *userdata);
 
 struct ev_listener* ev_listener_bind(struct ev_loop* loop,struct sockaddr* addr, int addrlen,int backlog,int flag,listener_callback accept_cb,void* userdata);
 int ev_listener_fd(struct ev_listener* listener);
-int ev_listener_port(struct ev_listener* listener);
+int ev_listener_addr(struct ev_listener* listener,char* addr,size_t length,int* port);
 void ev_listener_free(struct ev_listener* listener);
 
 struct ev_session* ev_session_bind(struct ev_loop* loop,int fd);

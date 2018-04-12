@@ -524,6 +524,22 @@ _listen_alive(lua_State* L) {
 }
 
 static int
+_listen_addr(lua_State* L) {
+	struct lua_ev_listener* lev_listener = (struct lua_ev_listener*)lua_touserdata(L, 1);
+	if (!lev_listener->listener) {
+		return 0;
+	}
+	char addr[INET6_ADDRSTRLEN] = {0};
+	int port = 0;
+	if (ev_listener_addr(lev_listener->listener,addr,INET6_ADDRSTRLEN,&port) < 0) {
+		return 0;
+	}
+	lua_pushstring(L, addr);
+	lua_pushinteger(L, port);
+	return 2;
+}
+
+static int
 _listen(lua_State* L) {
 	struct lua_ev* lev = (struct lua_ev*)lua_touserdata(L, 1);
 	struct ev_loop* loop = lev->loop;
@@ -1007,6 +1023,7 @@ luaopen_ev_core(lua_State* L) {
 
 	luaL_newmetatable(L, META_LISTENER);
 	const luaL_Reg meta_listener[] = {
+		{ "addr", _listen_addr },
 		{ "close", _listen_close },
 		{ "alive", _listen_alive },
 		{ NULL, NULL },

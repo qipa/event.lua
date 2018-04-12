@@ -243,13 +243,11 @@ ev_listener_fd(ev_listener_t* listener) {
 }
 
 int
-ev_listener_port(ev_listener_t* listener) {
-	char addr[INET6_ADDRSTRLEN] = {0};
-	int port = 0;
-	if (get_sockname(listener->fd,addr,INET6_ADDRSTRLEN,&port) < 0) {
+ev_listener_addr(ev_listener_t* listener,char* addr,size_t length,int* port) {
+	if (get_sockname(listener->fd,addr,length,port) < 0) {
 		return -1;
 	}
-	return port;
+	return 0;
 }
 
 void

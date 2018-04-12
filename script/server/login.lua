@@ -7,6 +7,7 @@ local channel = require "channel"
 local protocol_forward = import "server.protocol_forward"
 local rpc = import "server.rpc"
 local login_handler = import "handler.login_handler"
+local server_handler = import "handler.server_handler"
 
 model.register_value("mongodb")
 model.register_value("client_manager")
@@ -17,7 +18,9 @@ local rpc_channel = channel:inherit()
 
 function rpc_channel:disconnect()
 	if self.name ~= nil then
-		model.unbind_channel_with_name(self.name)
+		if self.name == "agent" then
+			server_handler:agent_down(self,self.id)
+		end
 	end
 end
 
@@ -40,7 +43,7 @@ end
 event.fork(function ()
 	protocol.parse("login")
 	protocol.load()
-	local mongodb,reason = event.connect("tcp://127.0.0.1:10105",4,mongo)
+	local mongodb,reason = event.connect(env.mongodb,4,mongo)
 	if not mongodb then
 		print(reason)
 		event.breakout()
@@ -49,7 +52,7 @@ event.fork(function ()
 	mongodb:init("sunset")
 	model.set_mongodb(mongodb)
 
-	local ok,reason = event.listen("ipc://login.ipc",4,channel_accept)
+	local ok,reason = event.listen(env.login,4,channel_accept)
 	if not ok then
 		print(reason)
 		event.breakout()

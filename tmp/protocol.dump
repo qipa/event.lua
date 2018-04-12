@@ -1,64 +1,64 @@
 {
 	{
-		["name"] = "c2s_auth",
 		["proto"] = {
 			["fields"] = {
 				{
+					["array"] = false,
 					["name"] = "account",
-					["type"] = 3,
 					["type_name"] = "string",
-					["array"] = false,
+					["type"] = 3,
 				},
 			},
 			["file"] = "login.protocol",
 		},
+		["name"] = "c2s_auth",
 	},
 	{
-		["name"] = "role_info",
 		["proto"] = {
 			["fields"] = {
 				{
+					["array"] = false,
 					["name"] = "id",
-					["type"] = 0,
 					["type_name"] = "int",
-					["array"] = false,
+					["type"] = 0,
 				},
 				{
-					["name"] = "name",
-					["type"] = 3,
-					["type_name"] = "string",
 					["array"] = false,
+					["name"] = "name",
+					["type_name"] = "string",
+					["type"] = 3,
 				},
 			},
 			["file"] = "login.protocol",
 		},
+		["name"] = "role_info",
 	},
 	{
-		["name"] = "s2c_auth",
 		["proto"] = {
 			["fields"] = {
 				{
-					["type_name"] = "role_info",
 					["name"] = "list",
-					["type"] = 4,
+					["array"] = true,
+					["type_name"] = "role_info",
 					["fields"] = {
 						{
-							["name"] = "id",
-							["type"] = 0,
-							["type_name"] = "int",
 							["array"] = false,
+							["name"] = "id",
+							["type_name"] = "int",
+							["type"] = 0,
 						},
 						{
-							["name"] = "name",
-							["type"] = 3,
-							["type_name"] = "string",
 							["array"] = false,
+							["name"] = "name",
+							["type_name"] = "string",
+							["type"] = 3,
 						},
 					},
-					["array"] = true,
+					["type"] = 4,
 				},
 			},
 			["file"] = "login.protocol",
 		},
+		["name"] = "s2c_auth",
 	},
 }
