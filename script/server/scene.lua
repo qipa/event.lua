@@ -29,11 +29,20 @@ function agent_channel:disconnect()
 end
 
 local function connect_server(name)
-	local channel,reason = event.connect(env[name],4,true,rpc_channel)
-	if not channel then
-		print(string.format("connect server:%s %s faield:%s",name,env[name],reason))
-		os.exit()
+	local channel,reason
+	local count = 0
+	while not channel do
+		channel,reason = event.connect(env[name],4,false,rpc_channel)
+		if not channel then
+			event.error(string.format("connect server:%s %s failed:%s",name,env[name],reason))
+			count = count + 1
+			if count >= 10 then
+				os.exit(1)
+			end
+			event.sleep(1)
+		end
 	end
+
 	channel.name = name
 	channel.monitor = event.gen_session()
 	model[string.format("set_%s_channel",name)](channel)
@@ -46,7 +55,7 @@ local function connect_server(name)
 			while not channel do
 				channel,reason = event.connect(env[name],4,false,rpc_channel)
 				if not channel then
-					print(string.format("connect server:%s %s faield:%s",name,env[name],reason))
+					event.error(string.format("connect server:%s %s failed:%s",name,env[name],reason))
 					event.sleep(1)
 				end
 			end
