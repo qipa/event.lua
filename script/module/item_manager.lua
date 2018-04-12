@@ -12,6 +12,10 @@ function cls_item_mgr:create()
 
 end
 
+function cls_item_mgr:init()
+
+end
+
 function cls_item_mgr:destroy()
 
 end
