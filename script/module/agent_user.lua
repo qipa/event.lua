@@ -6,7 +6,7 @@ local util = require "util"
 local database_object = import "database_object"
 
 
-cls_agent_user = database_object.cls_database:inherit("agent_user","uid")
+cls_agent_user = database_object.cls_database:inherit("agent_user","uid","cid")
 
 function __init__(self)
 	self.cls_agent_user:save_field("user_info")
@@ -29,23 +29,23 @@ function cls_agent_user:db_index()
 end
 
 function cls_agent_user:enter_game()
-	local world = model.get_world()
+	local world = model.get_world_channel()
 	world:send("handler.world_handler","enter_world",{uid = self.uid})
 
-	local scene_master = model.get_scene_master()
+	local scene_master = model.get_master_channel()
 	scene_master:send("handler.scene_master_handler","enter_scene",{scene_id = self.scene_info.id,pos = self.scene_info.pos})
 end
 
 function cls_agent_user:leave_game()
-	local world = model.get_world()
+	local world = model.get_world_channel()
 	world:call("handler.world_handler","leave_world",{uid = self.uid})
 
-	local scene_master = model.get_scene_master()
+	local scene_master = model.get_master_channel()
 	scene_master:call("handler.scene_master_handler","leave_scene",{uid = self.uid})
 end
 
 function cls_agent_user:transfer_scene(scene_id)
-	local scene_master = model.get_scene_master()
+	local scene_master = model.get_master_channel()
 	scene_master:send("handler.scene_master_handler","enter_scene",{scene_id = scene_id})
 end
 
@@ -59,15 +59,15 @@ function cls_agent_user:forward_scene(message_id,message)
 end
 
 function cls_agent_user:send_scene(file,method,args)
-	local scene_server = model.fetch_scene_server_with_id(self.scene_server)
-	if not scene_server then
+	local scene_channel = model.fetch_scene_channel_with_id(self.scene_server)
+	if not scene_channel then
 		local channel,reason = event.connect(self.scene_server_addr,4,true)
 		if not channel then
 			print(string.format("connect scene server:%d faield:%s",self.scene_server,reason))
 			return
 		end
-		model.bind_scene_server_with_id(self.scene_server,channel)
-		scene_server = channel
+		model.bind_scene_channel_with_id(self.scene_server,channel)
+		scene_channel = channel
 	end
-	scene_server:send(file,method,args)
+	scene_channel:send(file,method,args)
 end

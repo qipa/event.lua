@@ -35,7 +35,7 @@ function req_enter(cid,args)
 	local user = agent_user.cls_agent_user:new(cid,info.uid)
 	user:load(db_channel)
 	user:enter_game()
-	_enter_user[cid] = user
+	model.bind_agent_user_with_cid(cid,user)
 end
 
 function user_register(args)
@@ -51,7 +51,7 @@ function user_leave(cid)
 	end
 	user:leave_game()
 	user:release()
-	_enter_user[cid] = nil
+	model.unbind_agent_user_with_cid(cid)
 end
 
 function user_kick(args)
@@ -60,5 +60,7 @@ function user_kick(args)
 	client_manager:close(cid)
 	user:leave_game()
 	user:release()
-	_enter_user[cid] = nil
+	model.unbind_agent_user_with_cid(cid)
 end
+
+function 
