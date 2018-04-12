@@ -1,23 +1,45 @@
 local protocol = require "protocol"
 local cjson = require "cjson"
 local util = require "util"
-local protocol_forward = import "server.protocol_forward"
+local model = require "model"
 
-function client_forward(args)
-	local client_id = args.client_id
-	local message_id = args.message_id
-	local data = args.data
-	local name = protocol_forward.forward[message_id]
-	local message = protocol.decode[name](data)
-	table.print(message,"client_forward")
+
+_login_ctx = _login_ctx or {}
+
+function enter(cid,addr)
+	local info = {cid = cid,addr = addr}
+	_login_ctx[cid] = info
 end
 
-function auth(client_id,args)
+function leave(cid)
+	local info = _login_ctx[cid]
+	if info.account then
+		local login_user = model.fetch_login_user_with_account(account)
+		if login_user then
+			login_user:leave()
+		end
+	end
+	_login_ctx[cid] = nil
+end
+
+function kick_client(cid)
+	local client_manager = model.get_client_manager()
+	client_manager:close(cid)
+end
+
+function auth(cid,args)
 	local account = args.account
-
+	local login_user = model.fetch_login_user_with_account(account)
+	if login_user then
+		kick_client(login_user.cid)
+		login_user:leave()
+	end
+	local info = _login_ctx[cid]
+	info.account = account
+	login_user:new(cid,account)
 end
 
-function enter(client_id,args)
+function enter_game(client_id,args)
 	local account = args.account
 	local user_id = args.user_id
 	local json = cjson.encode({account = account,user_id = user_id})

@@ -55,7 +55,7 @@ function channel:read_util(sep)
 end
 
 local function call_method(channel,session,file,method,args)
-	local ok,result = xpcall(route.dispatch,debug.traceback,file,method,table.unpack(args))
+	local ok,result = xpcall(route.dispatch,debug.traceback,file,method,channel,table.unpack(args))
 	if not ok then
 		event.error(result)
 	end

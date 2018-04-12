@@ -3,15 +3,39 @@ local util = require "util"
 local model = require "model"
 local protocol = require "protocol"
 local mongo = require "mongo"
+local channel = require "channel"
 local protocol_forward = import "server.protocol_forward"
 local rpc = import "server.rpc"
+local login_handler = import "handler.login_handler"
 
 model.register_value("mongodb")
+model.register_value("client_manager")
+model.register_binder("channel","name")
+model.register_binder("login_info","cid")
+
+local rpc_channel = channel:inherit()
+
+function rpc_channel:disconnect()
+	if self.name ~= nil then
+		model.unbind_channel_with_name(self.name)
+	end
+end
 
 local function channel_accept(_,channel)
 	print("channel_accept",channel)
 end
 
+local function client_data(cid,message_id,data,size)
+	route.dispatch_client(cid,message_id,data,size)
+end
+
+local function client_accept(cid,addr)
+	login_handler.enter(cid,addr)
+end
+
+local function client_close(cid)
+	login_handler.leave(cid)
+end
 
 event.fork(function ()
 	protocol.parse("login")
@@ -19,9 +43,26 @@ event.fork(function ()
 	local mongodb,reason = event.connect("tcp://127.0.0.1:10105",4,mongo)
 	if not mongodb then
 		print(reason)
-		os.exit()
+		event.breakout()
+		return
 	end
 	mongodb:init("sunset")
 	model.set_mongodb(mongodb)
-	event.listen("ipc://login.ipc",4,channel_accept)
+
+	local ok,reason = event.listen("ipc://login.ipc",4,channel_accept)
+	if not ok then
+		print(reason)
+		event.breakout()
+		return
+	end
+
+	local client_manager = event.client_manager(5000)
+	client_manager:set_callback(client_accept,client_close,client_data)
+	local ok,reason = client_manager:start("0.0.0.0",1989)
+	if not ok then
+		print(reason)
+		event.breakout()
+		return
+	end
+	model.set_client_manager(client_manager)
 end)

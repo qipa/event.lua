@@ -21,9 +21,9 @@ function _M.dispatch(file,method,...)
 	return func(...)
 end
 
-function _M.dispatch_client(user,message_id,data,size)
+function _M.dispatch_client(message_id,data,size,...)
 	local name,message = protocol.decode[message_id](data,size)
-	protocol.handler[name](user,message)
+	protocol.handler[name](...,message)
 end
 
 
