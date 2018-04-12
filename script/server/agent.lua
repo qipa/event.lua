@@ -7,20 +7,11 @@ local route = require "route"
 local channel = require "channel"
 local startup = import "server.startup"
 
-
+model.register_binder("scene_channel","id")
 model.register_binder("client","id")
 model.register_value("client_manager")
 model.register_value("db_channel")
-model.register_value("logger_channel")
-model.register_value("login_channel")
-model.register_value("master_channel")
-model.register_value("world_channel")
-model.register_binder("scene_channel","id")
 
-local rpc_channel = channel:inherit()
-function rpc_channel:disconnect()
-	model[string.format("set_%s_channel",self.name)](nil)
-end
 
 local mongodb_channel = mongo:inherit()
 function mongodb_channel:disconnect()
@@ -46,35 +37,6 @@ local function client_close(id)
 	print("client_close",id)
 end
 
-local function connect_server(name)
-	local channel,reason = event.connect(env[name],4,true,rpc_channel)
-	if not channel then
-		event.breakout(string.format("connect server:%s %s faield:%s",name,env[name],reason))
-	end
-	channel.name = name
-	channel.monitor = event.gen_session()
-	model[string.format("set_%s_channel",name)](channel)
-
-	event.fork(function ( ... )
-		event.wait(channel.monitor)
-
-		while true do
-			local channel,reason
-			while not channel do
-				channel,reason = event.connect(env[name],4,false,rpc_channel)
-				if not channel then
-					print(string.format("connect server:%s %s faield:%s",name,env[name],reason))
-					event.sleep(1)
-				end
-			end
-			channel.name = name
-			channel.monitor = event.gen_session()
-			model[string.format("set_%s_channel",name)](channel)
-			event.wait(channel.monitor)
-		end
-	end)
-end
-
 
 event.fork(function ()
 	startup.run()
@@ -89,11 +51,11 @@ event.fork(function ()
 	mongodb:init("sunset")
 	model.set_db_channel(mongodb)
 
-	connect_server("login")
+	startup.connect_server("login")
 
-	connect_server("world")
+	startup.connect_server("world")
 
-	connect_server("master")
+	startup.connect_server("master")
 
 	local client_manager = event.client_manager(1024)
 	client_manager:set_callback(client_accept,client_close,client_data)
