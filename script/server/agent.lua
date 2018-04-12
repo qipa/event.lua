@@ -54,4 +54,6 @@ event.fork(function ()
 
 	local world_channel = model.get_world_channel()
 	world_channel:send("handler.server_handler","register_agent_server",{ip = "0.0.0.0",port = port})
+
+	event.error("agent start success")
 end)

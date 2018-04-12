@@ -17,7 +17,9 @@ function mongodb_channel:disconnect()
 end
 
 function run(db_addr)
-	local runtime_logger = logger:create("runtime",{level = env.log_lv,addr = env.logger},5)
+	connect_server("logger")
+
+	local runtime_logger = logger:create("runtime",5)
 	event.error = function (...)
 		runtime_logger:ERROR(...)
 	end
@@ -29,7 +31,7 @@ function run(db_addr)
 			print(string.format("connect db:%s faield:%s",env.mongodb,reason))
 			os.exit()
 		end
-		mongodb:init("sunset")
+		db_channel:init("sunset")
 		model.set_db_channel(db_channel)
 	end
 
@@ -38,7 +40,7 @@ function run(db_addr)
 end
 
 function connect_server(name)
-	model.register_value(string.format("%s_channel"))
+	model.register_value(string.format("%s_channel",name))
 	local channel,reason
 	local count = 0
 	while not channel do

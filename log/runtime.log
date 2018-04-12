@@ -113,3 +113,9 @@ stack traceback:
 [E:runtime][1970-06-26 16:01:02 @lualib/bootstrap.lua:103] thread:7248 start,command:event@server/world@101,lua mem:197.192383kb,c mem:265.164062kb
 [E:runtime][1970-06-26 16:01:02 @lualib/bootstrap.lua:103] thread:7275 start,command:event@server/scene@101,lua mem:198.307617kb,c mem:266.539062kb
 [E:runtime][1970-06-26 16:01:02 @lualib/bootstrap.lua:103] thread:7293 start,command:event@server/agent@101,lua mem:205.070312kb,c mem:299.164062kb
+[E:runtime][1970-06-26 16:02:53 @./lualib/event.lua:71] user.server.startup:34: attempt to index a nil value (global 'mongodb')
+stack traceback:
+	user.server.startup:34: in field 'run'
+	./script/server/world.lua:31: in upvalue 'func'
+	./lualib/event.lua:49: in function <./lualib/event.lua:48>
+[E:runtime][1970-06-26 16:02:55 @./script/server/agent.lua:58] agent start success

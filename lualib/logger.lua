@@ -1,5 +1,6 @@
 local event = require "event"
 local util = require "util"
+local model = require "model"
 local channel = require "channel"
 
 local LOG_LV_ERROR = 0
@@ -15,22 +16,20 @@ local LOG_TAG = {
 }
 
 
-local channel_container = {}
 local logger_container = {}
-local logger_FILE = nil
+
 
 local log_channel = channel:inherit()
 
 function log_channel:disconnect()
 	channel.disconnect(self)
-	channel_container[self.addr] = nil
+	_channel = nil
 end
 
 local _M = {}
 
-function _M:create(log_type,log_conf,depth)
+function _M:create(log_type,depth)
 	log_type = log_type or "unknown"
-	log_conf = log_conf or {}
 	depth = depth or 4
 
 	local logger = logger_container[log_type]
@@ -39,14 +38,7 @@ function _M:create(log_type,log_conf,depth)
 	end
 
 	local ctx = setmetatable({},{__index = self})
-	if log_conf.file then
-		if not logger_FILE then
-			logger_FILE  = assert(io.open(log_conf.file,"a+"))
-		end
-	elseif log_conf.addr then
-		ctx.log_addr = log_conf.addr
-	end
-	ctx.log_level = log_conf.level or LOG_LV_DEBUG
+	ctx.log_level = env.log_lv or LOG_LV_DEBUG
 	ctx.log_type = log_type
 	ctx.depth = depth
 
@@ -56,10 +48,7 @@ function _M:create(log_type,log_conf,depth)
 end
 
 function _M:close()
-	if logger_FILE then
-		logger_FILE:flush()
-		logger_FILE:close()
-	end
+
 end
 
 local function get_debug_info(logger)
@@ -73,28 +62,11 @@ local function append_log(logger,log_lv,...)
 	local now = math.modf(os.time() / 100)
 
 	local content = string.format("[%s:%s][%s %s:%s] %s",LOG_TAG[log_lv],logger.log_type,os.date("%Y-%m-%d %H:%M:%S",now),source,tostring(line),log)
-
-	if logger_FILE then
-		logger_FILE:write(content.."\n")
-		logger_FILE:flush()
-	else
-		if logger.log_addr then
-			local reason
-			local channel = channel_container[logger.log_addr]
-			if not channel then
-				channel,reason = event.connect(logger.log_addr,4,true,log_channel)
-				if not channel then
-					print(string.format("connect logger server failed,addr:%s,reason:%s",logger.log_addr,reason))
-					return
-				end
-				channel.addr = logger.log_addr
-				channel_container[logger.log_addr] = channel
-			end
-			channel:send("handler.logger_handler","log",{logger.log_type,content})
-		else
-			util.print(log_lv,content)
-		end
+	local logger_channel = model.get_logger_channel()
+	if not logger_channel then
+		return
 	end
+	logger_channel:send("handler.logger_handler","log",{logger.log_type,content})
 end
 
 function _M:DEBUG(...)

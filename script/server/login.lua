@@ -10,8 +10,17 @@ local login_handler = import "handler.login_handler"
 local server_handler = import "handler.server_handler"
 
 model.register_value("client_manager")
-model.register_binder("channel","name")
+model.register_binder("agent_channel","id")
 model.register_binder("login_info","cid")
+
+local common_channel = channel:inherit()
+function common_channel:disconnect()
+	if self.id ~= nil then
+		if self.name == "agent" then
+			server_handler:agent_server_down(self.id)
+		end
+	end
+end
 
 
 local function channel_accept(_,channel)
@@ -33,7 +42,7 @@ end
 event.fork(function ()
 	startup.run(env.mongodb)
 
-	local ok,reason = event.listen(env.login,4,channel_accept)
+	local ok,reason = event.listen(env.login,4,channel_accept,common_channel)
 	if not ok then
 		event.breakout(reason)
 		return
