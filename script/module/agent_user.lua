@@ -33,7 +33,7 @@ function cls_agent_user:enter_game()
 	world:send("handler.world_handler","enter_world",{uid = self.uid})
 
 	local scene_master = model.get_master_channel()
-	scene_master:send("handler.scene_master_handler","enter_scene",{scene_id = self.scene_info.id,pos = self.scene_info.pos})
+	scene_master:send("handler.master_handler","enter_scene",{scene_id = self.scene_info.id,pos = self.scene_info.pos})
 end
 
 function cls_agent_user:leave_game()
@@ -41,12 +41,12 @@ function cls_agent_user:leave_game()
 	world:call("handler.world_handler","leave_world",{uid = self.uid})
 
 	local scene_master = model.get_master_channel()
-	scene_master:call("handler.scene_master_handler","leave_scene",{uid = self.uid})
+	scene_master:call("handler.master_handler","leave_scene",{uid = self.uid})
 end
 
 function cls_agent_user:transfer_scene(scene_id)
 	local scene_master = model.get_master_channel()
-	scene_master:send("handler.scene_master_handler","enter_scene",{scene_id = scene_id})
+	scene_master:send("handler.master_handler","transfer_scene",{scene_id = scene_id})
 end
 
 function cls_agent_user:user_enter_scene(scene_id,scene_uid,server_id,server_addr)

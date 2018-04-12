@@ -20,7 +20,7 @@ end
 local agent_channel = channel:inherit()
 function agent_channel:disconnect()
 	if self.id ~= nil then
-		server_handler:agent_down(self.id)
+		server_handler:agent_server_down(self.id)
 	end
 end
 

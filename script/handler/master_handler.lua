@@ -1,67 +1,66 @@
-
 local model = require "model"
-local event = require "event"
+local server_handler = import "handler.server_handler"
 
-MODEL_BINDER("channel_ctx","channel")
+_scene_ctx = _scene_ctx or {}
+_user_ctx = _user_ctx or {}
 
-local _M = {}
-
-
-local channel_ctx = {}
-
-function enter(channel)
-	local ctx = {channel = channel}
-	model.bind_channel_ctx_with_channel(channel,ctx)
-end
-
-function leave(channel)
-	model.unbind_channel_ctx_with_channel(channel)
-end
-
-function register(name,port)
-	local ctx = model.fetch_channel_ctx_with_channel(channel)
-	ctx.name = name
-	ctx.port = port
-	return "ok"
-end
-
-function get_info(name)
-	local result = {}
-	for ch,ctx in pairs(model.fetch_channel_ctx()) do
-		if ctx.name == name then
-			table.insert(result,{port = ctx.port})
-		end
+function find_scene(scene_id,scene_uid)
+	local scene_info = _scene_ctx[scene_id]
+	if not scene_info then
+		return
 	end
-	return result
+	if not scene_uid then
+		return
+	end
+	local scene_server_id = scene_info[scene_uid]
+	if not scene_server_id then
+		return
+	end
+	return scene_server_id
 end
 
-function console(cmd,...)
-	local args = {...}
-	local session = event.gen_session()
-	event.fork(function ()
-		local list = {}
-		
-		if cmd == "stop" then
-			for ch,ctx in pairs(model.fetch_channel_ctx_with_channel()) do
-				ch:send("handler.cmd_handler",cmd)
-			end
+local function do_enter_scene(user_uid,scene_server_id,scene_uid,scene_pos)
+	server_handler:send_scene(scene_server_id,"handler.scene_channel","enter_scene",{scene_uid = scene_uid,pos = scene_pos,user_uid = user_uid})
+end
 
-			while true do
-				local channel_ctx = model.fetch_channel_ctx_with_channel()
-				if next(channel_ctx) == nil then
-					break
-				end
-				event.sleep(1)
-			end
-			event.breakout()
-		else
-			for ch,ctx in pairs(model.fetch_channel_ctx_with_channel()) do
-				local ok,result = pcall(ch.call,ch,"handler.cmd_handler",cmd,table.unpack(args))
-				table.insert(list,{name = ctx.name,result = result})
-			end
-			event.wakeup(session,table.tostring(list))
-		end
+local function try_enter_scene(user_uid,scene_id,scene_uid,scene_pos)
+	local scene_server_id = find_scene(scene_id,scene_uid)
+	if not scene_server_id then
+		scene_server_id = server_handler:find_min_scene_server()
+		server_handler:send_scene(scene_server_id,"handler.scene_handler","create_scene",{scene_id = scene_id},function (scene_uid)
+			do_enter_scene(user_uid,scene_server_id,scene_uid,scene_pos)
+		end)
+		return
+	end
+	do_enter_scene(user_uid,scene_server_id,scene_uid,scene_pos)
+end
+
+function enter_scene(channel,args)
+	local user_uid = args.uid
+	local scene_id = args.scene_id
+	local scene_uid = args.scene_uid
+	local scene_pos = args.pos
+
+	local user_info = _user_ctx[user_uid]
+	if not user_info then
+		try_enter_scene(user_uid,scene_id,scene_uid,scene_pos)
+	else
+		server_handler:send_scene(user_info.scene_server_id,"handler.scene_handler","leave_scene",{scene_uid = scene_uid,user_uid = user_uid},function (user_uid)
+			try_enter_scene(user_uid,scene_id,scene_uid,scene_pos)
+		end)
+	end
+end
+
+function leave_scene(channel,args)
+	local user_uid = args.uid
+	local user_info = _user_ctx[user_uid]
+	server_handler:send_scene(user_info.scene_server_id,"handler.scene_handler","leave_scene",{scene_uid = user_info.scene_uid,user_uid = user_uid},function (user_uid)
+		_user_ctx[user_uid] = nil
 	end)
-	return event.wait(session)
 end
 
+function transfer_scene(channel,args)
+
+end
+
+function 

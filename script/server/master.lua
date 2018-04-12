@@ -10,12 +10,17 @@ local server_handler = import "handler.server_handler"
 
 
 model.register_binder("scene_channel","id")
+model.register_binder("agent_channel","id")
 
 
-local scene_channel = channel:inherit()
-function scene_channel:disconnect()
+local common_channel = channel:inherit()
+function common_channel:disconnect()
 	if self.id ~= nil then
-		server_handler:scene_server_down(self.id)
+		if self.name == "agent" then
+			server_handler:agent_server_down(self.id)
+		elseif self.name == "scene" then
+			server_handler:scene_server_down(self.id)
+		end
 	end
 end
 
@@ -28,7 +33,7 @@ event.fork(function ()
 	protocol.parse("login")
 	protocol.load()
 
-	local ok,reason = event.listen(env.master,4,channel_accept,scene_channel)
+	local ok,reason = event.listen(env.master,4,channel_accept,common_channel)
 	if not ok then
 		event.breakout(reason)
 		return

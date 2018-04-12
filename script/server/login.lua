@@ -18,7 +18,7 @@ local rpc_channel = channel:inherit()
 function rpc_channel:disconnect()
 	if self.name ~= nil then
 		if self.name == "agent" then
-			server_handler:agent_down(self,self.id)
+			server_handler:agent_server_down(self,self.id)
 		end
 	end
 end
