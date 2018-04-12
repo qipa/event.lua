@@ -109,3 +109,7 @@ stack traceback:
 	./script/server/world.lua:65: in upvalue 'func'
 	./lualib/event.lua:49: in function <./lualib/event.lua:48>
 [E:runtime][1970-06-26 16:00:48 @lualib/bootstrap.lua:103] thread:24820 start,command:event@server/world@101,lua mem:204.273438kb,c mem:274.492188kb
+[E:runtime][1970-06-26 16:01:01 @lualib/bootstrap.lua:103] thread:7244 start,command:event@server/master@101,lua mem:194.525391kb,c mem:262.132812kb
+[E:runtime][1970-06-26 16:01:02 @lualib/bootstrap.lua:103] thread:7248 start,command:event@server/world@101,lua mem:197.192383kb,c mem:265.164062kb
+[E:runtime][1970-06-26 16:01:02 @lualib/bootstrap.lua:103] thread:7275 start,command:event@server/scene@101,lua mem:198.307617kb,c mem:266.539062kb
+[E:runtime][1970-06-26 16:01:02 @lualib/bootstrap.lua:103] thread:7293 start,command:event@server/agent@101,lua mem:205.070312kb,c mem:299.164062kb

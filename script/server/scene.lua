@@ -6,9 +6,7 @@ local mongo = require "mongo"
 local route = require "route"
 local channel = require "channel"
 local startup = import "server.startup"
-local protocol_forward = import "server.protocol_forward"
 
-local rpc = import "server.rpc"
 
 
 model.register_value("db_channel")
@@ -65,12 +63,10 @@ event.fork(function ()
 	startup.run()
 	protocol.parse("login")
 	protocol.load()
-	protocol.dumpfile()
 
 	local mongodb,reason = event.connect(env.mongodb,4,true,mongodb_channel)
 	if not mongodb then
-		print(string.format("connect db:%s faield:%s",env.mongodb,reason))
-		os.exit()
+		event.breakout(string.format("connect db:%s faield:%s",env.mongodb,reason))
 	end
 	mongodb:init("sunset")
 	model.set_db_channel(mongodb)
@@ -81,8 +77,7 @@ event.fork(function ()
 
 	local listener,reason = event.listen(env.scene,4,channel_accept,agent_channel)
 	if not listener then
-		print(reason)
-		event.breakout()
+		event.breakout(reason)
 		return
 	end
 

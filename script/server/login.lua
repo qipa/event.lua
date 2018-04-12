@@ -4,8 +4,7 @@ local model = require "model"
 local protocol = require "protocol"
 local mongo = require "mongo"
 local channel = require "channel"
-local protocol_forward = import "server.protocol_forward"
-local rpc = import "server.rpc"
+
 local login_handler = import "handler.login_handler"
 local server_handler = import "handler.server_handler"
 
@@ -45,8 +44,7 @@ event.fork(function ()
 	protocol.load()
 	local mongodb,reason = event.connect(env.mongodb,4,mongo)
 	if not mongodb then
-		print(reason)
-		event.breakout()
+		event.breakout(reason)
 		return
 	end
 	mongodb:init("sunset")
@@ -54,8 +52,7 @@ event.fork(function ()
 
 	local ok,reason = event.listen(env.login,4,channel_accept)
 	if not ok then
-		print(reason)
-		event.breakout()
+		event.breakout(reason)
 		return
 	end
 
@@ -63,8 +60,7 @@ event.fork(function ()
 	client_manager:set_callback(client_accept,client_close,client_data)
 	local ok,reason = client_manager:start("0.0.0.0",1989)
 	if not ok then
-		print(reason)
-		event.breakout()
+		event.breakout(reason)
 		return
 	end
 	model.set_client_manager(client_manager)

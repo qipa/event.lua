@@ -6,9 +6,6 @@ local mongo = require "mongo"
 local route = require "route"
 local channel = require "channel"
 local startup = import "server.startup"
-local protocol_forward = import "server.protocol_forward"
-
-local rpc = import "server.rpc"
 
 
 model.register_binder("client","id")
@@ -52,8 +49,7 @@ end
 local function connect_server(name)
 	local channel,reason = event.connect(env[name],4,true,rpc_channel)
 	if not channel then
-		print(string.format("connect server:%s %s faield:%s",name,env[name],reason))
-		os.exit()
+		event.breakout(string.format("connect server:%s %s faield:%s",name,env[name],reason))
 	end
 	channel.name = name
 	channel.monitor = event.gen_session()
@@ -84,7 +80,6 @@ event.fork(function ()
 	startup.run()
 	protocol.parse("login")
 	protocol.load()
-	protocol.dumpfile()
 
 	local mongodb,reason = event.connect(env.mongodb,4,true,mongodb_channel)
 	if not mongodb then
@@ -104,8 +99,7 @@ event.fork(function ()
 	client_manager:set_callback(client_accept,client_close,client_data)
 	local port,reason = client_manager:start("0.0.0.0",0)
 	if not port then
-		print(string.format("agent listen client failed:%s",reason))
-		os.exit()
+		event.breakout(reason)
 	end
 	model.set_client_manager(client_manager)
 

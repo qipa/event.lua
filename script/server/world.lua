@@ -7,7 +7,6 @@ local route = require "route"
 local channel = require "channel"
 local startup = import "server.startup"
 local server_handler = import "handler.server_handler"
-local rpc = import "server.rpc"
 
 model.register_value("db_channel")
 model.register_value("logger_channel")
@@ -25,42 +24,14 @@ function agent_channel:disconnect()
 	end
 end
 
-local function connect_server(name)
-	local channel,reason = event.connect(env[name],4,true,rpc_channel)
-	if not channel then
-		print(string.format("connect server:%s %s faield:%s",name,env[name],reason))
-		os.exit()
-	end
-	channel.name = name
-	channel.monitor = event.gen_session()
-	model[string.format("set_%s_channel",name)](channel)
+local function channel_accept()
 
-	event.fork(function ( ... )
-		event.wait(channel.monitor)
-
-		while true do
-			local channel,reason
-			while not channel do
-				channel,reason = event.connect(env[name],4,false,rpc_channel)
-				if not channel then
-					print(string.format("connect server:%s %s faield:%s",name,env[name],reason))
-					event.sleep(1)
-				end
-			end
-			channel.name = name
-			channel.monitor = event.gen_session()
-			model[string.format("set_%s_channel",name)](channel)
-			event.wait(channel.monitor)
-		end
-	end)
 end
-
 
 event.fork(function ()
 	startup.run()
 	protocol.parse("login")
 	protocol.load()
-	protocol.dumpfile()
 
 	local mongodb,reason = event.connect(env.mongodb,4,true,mongodb_channel)
 	if not mongodb then
@@ -72,9 +43,7 @@ event.fork(function ()
 
 	local ok,reason = event.listen(env.world,4,channel_accept,agent_channel)
 	if not ok then
-		print(reason)
-		event.breakout()
+		event.breakout(reason)
 		return
 	end
-
 end)

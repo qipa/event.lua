@@ -300,7 +300,8 @@ function _M.dispatch()
 	return code
 end
 
-function _M.breakout()
+function _M.breakout(reason)
+	print(reason)
 	_event:breakout()
 end
 
