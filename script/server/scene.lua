@@ -8,10 +8,6 @@ local channel = require "channel"
 local startup = import "server.startup"
 
 
-
-model.register_value("db_channel")
-
-
 local agent_channel = channel:inherit()
 function agent_channel:disconnect()
 	if self.id ~= nil then
@@ -20,20 +16,9 @@ function agent_channel:disconnect()
 end
 
 event.fork(function ()
-	startup.run()
-	protocol.parse("login")
-	protocol.load()
-
-	local mongodb,reason = event.connect(env.mongodb,4,true,mongodb_channel)
-	if not mongodb then
-		print(string.format("connect db:%s faield:%s",env.mongodb,reason))
-		os.exit(1)
-	end
-	mongodb:init("sunset")
-	model.set_db_channel(mongodb)
+	startup.run(env.mongodb)
 
 	startup.connect_server("world")
-
 	startup.connect_server("master")
 
 	local listener,reason = event.listen(env.scene,4,channel_accept,agent_channel)

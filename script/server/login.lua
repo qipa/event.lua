@@ -5,23 +5,14 @@ local protocol = require "protocol"
 local mongo = require "mongo"
 local channel = require "channel"
 
+local startup = import "server.startup"
 local login_handler = import "handler.login_handler"
 local server_handler = import "handler.server_handler"
 
-model.register_value("mongodb")
 model.register_value("client_manager")
 model.register_binder("channel","name")
 model.register_binder("login_info","cid")
 
-local rpc_channel = channel:inherit()
-
-function rpc_channel:disconnect()
-	if self.name ~= nil then
-		if self.name == "agent" then
-			server_handler:agent_server_down(self,self.id)
-		end
-	end
-end
 
 local function channel_accept(_,channel)
 	print("channel_accept",channel)
@@ -40,15 +31,7 @@ local function client_close(cid)
 end
 
 event.fork(function ()
-	protocol.parse("login")
-	protocol.load()
-	local mongodb,reason = event.connect(env.mongodb,4,mongo)
-	if not mongodb then
-		event.breakout(reason)
-		return
-	end
-	mongodb:init("sunset")
-	model.set_mongodb(mongodb)
+	startup.run(env.mongodb)
 
 	local ok,reason = event.listen(env.login,4,channel_accept)
 	if not ok then

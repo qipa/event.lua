@@ -2,17 +2,39 @@ local logger = require "logger"
 local event = require "event"
 local model = require "model"
 local channel = require "channel"
+local mongo = require "mongo"
+local protocol = require "protocol"
 
 local rpc_channel = channel:inherit()
 function rpc_channel:disconnect()
 	model[string.format("set_%s_channel",self.name)](nil)
 end
 
-function run()
+local mongodb_channel = mongo:inherit()
+function mongodb_channel:disconnect()
+	model.set_db_channel(nil)
+	os.exit(1)
+end
+
+function run(db_addr)
 	local runtime_logger = logger:create("runtime",{level = env.log_lv,addr = env.logger},5)
 	event.error = function (...)
 		runtime_logger:ERROR(...)
 	end
+
+	if db_addr then
+		model.register_value("db_channel")
+		local db_channel,reason = event.connect(db_addr,4,true,mongodb_channel)
+		if not db_channel then
+			print(string.format("connect db:%s faield:%s",env.mongodb,reason))
+			os.exit()
+		end
+		mongodb:init("sunset")
+		model.set_db_channel(db_channel)
+	end
+
+	protocol.parse("login")
+	protocol.load()
 end
 
 function connect_server(name)

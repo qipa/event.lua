@@ -30,8 +30,6 @@ end
 
 event.fork(function ()
 	startup.run()
-	protocol.parse("login")
-	protocol.load()
 
 	local ok,reason = event.listen(env.master,4,channel_accept,common_channel)
 	if not ok then
