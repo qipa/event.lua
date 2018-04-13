@@ -38,4 +38,7 @@ event.fork(function ()
 
 	local master_channel = model.get_master_channel()
 	master_channel:send("module.server_manager","register_scene_server",addr_info)
+
+	local world_channel = model.get_world_channel()
+	world_channel:send("module.server_manager","register_scene_server",addr_info)
 end)

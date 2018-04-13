@@ -1435,3 +1435,9 @@ stack traceback:
 [E:runtime][2018-04-13 14:44:49 @user.server.startup:49] server/agent connect server:world ipc://world.ipc failed:Connection refused
 [E:runtime][2018-04-13 14:44:50 @./script/server/agent.lua:58] agent start success
 [E:runtime][2018-04-13 14:44:50 @./script/server/agent.lua:58] agent start success
+[E:runtime][2018-04-13 14:50:16 @./script/server/login.lua:68] login listen client success
+[E:runtime][2018-04-13 14:50:16 @user.server.startup:49] server/agent connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 14:50:17 @user.server.startup:49] server/scene connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 14:50:17 @user.server.startup:49] server/agent connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 14:50:17 @./script/server/agent.lua:58] agent start success
+[E:runtime][2018-04-13 14:50:18 @./script/server/agent.lua:58] agent start success
