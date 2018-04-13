@@ -2,6 +2,10 @@ local object = import "object"
 
 cls_collection = object.cls_base:inherit("database_collection")
 
+function __init__()
+	self.cls_collection:save_field("__name")
+end
+
 function cls_collection:save_data()
 	local result = {}
 	for field in pairs(self.__save_fields) do

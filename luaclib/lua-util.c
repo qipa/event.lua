@@ -434,11 +434,6 @@ lpacket_unpack(lua_State* L) {
     uint8_t* data = lua_touserdata(L, 2);
     size_t size = lua_tointeger(L, 3);
 
-    int i;
-    for (i = 0; i < size; ++i) {
-        data[i] = data[i] ^ packet->rseed;
-        packet->rseed += data[i];
-    }
     ushort id = data[0] | data[1] << 8;
 
     lua_pushinteger(L, id);

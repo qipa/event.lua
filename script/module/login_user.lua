@@ -2,6 +2,7 @@ local event = require "event"
 local cjson = require "cjson"
 local model = require "model"
 local util = require "util"
+local protocol = require "protocol"
 
 local database_object = import "database_object"
 local server_manager = import "module.server_manager"
@@ -9,7 +10,7 @@ local server_manager = import "module.server_manager"
 cls_login_user = database_object.cls_database:inherit("login_user","account")
 
 function __init__(self)
-	self.cls_login_user:save_field("login_info")
+	self.cls_login_user:save_field("role_list")
 end
 
 local PHASE = {
@@ -39,8 +40,8 @@ end
 
 function cls_login_user:send_client(proto,args)
 	local client_manager = model.get_client_manager()
-	local data = protocol.encode[proto](args)
-	client_manager:send(self.cid,data)
+	local message_id,data = protocol.encode[proto](args)
+	client_manager:send(self.cid,message_id,data)
 end
 
 function cls_login_user:auth()
@@ -51,6 +52,17 @@ function cls_login_user:auth()
 	if not self then
 		return
 	end
+
+	if not self.role_list then
+		self.role_list = {}
+		self:dirty_field("role_list")
+	end
+
+	local result = {}
+	for _,role in pairs(self.role_list) do
+		table.insert(result,{uid = role.uid,name = role.name})
+	end
+	self:send_client("s2c_login_auth",{list = result})
 end
 
 function cls_login_user:create_role(career,name)

@@ -1,7 +1,7 @@
 
 protocol role_info
 {
-	int id
+	int uid
 	string name
 }
 

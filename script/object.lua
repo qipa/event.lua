@@ -47,6 +47,11 @@ function cls_base:inherit(name,...)
 	cls.__parent = parent.__name
 	cls.__childs = {}
 	cls.__save_fields = {}
+	if parent.__save_fields then
+		for f in pairs(parent.__save_fields) do
+			cls.__save_fields[f] = true
+		end
+	end
 	cls.__method = {}
 
 	assert(name ~= parent.__name)

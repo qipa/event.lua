@@ -12,6 +12,8 @@ _account_queue = _account_queue or {}
 function __init__()
 	protocol.handler["c2s_login_auth"] = req_enter
 	protocol.handler["c2s_login_enter"] = req_enter_game
+	protocol.handler["c2s_create_role"] = req_create_role
+	
 end
 
 function enter(cid,addr)
@@ -73,6 +75,14 @@ function req_enter(cid,args)
 			local user = login_user.cls_login_user:new(cid,account)
 			user:auth()
 		end
+	end
+end
+
+function req_create_role(cid,args)
+	local info = _login_ctx[cid]
+	if info.account then
+		user = model.fetch_login_user_with_account(info.account)
+		user:create_role(args.career)
 	end
 end
 

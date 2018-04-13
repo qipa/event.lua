@@ -15,9 +15,8 @@ function cls_database:load(db_channel)
 	for field in pairs(self.__save_fields) do
 		local result = db_channel:findOne(field,{query = self:db_index()})
 		if result then
-			local cls = class.get(field)
-			if cls then
-				local field_obj = class.instance_from(field,result)
+			if result.__name then
+				local field_obj = class.instance_from(result.__name,result)
 				self[field] = field_obj
 			else
 				self[field] = result

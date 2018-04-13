@@ -97,7 +97,8 @@ function _M.load()
 		_ctx:load(i,info.name,info.proto)
 
 		encode[info.name] = function (tbl)
-			return _ctx:encode(i,tbl)
+			local message = _ctx:encode(i,tbl)
+			return i,message
 		end
 
 		decode[i] = function (data,size)

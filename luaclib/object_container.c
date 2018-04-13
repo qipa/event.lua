@@ -52,6 +52,9 @@ container_release(struct object_container* container) {
 
 void*
 container_get(struct object_container* container,int id) {
+	if (id < 0 || id >= container->size) {
+		return NULL;
+	}
 	void* object = container->mgr[id];
 	return object;
 }

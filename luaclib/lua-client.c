@@ -148,7 +148,7 @@ accept_client(struct ev_listener *listener, int fd, const char* addr, void *ud) 
 	memset(client,0,sizeof(*client));
 	client->manager = manager;
 	client->session = ev_session_bind(manager->loop,fd);
-	client->id = container_add(manager->container,client->session);
+	client->id = container_add(manager->container,client);
 	if (client->id == -1) {
 		ev_session_free(client->session);
 		free(client);
