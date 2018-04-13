@@ -131,7 +131,7 @@ timeout(struct ev_loop* loop,struct ev_timer* io,int revents) {
 		error_happen(NULL, client);
 	}
 	client->freq = 0;
-	if (ev_now(client->manager->loop) - client->tick > ALIVE_TIME) {
+	if (client->tick != 0 && ev_now(client->manager->loop) - client->tick > ALIVE_TIME) {
 		error_happen(NULL, client);
 	}
 }

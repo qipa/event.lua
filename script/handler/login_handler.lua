@@ -1,3 +1,4 @@
+local event = require "event"
 local protocol = require "protocol"
 local cjson = require "cjson"
 local util = require "util"
@@ -10,9 +11,13 @@ _account_queue = _account_queue or {}
 function enter(cid,addr)
 	local info = {cid = cid,addr = addr}
 	_login_ctx[cid] = info
+	event.error(string.format("cid:%d addr:%s enter",cid,addr))
+	print("enter",cid)
 end
 
 function leave(cid)
+	print("leave",cid)
+	event.error(string.format("cid:%d enter",cid))
 	local info = _login_ctx[cid]
 	if not info then
 		return

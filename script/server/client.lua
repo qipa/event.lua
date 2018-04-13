@@ -26,7 +26,9 @@ end
 event.fork(function ()
 	protocol.parse("login")
 	protocol.load()
-	local channel,err = event.connect("tcp://127.0.0.1:1989",2,console_channel)
+	local ip,port = table.unpack(env.login_addr)
+	print(string.format("tcp://%s:%d",ip,port))
+	local channel,err = event.connect(string.format("tcp://%s:%d",ip,port),2,true,console_channel)
 	if not channel then
 		event.error(err)
 		return

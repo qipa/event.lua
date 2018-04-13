@@ -42,7 +42,8 @@ event.fork(function ()
 	client_manager:set_callback(client_accept,client_close,client_data)
 	local port,reason = client_manager:start("0.0.0.0",0)
 	if not port then
-		event.breakout(reason)
+		event.breakout(string.format("%s %s",env.name,reason))
+		os.exit(1)
 	end
 	model.set_client_manager(client_manager)
 

@@ -24,19 +24,28 @@ end
 
 
 local function channel_accept(_,channel)
-	print("channel_accept",channel)
+	
 end
 
 local function client_data(cid,message_id,data,size)
-	route.dispatch_client(cid,message_id,data,size)
+	local ok,err = xpcall(route.dispatch_client,debug.traceback,cid,message_id,data,size)
+	if not ok then
+		event.error(err)
+	end
 end
 
 local function client_accept(cid,addr)
-	login_handler.enter(cid,addr)
+	local ok,err = xpcall(login_handler.enter,debug.traceback,cid,addr)
+	if not ok then
+		event.error(err)
+	end
 end
 
 local function client_close(cid)
-	login_handler.leave(cid)
+	local ok,err = xpcall(login_handler.leave,debug.traceback,cid)
+	if not ok then
+		event.error(err)
+	end
 end
 
 event.fork(function ()
@@ -50,10 +59,11 @@ event.fork(function ()
 
 	local client_manager = event.client_manager(5000)
 	client_manager:set_callback(client_accept,client_close,client_data)
-	local ok,reason = client_manager:start("0.0.0.0",1989)
+	local ok,reason = client_manager:start(table.unpack(env.login_addr))
 	if not ok then
-		event.breakout(reason)
+		event.breakout(string.format("login listen client failed:%s",reason))
 		return
 	end
+	event.error(string.format("login listen client success",reason))
 	model.set_client_manager(client_manager)
 end)
