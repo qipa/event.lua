@@ -450,3 +450,707 @@ stack traceback:
 [E:runtime][2018-04-13 10:09:27 @./script/server/login.lua:68] login listen client success
 [E:runtime][2018-04-13 10:09:27 @./script/server/agent.lua:59] agent start success
 [E:runtime][2018-04-13 10:09:31 @user.handler.login_handler:14] cid:4999 addr:127.0.0.1:47198 enter
+[E:runtime][2018-04-13 11:34:29 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 11:34:29 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 11:37:21 @./script/server/login.lua:69] login listen client success
+[E:runtime][2018-04-13 11:37:21 @user.server.startup:49] server/agent connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 11:37:21 @user.server.startup:49] server/scene connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 11:37:21 @user.server.startup:49] server/agent connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 11:37:22 @./script/server/agent.lua:58] agent start success
+[E:runtime][2018-04-13 11:37:22 @./script/server/agent.lua:58] agent start success
+[E:runtime][2018-04-13 11:37:30 @user.handler.login_handler:19] cid:4999 addr:127.0.0.1:47460 enter
+[E:runtime][2018-04-13 11:38:03 @./script/server/login.lua:70] login listen client success
+[E:runtime][2018-04-13 11:38:03 @./script/server/agent.lua:58] agent start success
+[E:runtime][2018-04-13 11:38:03 @./script/server/agent.lua:58] agent start success
+[E:runtime][2018-04-13 11:38:05 @user.handler.login_handler:19] cid:4999 addr:127.0.0.1:47472 enter
+[E:runtime][2018-04-13 11:38:15 @user.server.startup:49] server/scene connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 11:38:15 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 11:38:15 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 11:38:15 @./script/server/login.lua:70] login listen client success
+[E:runtime][2018-04-13 11:38:16 @./script/server/agent.lua:58] agent start success
+[E:runtime][2018-04-13 11:38:16 @./script/server/agent.lua:58] agent start success
+[E:runtime][2018-04-13 11:38:18 @user.handler.login_handler:19] cid:4999 addr:127.0.0.1:47486 enter
+[E:runtime][2018-04-13 11:38:48 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 11:38:48 @./script/server/login.lua:70] login listen client success
+[E:runtime][2018-04-13 11:38:48 @user.server.startup:49] server/agent connect server:master ipc://master.ipc failed:Connection refused
+[E:runtime][2018-04-13 11:38:49 @./script/server/agent.lua:58] agent start success
+[E:runtime][2018-04-13 11:38:49 @./script/server/agent.lua:58] agent start success
+[E:runtime][2018-04-13 11:38:50 @user.handler.login_handler:19] cid:4999 addr:127.0.0.1:47498 enter
+[E:runtime][2018-04-13 11:39:10 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 11:39:10 @./script/server/login.lua:69] login listen client success
+[E:runtime][2018-04-13 11:39:10 @./script/server/agent.lua:58] agent start success
+[E:runtime][2018-04-13 11:39:11 @./script/server/agent.lua:58] agent start success
+[E:runtime][2018-04-13 11:39:13 @user.handler.login_handler:19] cid:4999 addr:127.0.0.1:47510 enter
+[E:runtime][2018-04-13 11:39:14 @./script/server/login.lua:33] ./lualib/route.lua:21: attempt to index a nil value (global 'protocol')
+stack traceback:
+	./lualib/route.lua:21: in function 'route.dispatch_client'
+	[C]: in function 'xpcall'
+	./script/server/login.lua:31: in function <./script/server/login.lua:30>
+	[C]: in method 'dispatch'
+	./lualib/event.lua:263: in function 'event.dispatch'
+	lualib/bootstrap.lua:106: in main chunk
+[E:runtime][2018-04-13 11:39:14 @./script/server/login.lua:33] ./lualib/route.lua:21: attempt to index a nil value (global 'protocol')
+stack traceback:
+	./lualib/route.lua:21: in function 'route.dispatch_client'
+	[C]: in function 'xpcall'
+	./script/server/login.lua:31: in function <./script/server/login.lua:30>
+	[C]: in method 'dispatch'
+	./lualib/event.lua:263: in function 'event.dispatch'
+	lualib/bootstrap.lua:106: in main chunk
+[E:runtime][2018-04-13 11:39:30 @user.server.startup:49] server/scene connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 11:39:30 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 11:39:30 @./script/server/login.lua:69] login listen client success
+[E:runtime][2018-04-13 11:39:30 @./script/server/agent.lua:58] agent start success
+[E:runtime][2018-04-13 11:39:31 @./script/server/agent.lua:58] agent start success
+[E:runtime][2018-04-13 11:39:33 @user.handler.login_handler:19] cid:4999 addr:127.0.0.1:47524 enter
+[E:runtime][2018-04-13 11:39:34 @./script/server/login.lua:33] ./lualib/route.lua:22: attempt to call a nil value (field '?')
+stack traceback:
+	./lualib/route.lua:22: in function 'route.dispatch_client'
+	[C]: in function 'xpcall'
+	./script/server/login.lua:31: in function <./script/server/login.lua:30>
+	[C]: in method 'dispatch'
+	./lualib/event.lua:263: in function 'event.dispatch'
+	lualib/bootstrap.lua:106: in main chunk
+[E:runtime][2018-04-13 11:39:34 @./script/server/login.lua:33] ./lualib/route.lua:22: attempt to call a nil value (field '?')
+stack traceback:
+	./lualib/route.lua:22: in function 'route.dispatch_client'
+	[C]: in function 'xpcall'
+	./script/server/login.lua:31: in function <./script/server/login.lua:30>
+	[C]: in method 'dispatch'
+	./lualib/event.lua:263: in function 'event.dispatch'
+	lualib/bootstrap.lua:106: in main chunk
+[E:runtime][2018-04-13 11:40:11 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 11:40:11 @user.server.startup:49] server/agent connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 11:40:11 @./script/server/login.lua:69] login listen client success
+[E:runtime][2018-04-13 11:40:11 @user.server.startup:49] server/scene connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 11:40:12 @./script/server/agent.lua:58] agent start success
+[E:runtime][2018-04-13 11:40:12 @./script/server/agent.lua:58] agent start success
+[E:runtime][2018-04-13 11:40:14 @user.handler.login_handler:19] cid:4999 addr:127.0.0.1:47538 enter
+[E:runtime][2018-04-13 11:40:17 @./script/server/login.lua:33] ./lualib/route.lua:22: attempt to call a nil value (field '?')
+stack traceback:
+	./lualib/route.lua:22: in function 'route.dispatch_client'
+	[C]: in function 'xpcall'
+	./script/server/login.lua:31: in function <./script/server/login.lua:30>
+	[C]: in method 'dispatch'
+	./lualib/event.lua:263: in function 'event.dispatch'
+	lualib/bootstrap.lua:106: in main chunk
+[E:runtime][2018-04-13 11:40:17 @./script/server/login.lua:33] ./lualib/route.lua:22: attempt to call a nil value (field '?')
+stack traceback:
+	./lualib/route.lua:22: in function 'route.dispatch_client'
+	[C]: in function 'xpcall'
+	./script/server/login.lua:31: in function <./script/server/login.lua:30>
+	[C]: in method 'dispatch'
+	./lualib/event.lua:263: in function 'event.dispatch'
+	lualib/bootstrap.lua:106: in main chunk
+[E:runtime][2018-04-13 11:40:37 @./script/server/login.lua:69] login listen client success
+[E:runtime][2018-04-13 11:40:37 @user.server.startup:49] server/scene connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 11:40:38 @./script/server/agent.lua:58] agent start success
+[E:runtime][2018-04-13 11:40:38 @./script/server/agent.lua:58] agent start success
+[E:runtime][2018-04-13 11:40:39 @user.handler.login_handler:19] cid:4999 addr:127.0.0.1:47550 enter
+[E:runtime][2018-04-13 11:40:41 @./script/server/login.lua:33] ./lualib/route.lua:23: attempt to call a nil value (field '?')
+stack traceback:
+	./lualib/route.lua:23: in function 'route.dispatch_client'
+	[C]: in function 'xpcall'
+	./script/server/login.lua:31: in function <./script/server/login.lua:30>
+	[C]: in method 'dispatch'
+	./lualib/event.lua:263: in function 'event.dispatch'
+	lualib/bootstrap.lua:106: in main chunk
+[E:runtime][2018-04-13 11:40:41 @./script/server/login.lua:33] ./lualib/route.lua:23: attempt to call a nil value (field '?')
+stack traceback:
+	./lualib/route.lua:23: in function 'route.dispatch_client'
+	[C]: in function 'xpcall'
+	./script/server/login.lua:31: in function <./script/server/login.lua:30>
+	[C]: in method 'dispatch'
+	./lualib/event.lua:263: in function 'event.dispatch'
+	lualib/bootstrap.lua:106: in main chunk
+[E:runtime][2018-04-13 11:40:49 @./script/server/login.lua:69] login listen client success
+[E:runtime][2018-04-13 11:40:49 @./script/server/agent.lua:58] agent start success
+[E:runtime][2018-04-13 11:40:50 @./script/server/agent.lua:58] agent start success
+[E:runtime][2018-04-13 11:40:52 @user.handler.login_handler:19] cid:4999 addr:127.0.0.1:47562 enter
+[E:runtime][2018-04-13 11:40:53 @./script/server/login.lua:33] ./lualib/route.lua:23: attempt to call a nil value (field '?')
+stack traceback:
+	./lualib/route.lua:23: in function 'route.dispatch_client'
+	[C]: in function 'xpcall'
+	./script/server/login.lua:31: in function <./script/server/login.lua:30>
+	[C]: in method 'dispatch'
+	./lualib/event.lua:263: in function 'event.dispatch'
+	lualib/bootstrap.lua:106: in main chunk
+[E:runtime][2018-04-13 11:40:53 @./script/server/login.lua:33] ./lualib/route.lua:23: attempt to call a nil value (field '?')
+stack traceback:
+	./lualib/route.lua:23: in function 'route.dispatch_client'
+	[C]: in function 'xpcall'
+	./script/server/login.lua:31: in function <./script/server/login.lua:30>
+	[C]: in method 'dispatch'
+	./lualib/event.lua:263: in function 'event.dispatch'
+	lualib/bootstrap.lua:106: in main chunk
+[E:runtime][2018-04-13 11:41:26 @./script/server/login.lua:69] login listen client success
+[E:runtime][2018-04-13 11:41:26 @user.server.startup:49] server/scene connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 11:41:26 @user.server.startup:49] server/agent connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 11:41:27 @./script/server/agent.lua:58] agent start success
+[E:runtime][2018-04-13 11:41:27 @./script/server/agent.lua:58] agent start success
+[E:runtime][2018-04-13 11:41:29 @user.handler.login_handler:19] cid:4999 addr:127.0.0.1:47576 enter
+[E:runtime][2018-04-13 11:41:30 @./script/server/login.lua:33] ./lualib/protocol.lua:104: bad argument #1 to 'decode' (number expected, got light userdata)
+stack traceback:
+	[C]: in method 'decode'
+	./lualib/protocol.lua:104: in field '?'
+	./lualib/route.lua:23: in function 'route.dispatch_client'
+	[C]: in function 'xpcall'
+	./script/server/login.lua:31: in function <./script/server/login.lua:30>
+	[C]: in method 'dispatch'
+	./lualib/event.lua:263: in function 'event.dispatch'
+	lualib/bootstrap.lua:106: in main chunk
+[E:runtime][2018-04-13 11:41:30 @./script/server/login.lua:33] ./lualib/protocol.lua:104: bad argument #1 to 'decode' (number expected, got light userdata)
+stack traceback:
+	[C]: in method 'decode'
+	./lualib/protocol.lua:104: in field '?'
+	./lualib/route.lua:23: in function 'route.dispatch_client'
+	[C]: in function 'xpcall'
+	./script/server/login.lua:31: in function <./script/server/login.lua:30>
+	[C]: in method 'dispatch'
+	./lualib/event.lua:263: in function 'event.dispatch'
+	lualib/bootstrap.lua:106: in main chunk
+[E:runtime][2018-04-13 11:42:42 @user.server.startup:49] server/scene connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 11:42:43 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:No such file or directory
+[E:runtime][2018-04-13 11:42:43 @./script/server/login.lua:69] login listen client success
+[E:runtime][2018-04-13 11:42:43 @./script/server/agent.lua:58] agent start success
+[E:runtime][2018-04-13 11:42:44 @./script/server/agent.lua:58] agent start success
+[E:runtime][2018-04-13 11:42:44 @user.handler.login_handler:19] cid:4999 addr:127.0.0.1:47590 enter
+[E:runtime][2018-04-13 11:42:46 @./script/server/login.lua:33] ./lualib/route.lua:24: attempt to call a nil value (field '?')
+stack traceback:
+	./lualib/route.lua:24: in function 'route.dispatch_client'
+	[C]: in function 'xpcall'
+	./script/server/login.lua:31: in function <./script/server/login.lua:30>
+	[C]: in method 'dispatch'
+	./lualib/event.lua:263: in function 'event.dispatch'
+	lualib/bootstrap.lua:106: in main chunk
+[E:runtime][2018-04-13 11:42:46 @./script/server/login.lua:33] ./lualib/route.lua:24: attempt to call a nil value (field '?')
+stack traceback:
+	./lualib/route.lua:24: in function 'route.dispatch_client'
+	[C]: in function 'xpcall'
+	./script/server/login.lua:31: in function <./script/server/login.lua:30>
+	[C]: in method 'dispatch'
+	./lualib/event.lua:263: in function 'event.dispatch'
+	lualib/bootstrap.lua:106: in main chunk
+[E:runtime][2018-04-13 11:43:03 @./script/server/login.lua:69] login listen client success
+[E:runtime][2018-04-13 11:43:03 @user.server.startup:49] server/agent connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 11:43:03 @user.server.startup:49] server/agent connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 11:43:04 @./script/server/agent.lua:58] agent start success
+[E:runtime][2018-04-13 11:43:04 @./script/server/agent.lua:58] agent start success
+[E:runtime][2018-04-13 11:43:05 @user.handler.login_handler:19] cid:4999 addr:127.0.0.1:47602 enter
+[E:runtime][2018-04-13 11:43:07 @./script/server/login.lua:33] ./lualib/route.lua:22: attempt to call a nil value (field '?')
+stack traceback:
+	./lualib/route.lua:22: in function 'route.dispatch_client'
+	[C]: in function 'xpcall'
+	./script/server/login.lua:31: in function <./script/server/login.lua:30>
+	[C]: in method 'dispatch'
+	./lualib/event.lua:263: in function 'event.dispatch'
+	lualib/bootstrap.lua:106: in main chunk
+[E:runtime][2018-04-13 11:43:07 @./script/server/login.lua:33] ./lualib/route.lua:22: attempt to call a nil value (field '?')
+stack traceback:
+	./lualib/route.lua:22: in function 'route.dispatch_client'
+	[C]: in function 'xpcall'
+	./script/server/login.lua:31: in function <./script/server/login.lua:30>
+	[C]: in method 'dispatch'
+	./lualib/event.lua:263: in function 'event.dispatch'
+	lualib/bootstrap.lua:106: in main chunk
+[E:runtime][2018-04-13 11:43:15 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 11:43:15 @./script/server/login.lua:69] login listen client success
+[E:runtime][2018-04-13 11:43:15 @./script/server/agent.lua:58] agent start success
+[E:runtime][2018-04-13 11:43:16 @./script/server/agent.lua:58] agent start success
+[E:runtime][2018-04-13 11:43:17 @user.handler.login_handler:19] cid:4999 addr:127.0.0.1:47616 enter
+[E:runtime][2018-04-13 11:43:18 @./script/server/login.lua:33] ./lualib/route.lua:23: attempt to call a nil value (field '?')
+stack traceback:
+	./lualib/route.lua:23: in function 'route.dispatch_client'
+	[C]: in function 'xpcall'
+	./script/server/login.lua:31: in function <./script/server/login.lua:30>
+	[C]: in method 'dispatch'
+	./lualib/event.lua:263: in function 'event.dispatch'
+	lualib/bootstrap.lua:106: in main chunk
+[E:runtime][2018-04-13 11:43:18 @./script/server/login.lua:33] ./lualib/route.lua:23: attempt to call a nil value (field '?')
+stack traceback:
+	./lualib/route.lua:23: in function 'route.dispatch_client'
+	[C]: in function 'xpcall'
+	./script/server/login.lua:31: in function <./script/server/login.lua:30>
+	[C]: in method 'dispatch'
+	./lualib/event.lua:263: in function 'event.dispatch'
+	lualib/bootstrap.lua:106: in main chunk
+[E:runtime][2018-04-13 11:44:00 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 11:44:00 @./script/server/login.lua:69] login listen client success
+[E:runtime][2018-04-13 11:44:00 @user.server.startup:49] server/scene connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 11:44:01 @./script/server/agent.lua:58] agent start success
+[E:runtime][2018-04-13 11:44:01 @./script/server/agent.lua:58] agent start success
+[E:runtime][2018-04-13 11:44:03 @user.handler.login_handler:19] cid:4999 addr:127.0.0.1:47628 enter
+[E:runtime][2018-04-13 11:44:04 @./script/server/login.lua:33] ./lualib/route.lua:23: attempt to index a nil value (global 'event')
+stack traceback:
+	./lualib/route.lua:23: in function 'route.dispatch_client'
+	[C]: in function 'xpcall'
+	./script/server/login.lua:31: in function <./script/server/login.lua:30>
+	[C]: in method 'dispatch'
+	./lualib/event.lua:263: in function 'event.dispatch'
+	lualib/bootstrap.lua:106: in main chunk
+[E:runtime][2018-04-13 11:44:04 @./script/server/login.lua:33] ./lualib/route.lua:23: attempt to index a nil value (global 'event')
+stack traceback:
+	./lualib/route.lua:23: in function 'route.dispatch_client'
+	[C]: in function 'xpcall'
+	./script/server/login.lua:31: in function <./script/server/login.lua:30>
+	[C]: in method 'dispatch'
+	./lualib/event.lua:263: in function 'event.dispatch'
+	lualib/bootstrap.lua:106: in main chunk
+[E:runtime][2018-04-13 11:44:15 @user.server.startup:49] server/scene connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 11:44:16 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 11:44:16 @./script/server/login.lua:69] login listen client success
+[E:runtime][2018-04-13 11:44:16 @./script/server/agent.lua:58] agent start success
+[E:runtime][2018-04-13 11:44:17 @./script/server/agent.lua:58] agent start success
+[E:runtime][2018-04-13 11:44:17 @user.handler.login_handler:19] cid:4999 addr:127.0.0.1:47642 enter
+[E:runtime][2018-04-13 11:44:18 @./script/server/login.lua:33] ./lualib/route.lua:24: bad argument #3 to 'format' (number expected, got string)
+stack traceback:
+	[C]: in function 'string.format'
+	./lualib/route.lua:24: in function 'route.dispatch_client'
+	[C]: in function 'xpcall'
+	./script/server/login.lua:31: in function <./script/server/login.lua:30>
+	[C]: in method 'dispatch'
+	./lualib/event.lua:263: in function 'event.dispatch'
+	lualib/bootstrap.lua:106: in main chunk
+[E:runtime][2018-04-13 11:44:18 @./script/server/login.lua:33] ./lualib/route.lua:24: bad argument #3 to 'format' (number expected, got string)
+stack traceback:
+	[C]: in function 'string.format'
+	./lualib/route.lua:24: in function 'route.dispatch_client'
+	[C]: in function 'xpcall'
+	./script/server/login.lua:31: in function <./script/server/login.lua:30>
+	[C]: in method 'dispatch'
+	./lualib/event.lua:263: in function 'event.dispatch'
+	lualib/bootstrap.lua:106: in main chunk
+[E:runtime][2018-04-13 11:44:33 @user.server.startup:49] server/scene connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 11:44:33 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 11:44:33 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 11:44:33 @./script/server/login.lua:69] login listen client success
+[E:runtime][2018-04-13 11:44:34 @./script/server/agent.lua:58] agent start success
+[E:runtime][2018-04-13 11:44:34 @./script/server/agent.lua:58] agent start success
+[E:runtime][2018-04-13 11:44:35 @user.handler.login_handler:19] cid:4999 addr:127.0.0.1:47654 enter
+[E:runtime][2018-04-13 11:44:36 @./lualib/route.lua:24] no such id:1 proto:c2s_auth 
+[E:runtime][2018-04-13 11:44:36 @./lualib/route.lua:24] no such id:1 proto:c2s_auth 
+[E:runtime][2018-04-13 11:46:41 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 11:46:41 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 11:46:41 @./script/server/login.lua:69] login listen client success
+[E:runtime][2018-04-13 11:46:42 @./script/server/agent.lua:58] agent start success
+[E:runtime][2018-04-13 11:46:42 @./script/server/agent.lua:58] agent start success
+[E:runtime][2018-04-13 11:47:04 @user.handler.login_handler:19] cid:4999 addr:127.0.0.1:47670 enter
+[E:runtime][2018-04-13 11:47:05 @./lualib/route.lua:24] no such id:1 proto:c2s_create_role 
+[E:runtime][2018-04-13 11:47:05 @./lualib/route.lua:24] no such id:1 proto:c2s_create_role 
+[E:runtime][2018-04-13 11:48:45 @user.handler.login_handler:23] cid:4999 enter
+[E:runtime][2018-04-13 11:48:46 @user.handler.login_handler:19] cid:4998 addr:127.0.0.1:47676 enter
+[E:runtime][2018-04-13 11:48:47 @./script/server/login.lua:33] user.handler.login_handler:48: attempt to call a nil value (field 'fetch_login_user_with_account')
+stack traceback:
+	user.handler.login_handler:48: in field '?'
+	./lualib/route.lua:27: in function 'route.dispatch_client'
+	[C]: in function 'xpcall'
+	./script/server/login.lua:31: in function <./script/server/login.lua:30>
+	[C]: in method 'dispatch'
+	./lualib/event.lua:263: in function 'event.dispatch'
+	lualib/bootstrap.lua:106: in main chunk
+[E:runtime][2018-04-13 11:48:47 @./script/server/login.lua:33] user.handler.login_handler:48: attempt to call a nil value (field 'fetch_login_user_with_account')
+stack traceback:
+	user.handler.login_handler:48: in field '?'
+	./lualib/route.lua:27: in function 'route.dispatch_client'
+	[C]: in function 'xpcall'
+	./script/server/login.lua:31: in function <./script/server/login.lua:30>
+	[C]: in method 'dispatch'
+	./lualib/event.lua:263: in function 'event.dispatch'
+	lualib/bootstrap.lua:106: in main chunk
+[E:runtime][2018-04-13 11:50:17 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 11:50:17 @user.server.startup:49] server/scene connect server:master ipc://master.ipc failed:Connection refused
+[E:runtime][2018-04-13 11:50:17 @./script/server/login.lua:69] login listen client success
+[E:runtime][2018-04-13 11:50:17 @./script/server/agent.lua:58] agent start success
+[E:runtime][2018-04-13 11:50:18 @./script/server/agent.lua:58] agent start success
+[E:runtime][2018-04-13 11:50:20 @user.handler.login_handler:19] cid:4999 addr:127.0.0.1:47692 enter
+[E:runtime][2018-04-13 11:50:24 @./script/server/login.lua:33] ./lualib/model.lua:33: attempt to index a nil value (local 'same_k')
+stack traceback:
+	./lualib/model.lua:33: in function 'model.fetch_login_user_with_account'
+	user.handler.login_handler:48: in field '?'
+	./lualib/route.lua:27: in function 'route.dispatch_client'
+	[C]: in function 'xpcall'
+	./script/server/login.lua:31: in function <./script/server/login.lua:30>
+	[C]: in method 'dispatch'
+	./lualib/event.lua:263: in function 'event.dispatch'
+	lualib/bootstrap.lua:106: in main chunk
+[E:runtime][2018-04-13 11:50:24 @./script/server/login.lua:33] ./lualib/model.lua:33: attempt to index a nil value (local 'same_k')
+stack traceback:
+	./lualib/model.lua:33: in function 'model.fetch_login_user_with_account'
+	user.handler.login_handler:48: in field '?'
+	./lualib/route.lua:27: in function 'route.dispatch_client'
+	[C]: in function 'xpcall'
+	./script/server/login.lua:31: in function <./script/server/login.lua:30>
+	[C]: in method 'dispatch'
+	./lualib/event.lua:263: in function 'event.dispatch'
+	lualib/bootstrap.lua:106: in main chunk
+[E:runtime][2018-04-13 11:51:59 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 11:51:59 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 11:51:59 @./script/server/login.lua:69] login listen client success
+[E:runtime][2018-04-13 11:52:00 @./script/server/agent.lua:58] agent start success
+[E:runtime][2018-04-13 11:52:00 @./script/server/agent.lua:58] agent start success
+[E:runtime][2018-04-13 11:52:01 @user.handler.login_handler:19] cid:4999 addr:127.0.0.1:47706 enter
+[E:runtime][2018-04-13 11:52:03 @./script/server/login.lua:33] user.handler.login_handler:72: attempt to index a nil value (local 'login_user')
+stack traceback:
+	user.handler.login_handler:72: in field '?'
+	./lualib/route.lua:27: in function 'route.dispatch_client'
+	[C]: in function 'xpcall'
+	./script/server/login.lua:31: in function <./script/server/login.lua:30>
+	[C]: in method 'dispatch'
+	./lualib/event.lua:263: in function 'event.dispatch'
+	lualib/bootstrap.lua:106: in main chunk
+[E:runtime][2018-04-13 11:52:03 @./script/server/login.lua:33] user.handler.login_handler:72: attempt to index a nil value (local 'login_user')
+stack traceback:
+	user.handler.login_handler:72: in field '?'
+	./lualib/route.lua:27: in function 'route.dispatch_client'
+	[C]: in function 'xpcall'
+	./script/server/login.lua:31: in function <./script/server/login.lua:30>
+	[C]: in method 'dispatch'
+	./lualib/event.lua:263: in function 'event.dispatch'
+	lualib/bootstrap.lua:106: in main chunk
+[E:runtime][2018-04-13 11:53:21 @./script/server/login.lua:69] login listen client success
+[E:runtime][2018-04-13 11:53:21 @user.server.startup:49] server/scene connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 11:53:21 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 11:53:21 @./lualib/event.lua:71] user.object:82: attempt to index a nil value (global 'model')
+stack traceback:
+	user.object:82: in method 'inherit'
+	user.module.login_user:9: in local 'func'
+	./lualib/import.lua:20: in upvalue 'loadfile'
+	./lualib/import.lua:34: in function 'import.import'
+	user.handler.login_handler:7: in local 'func'
+	./lualib/import.lua:20: in upvalue 'loadfile'
+	./lualib/import.lua:34: in function 'import.import'
+	./script/server/login.lua:72: in upvalue 'func'
+	./lualib/event.lua:49: in function <./lualib/event.lua:48>
+[E:runtime][2018-04-13 11:53:21 @./script/server/agent.lua:58] agent start success
+[E:runtime][2018-04-13 11:53:22 @./script/server/agent.lua:58] agent start success
+[E:runtime][2018-04-13 11:54:17 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 11:54:18 @user.server.startup:49] server/agent connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 11:54:18 @./script/server/login.lua:69] login listen client success
+[E:runtime][2018-04-13 11:54:18 @./lualib/event.lua:71] ./lualib/model.lua:13: name:login_user already register
+stack traceback:
+	[C]: in function 'assert'
+	./lualib/model.lua:13: in function 'model.register_binder'
+	user.object:82: in method 'inherit'
+	user.module.login_user:9: in local 'func'
+	./lualib/import.lua:20: in upvalue 'loadfile'
+	./lualib/import.lua:34: in function 'import'
+	user.handler.login_handler:7: in local 'func'
+	./lualib/import.lua:20: in upvalue 'loadfile'
+	./lualib/import.lua:34: in function 'import'
+	./script/server/login.lua:72: in upvalue 'func'
+	./lualib/event.lua:49: in function <./lualib/event.lua:48>
+[E:runtime][2018-04-13 11:54:18 @./script/server/agent.lua:58] agent start success
+[E:runtime][2018-04-13 11:54:19 @./script/server/agent.lua:58] agent start success
+[E:runtime][2018-04-13 11:54:34 @user.server.startup:49] server/scene connect server:master ipc://master.ipc failed:Connection refused
+[E:runtime][2018-04-13 11:54:34 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 11:54:34 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 11:54:34 @./script/server/login.lua:69] login listen client success
+[E:runtime][2018-04-13 11:54:35 @./script/server/agent.lua:58] agent start success
+[E:runtime][2018-04-13 11:54:35 @./script/server/agent.lua:58] agent start success
+[E:runtime][2018-04-13 11:54:38 @user.handler.login_handler:20] cid:4999 addr:127.0.0.1:47744 enter
+[E:runtime][2018-04-13 11:54:39 @./script/server/login.lua:33] user.module.login_user:40: attempt to call a nil value (field 'get_mongodb')
+stack traceback:
+	user.module.login_user:40: in method 'auth'
+	user.handler.login_handler:74: in field '?'
+	./lualib/route.lua:27: in function 'route.dispatch_client'
+	[C]: in function 'xpcall'
+	./script/server/login.lua:31: in function <./script/server/login.lua:30>
+	[C]: in method 'dispatch'
+	./lualib/event.lua:263: in function 'event.dispatch'
+	lualib/bootstrap.lua:106: in main chunk
+[E:runtime][2018-04-13 11:54:39 @./script/server/login.lua:33] user.module.login_user:40: attempt to call a nil value (field 'get_mongodb')
+stack traceback:
+	user.module.login_user:40: in method 'auth'
+	user.handler.login_handler:74: in field '?'
+	./lualib/route.lua:27: in function 'route.dispatch_client'
+	[C]: in function 'xpcall'
+	./script/server/login.lua:31: in function <./script/server/login.lua:30>
+	[C]: in method 'dispatch'
+	./lualib/event.lua:263: in function 'event.dispatch'
+	lualib/bootstrap.lua:106: in main chunk
+[E:runtime][2018-04-13 11:54:57 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 11:54:57 @user.server.startup:49] server/scene connect server:master ipc://master.ipc failed:Connection refused
+[E:runtime][2018-04-13 11:54:57 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:No such file or directory
+[E:runtime][2018-04-13 11:54:57 @./script/server/login.lua:69] login listen client success
+[E:runtime][2018-04-13 11:54:58 @./script/server/agent.lua:58] agent start success
+[E:runtime][2018-04-13 11:54:58 @./script/server/agent.lua:58] agent start success
+[E:runtime][2018-04-13 11:55:01 @user.handler.login_handler:20] cid:4999 addr:127.0.0.1:47756 enter
+[E:runtime][2018-04-13 11:55:02 @./script/server/login.lua:33] ./lualib/event.lua:240: cannot wait in main co,wait op should run in fork
+stack traceback:
+	[C]: in function 'error'
+	./lualib/event.lua:240: in function 'event.wait'
+	./lualib/mongo.lua:97: in upvalue 'find'
+	./lualib/mongo.lua:109: in function 'mongo.findOne'
+	user.database_object:16: in method 'load'
+	user.module.login_user:41: in method 'auth'
+	user.handler.login_handler:74: in field '?'
+	./lualib/route.lua:27: in function 'route.dispatch_client'
+	[C]: in function 'xpcall'
+	./script/server/login.lua:31: in function <./script/server/login.lua:30>
+	[C]: in method 'dispatch'
+	./lualib/event.lua:263: in function 'event.dispatch'
+	lualib/bootstrap.lua:106: in main chunk
+[E:runtime][2018-04-13 11:55:02 @./script/server/login.lua:33] ./lualib/event.lua:240: cannot wait in main co,wait op should run in fork
+stack traceback:
+	[C]: in function 'error'
+	./lualib/event.lua:240: in function 'event.wait'
+	./lualib/mongo.lua:97: in upvalue 'find'
+	./lualib/mongo.lua:109: in function 'mongo.findOne'
+	user.database_object:16: in method 'load'
+	user.module.login_user:41: in method 'auth'
+	user.handler.login_handler:74: in field '?'
+	./lualib/route.lua:27: in function 'route.dispatch_client'
+	[C]: in function 'xpcall'
+	./script/server/login.lua:31: in function <./script/server/login.lua:30>
+	[C]: in method 'dispatch'
+	./lualib/event.lua:263: in function 'event.dispatch'
+	lualib/bootstrap.lua:106: in main chunk
+[E:runtime][2018-04-13 11:55:02 @./lualib/event.lua:349] ./lualib/channel.lua:86: luaclib/lua-dump.c:965 unpack error at:0 : expect {,unknown char:<\0> 
+stack traceback:
+	[C]: in function 'dump.core.unpack'
+	./lualib/channel.lua:86: in function 'channel.data'
+	./lualib/event.lua:333: in function <./lualib/event.lua:331>
+	[C]: in function 'xpcall'
+	./lualib/event.lua:347: in function <./lualib/event.lua:341>
+	[C]: in method 'dispatch'
+	./lualib/event.lua:263: in function 'event.dispatch'
+	lualib/bootstrap.lua:106: in main chunk
+[E:runtime][2018-04-13 11:55:02 @./lualib/event.lua:349] ./lualib/channel.lua:86: luaclib/lua-dump.c:965 unpack error at:0 : expect {,unknown char:<\1> 
+stack traceback:
+	[C]: in function 'dump.core.unpack'
+	./lualib/channel.lua:86: in function 'channel.data'
+	./lualib/event.lua:333: in function <./lualib/event.lua:331>
+	[C]: in function 'xpcall'
+	./lualib/event.lua:347: in function <./lualib/event.lua:341>
+	[C]: in method 'dispatch'
+	./lualib/event.lua:263: in function 'event.dispatch'
+	lualib/bootstrap.lua:106: in main chunk
+[E:runtime][2018-04-13 11:56:13 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 11:56:13 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 11:56:13 @./script/server/login.lua:68] login listen client success
+[E:runtime][2018-04-13 11:56:14 @./script/server/agent.lua:58] agent start success
+[E:runtime][2018-04-13 11:56:14 @./script/server/agent.lua:58] agent start success
+[E:runtime][2018-04-13 11:56:16 @user.handler.login_handler:20] cid:4999 addr:127.0.0.1:47772 enter
+[E:runtime][2018-04-13 11:56:17 @./lualib/event.lua:349] ./lualib/channel.lua:86: luaclib/lua-dump.c:965 unpack error at:0 : expect {,unknown char:<\2> 
+stack traceback:
+	[C]: in function 'table.decode'
+	./lualib/channel.lua:86: in function 'channel.data'
+	./lualib/event.lua:333: in function <./lualib/event.lua:331>
+	[C]: in function 'xpcall'
+	./lualib/event.lua:347: in function <./lualib/event.lua:341>
+	[C]: in method 'dispatch'
+	./lualib/event.lua:263: in function 'event.dispatch'
+	lualib/bootstrap.lua:106: in main chunk
+[E:runtime][2018-04-13 11:56:17 @./lualib/event.lua:349] ./lualib/channel.lua:86: luaclib/lua-dump.c:965 unpack error at:0 : expect {,unknown char:<\3> 
+stack traceback:
+	[C]: in function 'table.decode'
+	./lualib/channel.lua:86: in function 'channel.data'
+	./lualib/event.lua:333: in function <./lualib/event.lua:331>
+	[C]: in function 'xpcall'
+	./lualib/event.lua:347: in function <./lualib/event.lua:341>
+	[C]: in method 'dispatch'
+	./lualib/event.lua:263: in function 'event.dispatch'
+	lualib/bootstrap.lua:106: in main chunk
+[E:runtime][2018-04-13 11:58:00 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 11:58:00 @user.server.startup:49] server/scene connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 11:58:00 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 11:58:00 @./script/server/login.lua:68] login listen client success
+[E:runtime][2018-04-13 11:58:01 @./script/server/agent.lua:58] agent start success
+[E:runtime][2018-04-13 11:58:01 @./script/server/agent.lua:58] agent start success
+[E:runtime][2018-04-13 11:58:03 @user.handler.login_handler:20] cid:4999 addr:127.0.0.1:47786 enter
+[E:runtime][2018-04-13 11:58:05 @./lualib/event.lua:349] ./lualib/channel.lua:86: luaclib/lua-dump.c:965 unpack error at:0 : expect {,unknown char:<\4> 
+stack traceback:
+	[C]: in function 'dump.core.unpack'
+	./lualib/channel.lua:86: in function 'channel.data'
+	./lualib/event.lua:333: in function <./lualib/event.lua:331>
+	[C]: in function 'xpcall'
+	./lualib/event.lua:347: in function <./lualib/event.lua:341>
+	[C]: in method 'dispatch'
+	./lualib/event.lua:263: in function 'event.dispatch'
+	lualib/bootstrap.lua:106: in main chunk
+[E:runtime][2018-04-13 11:58:05 @./lualib/event.lua:349] ./lualib/channel.lua:86: luaclib/lua-dump.c:965 unpack error at:0 : expect {,unknown char:<\5> 
+stack traceback:
+	[C]: in function 'dump.core.unpack'
+	./lualib/channel.lua:86: in function 'channel.data'
+	./lualib/event.lua:333: in function <./lualib/event.lua:331>
+	[C]: in function 'xpcall'
+	./lualib/event.lua:347: in function <./lualib/event.lua:341>
+	[C]: in method 'dispatch'
+	./lualib/event.lua:263: in function 'event.dispatch'
+	lualib/bootstrap.lua:106: in main chunk
+[E:runtime][2018-04-13 12:00:49 @./script/server/login.lua:68] login listen client success
+[E:runtime][2018-04-13 12:00:49 @./script/server/agent.lua:58] agent start success
+[E:runtime][2018-04-13 12:00:49 @./script/server/agent.lua:58] agent start success
+[E:runtime][2018-04-13 12:00:52 @user.handler.login_handler:20] cid:4999 addr:127.0.0.1:47804 enter
+[E:runtime][2018-04-13 12:00:53 @./lualib/event.lua:349] ./lualib/channel.lua:86: luaclib/lua-dump.c:965 unpack error at:0 : expect {,unknown char:<\6> 
+stack traceback:
+	[C]: in function 'dump.core.unpack'
+	./lualib/channel.lua:86: in function 'channel.data'
+	./lualib/event.lua:333: in function <./lualib/event.lua:331>
+	[C]: in function 'xpcall'
+	./lualib/event.lua:347: in function <./lualib/event.lua:341>
+	[C]: in method 'dispatch'
+	./lualib/event.lua:263: in function 'event.dispatch'
+	lualib/bootstrap.lua:106: in main chunk
+[E:runtime][2018-04-13 12:00:53 @./lualib/event.lua:349] ./lualib/channel.lua:86: luaclib/lua-dump.c:965 unpack error at:0 : expect {,unknown char:<\7> 
+stack traceback:
+	[C]: in function 'dump.core.unpack'
+	./lualib/channel.lua:86: in function 'channel.data'
+	./lualib/event.lua:333: in function <./lualib/event.lua:331>
+	[C]: in function 'xpcall'
+	./lualib/event.lua:347: in function <./lualib/event.lua:341>
+	[C]: in method 'dispatch'
+	./lualib/event.lua:263: in function 'event.dispatch'
+	lualib/bootstrap.lua:106: in main chunk
+[E:runtime][2018-04-13 12:02:46 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 12:02:46 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 12:02:46 @./script/server/login.lua:68] login listen client success
+[E:runtime][2018-04-13 12:02:47 @./script/server/agent.lua:58] agent start success
+[E:runtime][2018-04-13 12:02:47 @./script/server/agent.lua:58] agent start success
+[E:runtime][2018-04-13 12:02:49 @user.handler.login_handler:20] cid:4999 addr:127.0.0.1:47820 enter
+[E:runtime][2018-04-13 12:03:23 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 12:03:23 @./script/server/login.lua:68] login listen client success
+[E:runtime][2018-04-13 12:03:23 @user.server.startup:49] server/scene connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 12:03:23 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 12:03:24 @./script/server/agent.lua:58] agent start success
+[E:runtime][2018-04-13 12:03:24 @./script/server/agent.lua:58] agent start success
+[E:runtime][2018-04-13 12:03:25 @user.handler.login_handler:20] cid:4999 addr:127.0.0.1:47834 enter
+[E:runtime][2018-04-13 12:04:05 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 12:04:05 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 12:04:05 @./script/server/login.lua:68] login listen client success
+[E:runtime][2018-04-13 12:04:05 @user.server.startup:49] server/scene connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 12:04:06 @./script/server/agent.lua:58] agent start success
+[E:runtime][2018-04-13 12:04:06 @./script/server/agent.lua:58] agent start success
+[E:runtime][2018-04-13 12:04:07 @user.handler.login_handler:20] cid:4999 addr:127.0.0.1:47846 enter
+[E:runtime][2018-04-13 12:04:33 @user.server.startup:49] server/scene connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 12:04:33 @./script/server/login.lua:68] login listen client success
+[E:runtime][2018-04-13 12:04:33 @./script/server/agent.lua:58] agent start success
+[E:runtime][2018-04-13 12:04:33 @./script/server/agent.lua:58] agent start success
+[E:runtime][2018-04-13 12:04:35 @user.handler.login_handler:20] cid:4999 addr:127.0.0.1:47860 enter
+[E:runtime][2018-04-13 12:05:37 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 12:05:37 @./script/server/agent.lua:58] agent start success
+[E:runtime][2018-04-13 12:05:37 @./script/server/login.lua:68] login listen client success
+[E:runtime][2018-04-13 12:05:38 @./script/server/agent.lua:58] agent start success
+[E:runtime][2018-04-13 12:05:40 @user.handler.login_handler:20] cid:4999 addr:127.0.0.1:47874 enter
+[E:runtime][2018-04-13 12:05:42 @./lualib/event.lua:349] user.module.login_user:30: attempt to call a nil value (field 'get_mongod')
+stack traceback:
+	user.module.login_user:30: in local 'info'
+	./lualib/event.lua:317: in function <./lualib/event.lua:310>
+	[C]: in function 'xpcall'
+	./lualib/event.lua:347: in function <./lualib/event.lua:341>
+	[C]: in method 'dispatch'
+	./lualib/event.lua:263: in function 'event.dispatch'
+	lualib/bootstrap.lua:106: in main chunk
+[E:runtime][2018-04-13 12:05:43 @./lualib/event.lua:349] user.module.login_user:30: attempt to call a nil value (field 'get_mongod')
+stack traceback:
+	user.module.login_user:30: in local 'info'
+	./lualib/event.lua:317: in function <./lualib/event.lua:310>
+	[C]: in function 'xpcall'
+	./lualib/event.lua:347: in function <./lualib/event.lua:341>
+	[C]: in method 'dispatch'
+	./lualib/event.lua:263: in function 'event.dispatch'
+	lualib/bootstrap.lua:106: in main chunk
+[E:runtime][2018-04-13 12:05:44 @./lualib/event.lua:349] user.module.login_user:30: attempt to call a nil value (field 'get_mongod')
+stack traceback:
+	user.module.login_user:30: in local 'info'
+	./lualib/event.lua:317: in function <./lualib/event.lua:310>
+	[C]: in function 'xpcall'
+	./lualib/event.lua:347: in function <./lualib/event.lua:341>
+	[C]: in method 'dispatch'
+	./lualib/event.lua:263: in function 'event.dispatch'
+	lualib/bootstrap.lua:106: in main chunk
+[E:runtime][2018-04-13 12:05:45 @./lualib/event.lua:349] user.module.login_user:30: attempt to call a nil value (field 'get_mongod')
+stack traceback:
+	user.module.login_user:30: in local 'info'
+	./lualib/event.lua:317: in function <./lualib/event.lua:310>
+	[C]: in function 'xpcall'
+	./lualib/event.lua:347: in function <./lualib/event.lua:341>
+	[C]: in method 'dispatch'
+	./lualib/event.lua:263: in function 'event.dispatch'
+	lualib/bootstrap.lua:106: in main chunk
+[E:runtime][2018-04-13 12:05:46 @./lualib/event.lua:349] user.module.login_user:30: attempt to call a nil value (field 'get_mongod')
+stack traceback:
+	user.module.login_user:30: in local 'info'
+	./lualib/event.lua:317: in function <./lualib/event.lua:310>
+	[C]: in function 'xpcall'
+	./lualib/event.lua:347: in function <./lualib/event.lua:341>
+	[C]: in method 'dispatch'
+	./lualib/event.lua:263: in function 'event.dispatch'
+	lualib/bootstrap.lua:106: in main chunk
+[E:runtime][2018-04-13 12:05:47 @./lualib/event.lua:349] user.module.login_user:30: attempt to call a nil value (field 'get_mongod')
+stack traceback:
+	user.module.login_user:30: in local 'info'
+	./lualib/event.lua:317: in function <./lualib/event.lua:310>
+	[C]: in function 'xpcall'
+	./lualib/event.lua:347: in function <./lualib/event.lua:341>
+	[C]: in method 'dispatch'
+	./lualib/event.lua:263: in function 'event.dispatch'
+	lualib/bootstrap.lua:106: in main chunk
+[E:runtime][2018-04-13 12:05:48 @./lualib/event.lua:349] user.module.login_user:30: attempt to call a nil value (field 'get_mongod')
+stack traceback:
+	user.module.login_user:30: in local 'info'
+	./lualib/event.lua:317: in function <./lualib/event.lua:310>
+	[C]: in function 'xpcall'
+	./lualib/event.lua:347: in function <./lualib/event.lua:341>
+	[C]: in method 'dispatch'
+	./lualib/event.lua:263: in function 'event.dispatch'
+	lualib/bootstrap.lua:106: in main chunk
+[E:runtime][2018-04-13 12:05:49 @./lualib/event.lua:349] user.module.login_user:30: attempt to call a nil value (field 'get_mongod')
+stack traceback:
+	user.module.login_user:30: in local 'info'
+	./lualib/event.lua:317: in function <./lualib/event.lua:310>
+	[C]: in function 'xpcall'
+	./lualib/event.lua:347: in function <./lualib/event.lua:341>
+	[C]: in method 'dispatch'
+	./lualib/event.lua:263: in function 'event.dispatch'
+	lualib/bootstrap.lua:106: in main chunk
+[E:runtime][2018-04-13 12:05:50 @./lualib/event.lua:349] user.module.login_user:30: attempt to call a nil value (field 'get_mongod')
+stack traceback:
+	user.module.login_user:30: in local 'info'
+	./lualib/event.lua:317: in function <./lualib/event.lua:310>
+	[C]: in function 'xpcall'
+	./lualib/event.lua:347: in function <./lualib/event.lua:341>
+	[C]: in method 'dispatch'
+	./lualib/event.lua:263: in function 'event.dispatch'
+	lualib/bootstrap.lua:106: in main chunk
+[E:runtime][2018-04-13 12:05:51 @./lualib/event.lua:349] user.module.login_user:30: attempt to call a nil value (field 'get_mongod')
+stack traceback:
+	user.module.login_user:30: in local 'info'
+	./lualib/event.lua:317: in function <./lualib/event.lua:310>
+	[C]: in function 'xpcall'
+	./lualib/event.lua:347: in function <./lualib/event.lua:341>
+	[C]: in method 'dispatch'
+	./lualib/event.lua:263: in function 'event.dispatch'
+	lualib/bootstrap.lua:106: in main chunk
+[E:runtime][2018-04-13 12:05:52 @./lualib/event.lua:349] user.module.login_user:30: attempt to call a nil value (field 'get_mongod')
+stack traceback:
+	user.module.login_user:30: in local 'info'
+	./lualib/event.lua:317: in function <./lualib/event.lua:310>
+	[C]: in function 'xpcall'
+	./lualib/event.lua:347: in function <./lualib/event.lua:341>
+	[C]: in method 'dispatch'
+	./lualib/event.lua:263: in function 'event.dispatch'
+	lualib/bootstrap.lua:106: in main chunk
+[E:runtime][2018-04-13 12:05:53 @./lualib/event.lua:349] user.module.login_user:30: attempt to call a nil value (field 'get_mongod')
+stack traceback:
+	user.module.login_user:30: in local 'info'
+	./lualib/event.lua:317: in function <./lualib/event.lua:310>
+	[C]: in function 'xpcall'
+	./lualib/event.lua:347: in function <./lualib/event.lua:341>
+	[C]: in method 'dispatch'
+	./lualib/event.lua:263: in function 'event.dispatch'
+	lualib/bootstrap.lua:106: in main chunk
+[E:runtime][2018-04-13 12:05:54 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 12:05:54 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 12:05:54 @./script/server/login.lua:68] login listen client success
+[E:runtime][2018-04-13 12:05:55 @./script/server/agent.lua:58] agent start success
+[E:runtime][2018-04-13 12:05:55 @./script/server/agent.lua:58] agent start success
+[E:runtime][2018-04-13 12:05:57 @user.handler.login_handler:20] cid:4999 addr:127.0.0.1:47886 enter
+[E:runtime][2018-04-13 12:06:17 @user.handler.login_handler:24] cid:4999 enter
+[E:runtime][2018-04-13 12:07:25 @./script/server/login.lua:68] login listen client success
+[E:runtime][2018-04-13 12:07:25 @user.server.startup:49] server/scene connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 12:07:25 @user.server.startup:49] server/agent connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 12:07:25 @user.server.startup:49] server/agent connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 12:07:26 @./script/server/agent.lua:58] agent start success
+[E:runtime][2018-04-13 12:07:26 @./script/server/agent.lua:58] agent start success
+[E:runtime][2018-04-13 12:07:28 @user.handler.login_handler:20] cid:4999 addr:127.0.0.1:47902 enter

@@ -17,9 +17,9 @@ end
 local _M = {}
 
 function _M.login(channel,account)
-	local data = protocol.encode.c2s_auth({account = account})
+	local data = protocol.encode.c2s_login_auth({account = account})
 	for i = 1,2 do
-		channel:write(channel.packet:pack(1,data))
+		channel:write(channel.packet:pack(protocol.name_id["c2s_login_auth"],data))
 	end
 end
 

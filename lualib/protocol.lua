@@ -90,7 +90,7 @@ function _M.load()
 	local encode = {}
 	local decode = {}
 
-	local name_map = {}
+	local name_id = {}
 
 	_ctx = protocolcore.new()
 	for i,info in ipairs(meta) do
@@ -101,22 +101,23 @@ function _M.load()
 		end
 
 		decode[i] = function (data,size)
-			local message =  _ctx:decode(data,size)
+			local message =  _ctx:decode(i,data,size)
 			return info.name,message
 		end
 
-		name_map[info.name] = i
+		name_id[info.name] = i
 	end
 
 	_M.encode = encode
 	_M.decode = decode
 	_M.handler = setmetatable({},{__newindex = function (self,proto,func)
-		if not name_map[proto] then
+		if not name_id[proto] then
 			print(string.format("no such protocol:%s",proto))
 			return
 		end
 		rawset(self,proto,func)
 	end})
+	_M.name_id = name_id
 end
 
 function _M.dump(id)

@@ -4,35 +4,39 @@ local cjson = require "cjson"
 local util = require "util"
 local model = require "model"
 
+local login_user = import "module.login_user"
 
 _login_ctx = _login_ctx or {}
 _account_queue = _account_queue or {}
+
+function __init__()
+	protocol.handler["c2s_login_auth"] = req_enter
+	protocol.handler["c2s_login_enter"] = req_enter_game
+end
 
 function enter(cid,addr)
 	local info = {cid = cid,addr = addr}
 	_login_ctx[cid] = info
 	event.error(string.format("cid:%d addr:%s enter",cid,addr))
-	print("enter",cid)
 end
 
 function leave(cid)
-	print("leave",cid)
-	event.error(string.format("cid:%d enter",cid))
+	event.error(string.format("cid:%d leave",cid))
 	local info = _login_ctx[cid]
 	if not info then
 		return
 	end
 	
 	if info.account then
-		local login_user = model.fetch_login_user_with_account(account)
-		if login_user then
-			login_user:leave()
+		local user = model.fetch_login_user_with_account(account)
+		if user then
+			user:leave()
 		end
 	end
 	_login_ctx[cid] = nil
 end
 
-function auth(cid,args)
+function req_enter(cid,args)
 	local account = args.account
 	
 	local queue = _account_queue[account]
@@ -42,9 +46,9 @@ function auth(cid,args)
 	end
 	table.insert(queue,cid)
 
-	local login_user = model.fetch_login_user_with_account(account)
-	if login_user then
-		login_user:leave(function ()
+	local user = model.fetch_login_user_with_account(account)
+	if user then
+		user:leave(function ()
 			local last_cid = table.remove(queue)
 			local client_manager = model.get_client_manager()
 			for _,cid in pairs(queue) do
@@ -55,8 +59,8 @@ function auth(cid,args)
 			local info = _login_ctx[last_cid]
 			if info then
 				info.account = account
-				login_user:new(last_cid,account)
-				login_user:auth()
+				user:new(last_cid,account)
+				user:auth()
 			end
 		end)
 	else
@@ -66,13 +70,13 @@ function auth(cid,args)
 		local info = _login_ctx[cid]
 		if info then
 			info.account = account
-			login_user:new(cid,account)
-			login_user:auth()
+			local user = login_user.cls_login_user:new(cid,account)
+			user:auth()
 		end
 	end
 end
 
-function enter_game(client_id,args)
+function req_enter_game(client_id,args)
 	local account = args.account
 	local user_id = args.user_id
 	local json = cjson.encode({account = account,user_id = user_id})

@@ -5,12 +5,34 @@ protocol role_info
 	string name
 }
 
-protocol c2s_auth
+protocol c2s_login_auth
 {
 	string account
 }
 
-protocol s2c_auth
+protocol s2c_login_auth
 {
 	role_info[] list
+}
+
+protocol c2s_create_role
+{
+	int career
+}
+
+protocol s2c_create_role
+{
+	role_info[] list
+}
+
+protocol c2s_login_enter
+{
+	int uid
+}
+
+protocol s2c_login_enter
+{
+	string token
+	string ip
+	int port
 }

@@ -27,6 +27,10 @@ function _M.register_binder(name,...)
 	local binder_map = {}
 
 	for _,key in pairs(keys) do
+		if not _binder_ctx[name][key] then
+			_binder_ctx[name][key] = {}
+		end
+
 		_M[string.format("fetch_%s_with_%s",name,key)] = function (k)
 			local same_name = _binder_ctx[name]
 			local same_k = same_name[key]

@@ -22,7 +22,6 @@ local function client_data(cid,message_id,data,size)
 end
 
 local function client_accept(id)
-	print("client_accept",id)
 	model.bind_client_with_id(id,{login = false})
 end
 

@@ -27,9 +27,10 @@ function cls_login_user:create(cid,account)
 		if not user then
 			return
 		end
-		local db_channel = model.get_mongod()
+		local db_channel = model.get_db_channel()
 		user:save(db_channel)
 	end)
+	model.bind_login_user_with_account(account,self)
 end
 
 function cls_login_user:db_index()
@@ -37,8 +38,9 @@ function cls_login_user:db_index()
 end
 
 function cls_login_user:auth()
-	local db_channel = model.get_mongodb()
+	local db_channel = model.get_db_channel()
 	self:load(db_channel)
+
 	local self = model.fetch_login_user_with_account(self.account)
 	if not self then
 		return

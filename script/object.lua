@@ -1,6 +1,6 @@
 local event = require "event"
 local util = require "util"
-local object_mgr = require "model"
+local model = require "model"
 
 class_ctx = class_ctx or {}
 
@@ -200,7 +200,7 @@ function class.detect_leak()
 		local object_set = object_ctx[name]
 		if object_set then
 			for weak_obj,info in pairs(object_set) do
-				local alive_object_ctx = object_mgr[string.format("all%s",name)]()
+				local alive_object_ctx = model[string.format("fetch_%s",name)]()
 				local alive = false
 
 				if alive_object_ctx then

@@ -1,3 +1,5 @@
+local protocol = require "protocol"
+local event = require "event"
 
 local _M = {}
 
@@ -18,6 +20,10 @@ end
 
 function _M.dispatch_client(message_id,data,size,...)
 	local name,message = protocol.decode[message_id](data,size)
+	if not protocol.handler[name] then
+		event.error(string.format("no such id:%d proto:%s ",message_id,name))
+		return
+	end
 	protocol.handler[name](...,message)
 end
 

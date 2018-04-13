@@ -4,14 +4,14 @@ local model = require "model"
 local protocol = require "protocol"
 local mongo = require "mongo"
 local channel = require "channel"
-
+local route = require "route"
 local startup = import "server.startup"
-local login_handler = import "handler.login_handler"
+
 local server_manager = import "module.server_manager"
 
 model.register_value("client_manager")
 model.register_binder("agent_channel","id")
-model.register_binder("login_info","cid")
+
 
 local common_channel = channel:inherit()
 function common_channel:disconnect()
@@ -28,13 +28,13 @@ local function channel_accept(_,channel)
 end
 
 local function client_data(cid,message_id,data,size)
-	local ok,err = xpcall(route.dispatch_client,debug.traceback,cid,message_id,data,size)
-	if not ok then
-		event.error(err)
-	end
+	event.fork(function ()
+		route.dispatch_client(message_id,data,size,cid)
+	end)
 end
 
 local function client_accept(cid,addr)
+	local login_handler = import "handler.login_handler"
 	local ok,err = xpcall(login_handler.enter,debug.traceback,cid,addr)
 	if not ok then
 		event.error(err)
@@ -42,6 +42,7 @@ local function client_accept(cid,addr)
 end
 
 local function client_close(cid)
+	local login_handler = import "handler.login_handler"
 	local ok,err = xpcall(login_handler.leave,debug.traceback,cid)
 	if not ok then
 		event.error(err)
@@ -66,4 +67,6 @@ event.fork(function ()
 	end
 	event.error(string.format("login listen client success",reason))
 	model.set_client_manager(client_manager)
+
+	import "handler.login_handler"
 end)
