@@ -125,3 +125,21 @@ stack traceback:
 [E:runtime][1970-06-26 16:10:18 @./script/server/agent.lua:58] agent start success
 [E:runtime][1970-06-26 16:10:20 @./script/server/agent.lua:58] agent start success
 [E:runtime][2018-04-13 09:14:25 @./script/server/agent.lua:58] agent start success
+[E:runtime][2018-04-13 09:17:21 @./script/server/agent.lua:58] agent start success
+[E:runtime][2018-04-13 09:25:48 @user.server.startup:49] connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 09:25:49 @./script/server/agent.lua:58] agent start success
+[E:runtime][2018-04-13 09:26:37 @user.server.startup:49] connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 09:26:38 @./script/server/agent.lua:58] agent start success
+[E:runtime][2018-04-13 09:27:21 @user.server.startup:49] connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 09:27:21 @user.server.startup:49] connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 09:27:22 @./script/server/agent.lua:58] agent start success
+[E:runtime][2018-04-13 09:27:40 @user.server.startup:49] connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 09:27:40 @user.server.startup:49] connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 09:27:41 @./script/server/agent.lua:58] agent start success
+[E:runtime][2018-04-13 09:28:21 @user.server.startup:49] connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 09:28:21 @user.server.startup:49] connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 09:28:22 @./script/server/agent.lua:58] agent start success
+[E:runtime][2018-04-13 09:28:22 @./script/server/agent.lua:58] agent start success
+[E:runtime][2018-04-13 09:29:55 @user.server.startup:49] connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 09:29:55 @./script/server/agent.lua:58] agent start success
+[E:runtime][2018-04-13 09:29:56 @./script/server/agent.lua:58] agent start success

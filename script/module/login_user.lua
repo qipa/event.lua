@@ -4,7 +4,7 @@ local model = require "model"
 local util = require "util"
 
 local database_object = import "database_object"
-local server_handler = import "handler.server_handler"
+local server_manager = import "module.server_manager"
 
 cls_login_user = database_object.cls_database:inherit("login_user","account")
 
@@ -71,7 +71,7 @@ function cls_login_user:leave(callback)
 		local client_manager = model.get_client_manager()
 		client_manager:close(self.cid)
 		self.phase = PHASE.AGENT_LEAVING
-		server_handler:send_agent(self.agent,"handler.agent_handler","user_kick",{uid = uid},function ()
+		server_manager:send_agent(self.agent,"handler.agent_handler","user_kick",{uid = uid},function ()
 			self:release()
 			if callback then
 				callback()
@@ -89,7 +89,7 @@ end
 
 function cls_login_user:enter_agent(uid)
 
-	local agent,agent_addr = server_handler:find_min_agent()
+	local agent,agent_addr = server_manager:find_min_agent()
 	self.uid = uid
 	self.agent = agent
 	self.phase = PHASE.AGENT
@@ -97,6 +97,6 @@ function cls_login_user:enter_agent(uid)
 	local time = util.time()
 	local json = cjson.encode({account = self.account,uid = uid})
 	local token = util.authcode(json,tostring(time),1)
-	server_handler:send_agent(agent,"handler.agent_handler","user_register",{token = token,time = time})
+	server_manager:send_agent(agent,"handler.agent_handler","user_register",{token = token,time = time})
 end
 

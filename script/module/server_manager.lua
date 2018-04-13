@@ -1,10 +1,14 @@
 local model = require "model"
 
 _agent_server_manager = _agent_server_manager or {}
-_agent_counter = 1
+_agent_counter = _agent_counter or 1
 
 _scene_server_manager = _scene_server_manager or {}
-_scene_server_counter = 1
+_scene_server_counter = _scene_server_counter or 1
+
+function __init__(self)
+
+end
 
 function register_agent_server(channel,args)
 	local agent = {channel = channel,count = 0,ip = args.ip,port = args.port}
@@ -12,6 +16,7 @@ function register_agent_server(channel,args)
 	channel.name = "agent"
 	channel.id = _agent_counter
 	_agent_counter = _agent_counter + 1
+	table.print(args,"register_agent_server")
 	return true
 end
 
@@ -59,6 +64,7 @@ function register_scene_server(channel,addr)
 	channel.name = "scene"
 	channel.id = _scene_server_counter
 	_scene_server_counter = _scene_server_counter + 1
+	table.print(addr,"register_scene_server")
 	return true
 end
 

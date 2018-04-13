@@ -47,13 +47,13 @@ event.fork(function ()
 	model.set_client_manager(client_manager)
 
 	local login_channel = model.get_login_channel()
-	login_channel:send("handler.server_handler","register_agent_server",{ip = "0.0.0.0",port = port})
+	login_channel:send("module.server_manager","register_agent_server",{ip = "0.0.0.0",port = port})
 
 	local master_channel = model.get_master_channel()
-	master_channel:send("handler.server_handler","register_agent_server",{ip = "0.0.0.0",port = port})
+	master_channel:send("module.server_manager","register_agent_server",{ip = "0.0.0.0",port = port})
 
 	local world_channel = model.get_world_channel()
-	world_channel:send("handler.server_handler","register_agent_server",{ip = "0.0.0.0",port = port})
+	world_channel:send("module.server_manager","register_agent_server",{ip = "0.0.0.0",port = port})
 
 	event.error("agent start success")
 end)

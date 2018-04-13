@@ -6,12 +6,12 @@ local mongo = require "mongo"
 local route = require "route"
 local channel = require "channel"
 local startup = import "server.startup"
-
+local server_manager = import "module.server_manager"
 
 local agent_channel = channel:inherit()
 function agent_channel:disconnect()
 	if self.id ~= nil then
-		server_handler:agent_server_down(self.id)
+		server_manager:agent_server_down(self.id)
 	end
 end
 
@@ -37,5 +37,5 @@ event.fork(function ()
 	end
 
 	local master_channel = model.get_master_channel()
-	master_channel:send("handler.server_handler","register_scene_server",addr_info)
+	master_channel:send("module.server_manager","register_scene_server",addr_info)
 end)

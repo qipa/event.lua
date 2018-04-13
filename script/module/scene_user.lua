@@ -4,7 +4,6 @@ local model = require "model"
 local util = require "util"
 
 local database_object = import "database_object"
-local server_handler = import "handler.server_handler"
 
 cls_scene_user = database_object.cls_database:inherit("scene_user","uid")
 

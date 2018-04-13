@@ -62,7 +62,7 @@ end
 env.name = name
 env.tid = util.thread_id()
 
-local command = string.format("event@%s@%d",name,env.uid)
+local command = string.format("%s@%d",name,env.uid)
 util.thread_name(command)
 
 if main then

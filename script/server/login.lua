@@ -7,7 +7,7 @@ local channel = require "channel"
 
 local startup = import "server.startup"
 local login_handler = import "handler.login_handler"
-local server_handler = import "handler.server_handler"
+local server_manager = import "module.server_manager"
 
 model.register_value("client_manager")
 model.register_binder("agent_channel","id")
@@ -17,7 +17,7 @@ local common_channel = channel:inherit()
 function common_channel:disconnect()
 	if self.id ~= nil then
 		if self.name == "agent" then
-			server_handler:agent_server_down(self.id)
+			server_manager:agent_server_down(self.id)
 		end
 	end
 end
