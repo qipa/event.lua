@@ -4,6 +4,7 @@ local model = require "model"
 local util = require "util"
 local protocol = require "protocol"
 
+local id_builder = import "module.id_builder"
 local database_object = import "module.database_object"
 local server_manager = import "module.server_manager"
 
@@ -20,6 +21,7 @@ local PHASE = {
 }
 
 function cls_login_user:create(cid,account)
+	print("cls_login_user:create",cid)
 	self.cid = cid
 	self.phase = PHASE.LOGIN
 	self.account = account
@@ -45,6 +47,7 @@ function cls_login_user:send_client(proto,args)
 end
 
 function cls_login_user:auth()
+	print("cls_login_user:auth")
 	local db_channel = model.get_db_channel()
 	self:load(db_channel)
 
@@ -66,7 +69,16 @@ function cls_login_user:auth()
 end
 
 function cls_login_user:create_role(career)
+	print("cls_login_user:create_role")
+	local role = {career = career,name = "mrq",uid = id_builder:alloc_user_uid()}
+	table.insert(self.role_list,role)
+	self:dirty_field("role_list")
 
+	local result = {}
+	for _,role in pairs(self.role_list) do
+		table.insert(result,{uid = role.uid,name = role.name})
+	end
+	self:send_client("s2c_create_role",{list = result})
 end
 
 function cls_login_user:delete_role(uid)

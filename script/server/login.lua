@@ -7,7 +7,7 @@ local channel = require "channel"
 local route = require "route"
 local http = require "http"
 local startup = import "server.startup"
-
+local id_builder = import "module.id_builder"
 local server_manager = import "module.server_manager"
 
 model.register_value("client_manager")
@@ -59,7 +59,8 @@ event.fork(function ()
 		os.exit(1)
 	end
 	env.dist_id = result.id
-
+	id_builder:init(env.dist_id)
+	
 	local ok,reason = event.listen(env.login,4,channel_accept,common_channel)
 	if not ok then
 		event.breakout(reason)

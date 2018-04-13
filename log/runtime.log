@@ -2105,3 +2105,424 @@ stack traceback:
 [E:runtime][2018-04-13 17:28:48 @./script/server/login.lua:76] login listen client success
 [E:runtime][2018-04-13 17:28:49 @./script/server/agent.lua:66] agent start success
 [E:runtime][2018-04-13 17:28:49 @./script/server/agent.lua:66] agent start success
+[E:runtime][2018-04-13 17:55:23 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:55:23 @./script/server/login.lua:77] login listen client success
+[E:runtime][2018-04-13 17:55:23 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 17:55:24 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 17:55:33 @user.handler.login_handler:22] cid:4999 addr:127.0.0.1:51102 enter
+[E:runtime][2018-04-13 17:55:35 @./lualib/event.lua:71] user.module.login_user:71: bad argument #1 to 'insert' (table expected, got nil)
+stack traceback:
+	[C]: in function 'table.insert'
+	user.module.login_user:71: in method 'create_role'
+	user.handler.login_handler:85: in field '?'
+	./lualib/route.lua:27: in function 'route.dispatch_client'
+	./script/server/login.lua:33: in upvalue 'func'
+	./lualib/event.lua:49: in function <./lualib/event.lua:48>
+[E:runtime][2018-04-13 17:56:07 @user.handler.login_handler:26] cid:4999 leave
+[E:runtime][2018-04-13 17:56:08 @user.handler.login_handler:22] cid:4998 addr:127.0.0.1:51104 enter
+[E:runtime][2018-04-13 17:56:11 @./lualib/event.lua:71] user.module.login_user:71: bad argument #1 to 'insert' (table expected, got nil)
+stack traceback:
+	[C]: in function 'table.insert'
+	user.module.login_user:71: in method 'create_role'
+	user.handler.login_handler:85: in field '?'
+	./lualib/route.lua:27: in function 'route.dispatch_client'
+	./script/server/login.lua:33: in upvalue 'func'
+	./lualib/event.lua:49: in function <./lualib/event.lua:48>
+[E:runtime][2018-04-13 17:56:50 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:56:50 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:56:50 @user.server.startup:49] server/scene connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:56:50 @./script/server/login.lua:77] login listen client success
+[E:runtime][2018-04-13 17:56:51 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 17:56:51 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 17:56:56 @user.handler.login_handler:22] cid:4999 addr:127.0.0.1:51128 enter
+[E:runtime][2018-04-13 17:56:57 @./lualib/event.lua:71] user.module.login_user:71: bad argument #1 to 'insert' (table expected, got nil)
+stack traceback:
+	[C]: in function 'table.insert'
+	user.module.login_user:71: in method 'create_role'
+	user.handler.login_handler:85: in field '?'
+	./lualib/route.lua:27: in function 'route.dispatch_client'
+	./script/server/login.lua:33: in upvalue 'func'
+	./lualib/event.lua:49: in function <./lualib/event.lua:48>
+[E:runtime][2018-04-13 17:57:56 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:57:56 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:57:56 @user.server.startup:49] server/scene connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:57:56 @./script/server/login.lua:77] login listen client success
+[E:runtime][2018-04-13 17:57:57 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 17:57:57 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 17:58:01 @user.handler.login_handler:22] cid:4999 addr:127.0.0.1:51154 enter
+[E:runtime][2018-04-13 17:58:03 @./lualib/event.lua:71] user.module.login_user:71: bad argument #1 to 'insert' (table expected, got nil)
+stack traceback:
+	[C]: in function 'table.insert'
+	user.module.login_user:71: in method 'create_role'
+	user.handler.login_handler:87: in field '?'
+	./lualib/route.lua:27: in function 'route.dispatch_client'
+	./script/server/login.lua:33: in upvalue 'func'
+	./lualib/event.lua:49: in function <./lualib/event.lua:48>
+[E:runtime][2018-04-13 17:58:45 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:58:45 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:58:45 @user.server.startup:49] server/scene connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:58:45 @./script/server/login.lua:77] login listen client success
+[E:runtime][2018-04-13 17:58:46 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 17:58:46 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 17:58:48 @user.handler.login_handler:22] cid:4999 addr:127.0.0.1:51168 enter
+[E:runtime][2018-04-13 17:58:49 @./lualib/event.lua:71] user.module.login_user:72: bad argument #1 to 'insert' (table expected, got nil)
+stack traceback:
+	[C]: in function 'table.insert'
+	user.module.login_user:72: in method 'create_role'
+	user.handler.login_handler:87: in field '?'
+	./lualib/route.lua:27: in function 'route.dispatch_client'
+	./script/server/login.lua:33: in upvalue 'func'
+	./lualib/event.lua:49: in function <./lualib/event.lua:48>
+[E:runtime][2018-04-13 17:59:33 @user.server.startup:49] server/scene connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:59:33 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:59:33 @./script/server/login.lua:77] login listen client success
+[E:runtime][2018-04-13 17:59:33 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 17:59:34 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 17:59:36 @user.handler.login_handler:22] cid:4999 addr:127.0.0.1:51182 enter
+[E:runtime][2018-04-13 17:59:37 @./lualib/event.lua:71] user.module.login_user:72: bad argument #1 to 'insert' (table expected, got nil)
+stack traceback:
+	[C]: in function 'table.insert'
+	user.module.login_user:72: in method 'create_role'
+	user.handler.login_handler:87: in field '?'
+	./lualib/route.lua:27: in function 'route.dispatch_client'
+	./script/server/login.lua:33: in upvalue 'func'
+	./lualib/event.lua:49: in function <./lualib/event.lua:48>
+[E:runtime][2018-04-13 18:00:28 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 18:00:28 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 18:00:28 @user.server.startup:49] server/scene connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 18:00:28 @./script/server/login.lua:77] login listen client success
+[E:runtime][2018-04-13 18:00:29 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 18:00:29 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 18:00:40 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 18:00:40 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 18:00:40 @user.server.startup:49] server/scene connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 18:00:40 @./script/server/login.lua:77] login listen client success
+[E:runtime][2018-04-13 18:00:41 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 18:00:41 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 18:00:44 @user.handler.login_handler:22] cid:4999 addr:127.0.0.1:51220 enter
+[E:runtime][2018-04-13 18:00:45 @./lualib/event.lua:71] user.module.login_user:73: bad argument #1 to 'insert' (table expected, got nil)
+stack traceback:
+	[C]: in function 'table.insert'
+	user.module.login_user:73: in method 'create_role'
+	user.handler.login_handler:85: in field '?'
+	./lualib/route.lua:27: in function 'route.dispatch_client'
+	./script/server/login.lua:33: in upvalue 'func'
+	./lualib/event.lua:49: in function <./lualib/event.lua:48>
+[E:runtime][2018-04-13 18:01:16 @user.server.startup:49] server/scene connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 18:01:16 @./script/server/login.lua:77] login listen client success
+[E:runtime][2018-04-13 18:01:17 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 18:01:17 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 18:01:18 @user.handler.login_handler:22] cid:4999 addr:127.0.0.1:51234 enter
+[E:runtime][2018-04-13 18:01:20 @./lualib/event.lua:71] user.module.login_user:72: bad argument #1 to 'insert' (table expected, got nil)
+stack traceback:
+	[C]: in function 'table.insert'
+	user.module.login_user:72: in method 'create_role'
+	user.handler.login_handler:85: in field '?'
+	./lualib/route.lua:27: in function 'route.dispatch_client'
+	./script/server/login.lua:33: in upvalue 'func'
+	./lualib/event.lua:49: in function <./lualib/event.lua:48>
+[E:runtime][2018-04-13 18:03:11 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 18:03:11 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 18:03:11 @user.server.startup:49] server/scene connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 18:03:11 @./script/server/login.lua:77] login listen client success
+[E:runtime][2018-04-13 18:03:12 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 18:03:12 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 18:03:14 @user.handler.login_handler:22] cid:4999 addr:127.0.0.1:51270 enter
+[E:runtime][2018-04-13 18:03:15 @./lualib/event.lua:71] user.module.login_user:72: bad argument #1 to 'insert' (table expected, got nil)
+stack traceback:
+	[C]: in function 'table.insert'
+	user.module.login_user:72: in method 'create_role'
+	user.handler.login_handler:85: in field '?'
+	./lualib/route.lua:27: in function 'route.dispatch_client'
+	./script/server/login.lua:33: in upvalue 'func'
+	./lualib/event.lua:49: in function <./lualib/event.lua:48>
+[E:runtime][2018-04-13 18:03:58 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 18:03:58 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 18:03:58 @user.server.startup:49] server/scene connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 18:03:58 @./script/server/login.lua:77] login listen client success
+[E:runtime][2018-04-13 18:03:59 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 18:03:59 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 18:04:01 @user.handler.login_handler:22] cid:4999 addr:127.0.0.1:51282 enter
+[E:runtime][2018-04-13 18:07:00 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 18:07:00 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 18:07:00 @user.server.startup:49] server/scene connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 18:07:00 @./script/server/login.lua:77] login listen client success
+[E:runtime][2018-04-13 18:07:01 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 18:07:01 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 18:07:03 @user.handler.login_handler:22] cid:4999 addr:127.0.0.1:51362 enter
+[E:runtime][2018-04-13 18:07:04 @./lualib/event.lua:71] user.module.login_user:70: bad argument #1 to 'insert' (table expected, got nil)
+stack traceback:
+	[C]: in function 'table.insert'
+	user.module.login_user:70: in method 'create_role'
+	user.handler.login_handler:85: in field '?'
+	./lualib/route.lua:27: in function 'route.dispatch_client'
+	./script/server/login.lua:33: in upvalue 'func'
+	./lualib/event.lua:49: in function <./lualib/event.lua:48>
+[E:runtime][2018-04-13 18:07:43 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 18:07:46 @user.server.startup:49] server/scene connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 18:07:46 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 18:07:46 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 18:07:46 @./script/server/login.lua:77] login listen client success
+[E:runtime][2018-04-13 18:07:47 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 18:07:47 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 18:07:50 @user.handler.login_handler:22] cid:4999 addr:127.0.0.1:51396 enter
+[E:runtime][2018-04-13 18:07:51 @./lualib/event.lua:71] user.module.login_user:70: bad argument #1 to 'insert' (table expected, got nil)
+stack traceback:
+	[C]: in function 'table.insert'
+	user.module.login_user:70: in method 'create_role'
+	user.handler.login_handler:85: in field '?'
+	./lualib/route.lua:27: in function 'route.dispatch_client'
+	./script/server/login.lua:33: in upvalue 'func'
+	./lualib/event.lua:49: in function <./lualib/event.lua:48>
+[E:runtime][2018-04-13 18:08:47 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 18:08:47 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 18:08:47 @./script/server/login.lua:77] login listen client success
+[E:runtime][2018-04-13 18:08:48 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 18:08:48 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 18:08:50 @user.handler.login_handler:22] cid:4999 addr:127.0.0.1:51410 enter
+[E:runtime][2018-04-13 18:08:51 @./lualib/event.lua:71] user.module.login_user:70: bad argument #1 to 'insert' (table expected, got nil)
+stack traceback:
+	[C]: in function 'table.insert'
+	user.module.login_user:70: in method 'create_role'
+	user.handler.login_handler:85: in field '?'
+	./lualib/route.lua:27: in function 'route.dispatch_client'
+	./script/server/login.lua:33: in upvalue 'func'
+	./lualib/event.lua:49: in function <./lualib/event.lua:48>
+[E:runtime][2018-04-13 18:09:43 @user.server.startup:49] server/scene connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 18:09:43 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 18:09:43 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 18:09:43 @./script/server/login.lua:77] login listen client success
+[E:runtime][2018-04-13 18:09:44 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 18:09:44 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 18:09:46 @user.handler.login_handler:22] cid:4999 addr:127.0.0.1:51424 enter
+[E:runtime][2018-04-13 18:09:49 @./lualib/event.lua:71] user.module.login_user:70: bad argument #1 to 'insert' (table expected, got nil)
+stack traceback:
+	[C]: in function 'table.insert'
+	user.module.login_user:70: in method 'create_role'
+	user.handler.login_handler:85: in field '?'
+	./lualib/route.lua:27: in function 'route.dispatch_client'
+	./script/server/login.lua:33: in upvalue 'func'
+	./lualib/event.lua:49: in function <./lualib/event.lua:48>
+[E:runtime][2018-04-13 18:10:52 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 18:10:52 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 18:10:54 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 18:10:54 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 18:10:55 @./script/server/login.lua:77] login listen client success
+[E:runtime][2018-04-13 18:10:55 @./lualib/event.lua:71] ./lualib/import.lua:19: user.module.database_object:18: unfinished string near '"'
+stack traceback:
+	[C]: in function 'util.core.load_script'
+	./lualib/import.lua:19: in upvalue 'loadfile'
+	./lualib/import.lua:34: in function 'import'
+	user.module.login_user:8: in local 'func'
+	./lualib/import.lua:20: in upvalue 'loadfile'
+	./lualib/import.lua:34: in function 'import'
+	user.handler.login_handler:7: in local 'func'
+	./lualib/import.lua:20: in upvalue 'loadfile'
+	./lualib/import.lua:34: in function 'import'
+	./script/server/login.lua:80: in upvalue 'func'
+	./lualib/event.lua:49: in function <./lualib/event.lua:48>
+[E:runtime][2018-04-13 18:10:55 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 18:10:55 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 18:11:01 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 18:11:01 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 18:11:01 @./script/server/login.lua:77] login listen client success
+[E:runtime][2018-04-13 18:11:02 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 18:11:02 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 18:11:04 @user.handler.login_handler:22] cid:4999 addr:127.0.0.1:51468 enter
+[E:runtime][2018-04-13 18:11:05 @./lualib/event.lua:71] user.module.login_user:70: bad argument #1 to 'insert' (table expected, got nil)
+stack traceback:
+	[C]: in function 'table.insert'
+	user.module.login_user:70: in method 'create_role'
+	user.handler.login_handler:85: in field '?'
+	./lualib/route.lua:27: in function 'route.dispatch_client'
+	./script/server/login.lua:33: in upvalue 'func'
+	./lualib/event.lua:49: in function <./lualib/event.lua:48>
+[E:runtime][2018-04-13 18:12:53 @user.server.startup:49] server/scene connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 18:12:54 @./script/server/login.lua:77] login listen client success
+[E:runtime][2018-04-13 18:12:54 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 18:12:54 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 18:12:56 @user.handler.login_handler:22] cid:4999 addr:127.0.0.1:51500 enter
+[E:runtime][2018-04-13 18:12:57 @./lualib/event.lua:71] user.module.login_user:70: bad argument #1 to 'insert' (table expected, got nil)
+stack traceback:
+	[C]: in function 'table.insert'
+	user.module.login_user:70: in method 'create_role'
+	user.handler.login_handler:85: in field '?'
+	./lualib/route.lua:27: in function 'route.dispatch_client'
+	./script/server/login.lua:33: in upvalue 'func'
+	./lualib/event.lua:49: in function <./lualib/event.lua:48>
+[E:runtime][2018-04-13 18:13:43 @user.handler.login_handler:26] cid:4999 leave
+[E:runtime][2018-04-13 18:13:44 @user.handler.login_handler:22] cid:4998 addr:127.0.0.1:51504 enter
+[E:runtime][2018-04-13 18:13:46 @./lualib/event.lua:71] user.module.login_user:70: bad argument #1 to 'insert' (table expected, got nil)
+stack traceback:
+	[C]: in function 'table.insert'
+	user.module.login_user:70: in method 'create_role'
+	user.handler.login_handler:85: in field '?'
+	./lualib/route.lua:27: in function 'route.dispatch_client'
+	./script/server/login.lua:33: in upvalue 'func'
+	./lualib/event.lua:49: in function <./lualib/event.lua:48>
+[E:runtime][2018-04-13 18:13:55 @user.handler.login_handler:26] cid:4998 leave
+[E:runtime][2018-04-13 18:13:56 @user.handler.login_handler:22] cid:4997 addr:127.0.0.1:51506 enter
+[E:runtime][2018-04-13 18:13:57 @./lualib/event.lua:71] user.module.login_user:70: bad argument #1 to 'insert' (table expected, got nil)
+stack traceback:
+	[C]: in function 'table.insert'
+	user.module.login_user:70: in method 'create_role'
+	user.handler.login_handler:85: in field '?'
+	./lualib/route.lua:27: in function 'route.dispatch_client'
+	./script/server/login.lua:33: in upvalue 'func'
+	./lualib/event.lua:49: in function <./lualib/event.lua:48>
+[E:runtime][2018-04-13 18:14:01 @user.handler.login_handler:26] cid:4997 leave
+[E:runtime][2018-04-13 18:15:20 @user.server.startup:49] server/scene connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 18:15:20 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 18:15:20 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 18:15:20 @./script/server/login.lua:77] login listen client success
+[E:runtime][2018-04-13 18:15:21 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 18:15:21 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 18:15:22 @user.handler.login_handler:22] cid:4999 addr:127.0.0.1:51522 enter
+[E:runtime][2018-04-13 18:15:24 @./lualib/event.lua:71] user.module.login_user:70: bad argument #1 to 'insert' (table expected, got nil)
+stack traceback:
+	[C]: in function 'table.insert'
+	user.module.login_user:70: in method 'create_role'
+	user.handler.login_handler:85: in field '?'
+	./lualib/route.lua:27: in function 'route.dispatch_client'
+	./script/server/login.lua:33: in upvalue 'func'
+	./lualib/event.lua:49: in function <./lualib/event.lua:48>
+[E:runtime][2018-04-13 18:15:56 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 18:15:56 @user.server.startup:49] server/scene connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 18:15:56 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 18:15:56 @./script/server/login.lua:77] login listen client success
+[E:runtime][2018-04-13 18:15:57 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 18:15:57 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 18:15:58 @user.handler.login_handler:22] cid:4999 addr:127.0.0.1:51534 enter
+[E:runtime][2018-04-13 18:16:00 @./lualib/event.lua:71] user.module.login_user:71: bad argument #1 to 'insert' (table expected, got nil)
+stack traceback:
+	[C]: in function 'table.insert'
+	user.module.login_user:71: in method 'create_role'
+	user.handler.login_handler:85: in field '?'
+	./lualib/route.lua:27: in function 'route.dispatch_client'
+	./script/server/login.lua:33: in upvalue 'func'
+	./lualib/event.lua:49: in function <./lualib/event.lua:48>
+[E:runtime][2018-04-13 18:16:27 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 18:16:27 @user.server.startup:49] server/scene connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 18:16:27 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 18:16:27 @./script/server/login.lua:77] login listen client success
+[E:runtime][2018-04-13 18:16:28 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 18:16:28 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 18:16:30 @user.handler.login_handler:22] cid:4999 addr:127.0.0.1:51552 enter
+[E:runtime][2018-04-13 18:16:32 @./lualib/event.lua:71] user.module.login_user:73: bad argument #1 to 'insert' (table expected, got nil)
+stack traceback:
+	[C]: in function 'table.insert'
+	user.module.login_user:73: in method 'create_role'
+	user.handler.login_handler:85: in field '?'
+	./lualib/route.lua:27: in function 'route.dispatch_client'
+	./script/server/login.lua:33: in upvalue 'func'
+	./lualib/event.lua:49: in function <./lualib/event.lua:48>
+[E:runtime][2018-04-13 18:17:53 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 18:17:53 @user.server.startup:49] server/scene connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 18:17:53 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 18:17:53 @./script/server/login.lua:77] login listen client success
+[E:runtime][2018-04-13 18:17:54 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 18:17:54 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 18:17:56 @user.handler.login_handler:22] cid:4999 addr:127.0.0.1:51566 enter
+[E:runtime][2018-04-13 18:17:58 @./lualib/event.lua:71] user.module.login_user:74: bad argument #1 to 'insert' (table expected, got nil)
+stack traceback:
+	[C]: in function 'table.insert'
+	user.module.login_user:74: in method 'create_role'
+	user.handler.login_handler:85: in field '?'
+	./lualib/route.lua:27: in function 'route.dispatch_client'
+	./script/server/login.lua:33: in upvalue 'func'
+	./lualib/event.lua:49: in function <./lualib/event.lua:48>
+[E:runtime][2018-04-13 18:18:23 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 18:18:23 @user.server.startup:49] server/scene connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 18:18:23 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 18:18:23 @./script/server/login.lua:77] login listen client success
+[E:runtime][2018-04-13 18:18:24 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 18:18:24 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 18:18:25 @user.handler.login_handler:22] cid:4999 addr:127.0.0.1:51580 enter
+[E:runtime][2018-04-13 18:18:27 @./lualib/event.lua:71] user.module.login_user:75: bad argument #1 to 'insert' (table expected, got nil)
+stack traceback:
+	[C]: in function 'table.insert'
+	user.module.login_user:75: in method 'create_role'
+	user.handler.login_handler:85: in field '?'
+	./lualib/route.lua:27: in function 'route.dispatch_client'
+	./script/server/login.lua:33: in upvalue 'func'
+	./lualib/event.lua:49: in function <./lualib/event.lua:48>
+[E:runtime][2018-04-13 18:19:09 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 18:19:09 @user.server.startup:49] server/scene connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 18:19:09 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 18:19:09 @./script/server/login.lua:77] login listen client success
+[E:runtime][2018-04-13 18:19:10 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 18:19:10 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 18:19:11 @user.handler.login_handler:22] cid:4999 addr:127.0.0.1:51592 enter
+[E:runtime][2018-04-13 18:19:13 @./lualib/event.lua:71] user.module.login_user:75: bad argument #1 to 'insert' (table expected, got nil)
+stack traceback:
+	[C]: in function 'table.insert'
+	user.module.login_user:75: in method 'create_role'
+	user.handler.login_handler:85: in field '?'
+	./lualib/route.lua:27: in function 'route.dispatch_client'
+	./script/server/login.lua:33: in upvalue 'func'
+	./lualib/event.lua:49: in function <./lualib/event.lua:48>
+[E:runtime][2018-04-13 18:20:56 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 18:20:56 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 18:20:56 @user.server.startup:49] server/scene connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 18:20:56 @./script/server/login.lua:77] login listen client success
+[E:runtime][2018-04-13 18:20:57 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 18:20:57 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 18:20:59 @user.handler.login_handler:22] cid:4999 addr:127.0.0.1:51608 enter
+[E:runtime][2018-04-13 18:21:16 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 18:21:16 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 18:21:16 @user.server.startup:49] server/scene connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 18:21:16 @./script/server/login.lua:77] login listen client success
+[E:runtime][2018-04-13 18:21:17 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 18:21:17 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 18:21:19 @user.handler.login_handler:22] cid:4999 addr:127.0.0.1:51634 enter
+[E:runtime][2018-04-13 18:21:20 @./lualib/event.lua:71] user.module.login_user:75: bad argument #1 to 'insert' (table expected, got nil)
+stack traceback:
+	[C]: in function 'table.insert'
+	user.module.login_user:75: in method 'create_role'
+	user.handler.login_handler:85: in field '?'
+	./lualib/route.lua:27: in function 'route.dispatch_client'
+	./script/server/login.lua:33: in upvalue 'func'
+	./lualib/event.lua:49: in function <./lualib/event.lua:48>
+[E:runtime][2018-04-13 18:21:48 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 18:21:48 @user.server.startup:49] server/scene connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 18:21:48 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 18:21:48 @./script/server/login.lua:77] login listen client success
+[E:runtime][2018-04-13 18:21:49 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 18:21:49 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 18:21:51 @user.handler.login_handler:22] cid:4999 addr:127.0.0.1:51646 enter
+[E:runtime][2018-04-13 18:21:52 @./lualib/event.lua:71] user.module.login_user:75: bad argument #1 to 'insert' (table expected, got nil)
+stack traceback:
+	[C]: in function 'table.insert'
+	user.module.login_user:75: in method 'create_role'
+	user.handler.login_handler:85: in field '?'
+	./lualib/route.lua:27: in function 'route.dispatch_client'
+	./script/server/login.lua:33: in upvalue 'func'
+	./lualib/event.lua:49: in function <./lualib/event.lua:48>
+[E:runtime][2018-04-13 18:23:18 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 18:23:18 @user.server.startup:49] server/scene connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 18:23:18 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 18:23:18 @./script/server/login.lua:77] login listen client success
+[E:runtime][2018-04-13 18:23:19 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 18:23:19 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 18:23:21 @user.handler.login_handler:22] cid:4999 addr:127.0.0.1:51718 enter
+[E:runtime][2018-04-13 18:23:22 @./lualib/event.lua:71] user.module.login_user:74: bad argument #1 to 'insert' (table expected, got nil)
+stack traceback:
+	[C]: in function 'table.insert'
+	user.module.login_user:74: in method 'create_role'
+	user.handler.login_handler:85: in field '?'
+	./lualib/route.lua:27: in function 'route.dispatch_client'
+	./script/server/login.lua:33: in upvalue 'func'
+	./lualib/event.lua:49: in function <./lualib/event.lua:48>
+[E:runtime][2018-04-13 18:23:57 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 18:23:57 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 18:23:57 @./script/server/login.lua:77] login listen client success
+[E:runtime][2018-04-13 18:23:58 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 18:23:58 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 18:23:59 @user.handler.login_handler:22] cid:4999 addr:127.0.0.1:51744 enter
+[E:runtime][2018-04-13 18:24:07 @user.handler.login_handler:26] cid:4999 leave
+[E:runtime][2018-04-13 18:24:46 @user.server.startup:49] server/scene connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 18:24:46 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 18:24:46 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 18:24:46 @./script/server/login.lua:77] login listen client success
+[E:runtime][2018-04-13 18:24:47 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 18:24:47 @./script/server/agent.lua:67] agent start success

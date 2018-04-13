@@ -10,14 +10,16 @@ function client_channel:disconnect()
 end
 
 function client_channel:data(data,size)
-	local id ,data,size = self.packet:unpack(data,size)
-	table.print(protocol.decode[i](data,size))
+	local id,data,size = self.packet:unpack(data,size)
+	local name,message = protocol.decode[id](data,size)
+	table.print(message,name)
 end
 
 local _M = {}
 
 function _M.login(channel,account)
 	channel:write(channel.packet:pack(protocol.encode.c2s_login_auth({account = account})))
+	event.sleep(1)
 	channel:write(channel.packet:pack(protocol.encode.c2s_create_role({career = 1})))
 end
 

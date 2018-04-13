@@ -11,14 +11,15 @@ local tmp_offset = {
 	monster = 2
 }
 
-function __init__(self)
+
+function init(self,dist_id)
 	for field,offset in pairs(save_offset) do
-		local uname = string.format("%s%d",field,env.dist_id)
+		local uname = string.format("%s%d",field,dist_id)
 		local attr = lfs.attributes(string.format("./tmp/id_builder/%s",uname))
 		local fs = persistence:open("id_builder")
 		local save_info
 		if not attr then
-			save_info = {begin = 10000 + env.dist_id,offset = 100}
+			save_info = {begin = 10000 + dist_id,offset = 100}
 			fs:save(uname,save_info)
 		else
 			save_info = fs:load(uname)
@@ -46,7 +47,7 @@ function __init__(self)
 	for field,offset in pairs(tmp_offset) do
 		local step = 1
 		self[string.format("alloc_%s_tid",field)] = function ()
-			local tid = step * 10000 + env.dist_id
+			local tid = step * 10000 + dist_id
 			step = step + 1
 			return tid
 		end

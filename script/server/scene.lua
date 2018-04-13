@@ -8,6 +8,7 @@ local channel = require "channel"
 local http = require "http"
 local startup = import "server.startup"
 local server_manager = import "module.server_manager"
+local id_builder = import "module.id_builder"
 
 local agent_channel = channel:inherit()
 function agent_channel:disconnect()
@@ -34,7 +35,8 @@ event.fork(function ()
 		os.exit(1)
 	end
 	env.dist_id = result.id
-
+	id_builder:init(env.dist_id)
+	
 	local ip,port = listener:addr()
 	local addr_info = {}
 	if port == 0 then

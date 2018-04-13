@@ -29,6 +29,7 @@ function cls_database:save(db_channel)
 	for field in pairs(self.__dirty) do
 		if self.__save_fields[field] then
 			local data = self[field]
+			print(field,data)
 			if data then
 				local updater = {}
 				if data.save_data then

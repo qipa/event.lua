@@ -8,6 +8,7 @@ local http = require "http"
 local channel = require "channel"
 local startup = import "server.startup"
 local server_manager = import "module.server_manager"
+local id_builder = import "module.id_builder"
 
 local common_channel = channel:inherit()
 function common_channel:disconnect()
@@ -33,7 +34,8 @@ event.fork(function ()
 		os.exit(1)
 	end
 	env.dist_id = result.id
-
+	id_builder:init(env.dist_id)
+	
 	local ok,reason = event.listen(env.world,4,channel_accept,agent_channel)
 	if not ok then
 		event.breakout(reason)

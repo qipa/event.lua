@@ -6,6 +6,7 @@ local http = require "http"
 local route = require "route"
 local channel = require "channel"
 local startup = import "server.startup"
+local id_builder = import "module.id_builder"
 
 model.register_binder("scene_channel","id")
 model.register_binder("client","id")
@@ -52,7 +53,7 @@ event.fork(function ()
 		os.exit(1)
 	end
 	env.dist_id = result.id
-
+	id_builder:init(env.dist_id)
 
 	local login_channel = model.get_login_channel()
 	login_channel:send("module.server_manager","register_agent_server",{ip = "0.0.0.0",port = port})
