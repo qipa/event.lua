@@ -1,7 +1,7 @@
 local event = require "event"
 local util = require "util"
 local model = require "model"
-local channel = require "channel"
+
 
 local LOG_LV_ERROR = 0
 local LOG_LV_WARN = 1
@@ -17,14 +17,6 @@ local LOG_TAG = {
 
 
 local logger_container = {}
-
-
-local log_channel = channel:inherit()
-
-function log_channel:disconnect()
-	channel.disconnect(self)
-	_channel = nil
-end
 
 local _M = {}
 
@@ -47,25 +39,26 @@ function _M:create(log_type,depth)
 	return ctx
 end
 
-function _M:close()
-
-end
-
 local function get_debug_info(logger)
 	local info = debug.getinfo(logger.depth,"lS")
 	return info.source,info.currentline
 end
 
 local function append_log(logger,log_lv,...)
-	local log = table.concat({...},"\t")
-	local source,line = get_debug_info(logger)
-	local now = math.modf(os.time() / 100)
-
-	local content = string.format("[%s:%s][%s %s:%s] %s",LOG_TAG[log_lv],logger.log_type,os.date("%Y-%m-%d %H:%M:%S",now),source,tostring(line),log)
 	local logger_channel = model.get_logger_channel()
 	if not logger_channel then
 		return
 	end
+
+	local log = table.concat({...},"\t")
+	local content
+	if log_lv == LOG_LV_ERROR then
+		local source,line = get_debug_info(logger)
+		content = string.format("[%s:%s][%s %s:%s] %s",LOG_TAG[log_lv],logger.log_type,os.date("%Y-%m-%d %H:%M:%S",os.time()),source,tostring(line),log)
+	else
+		content = string.format("[%s:%s][%s] %s",LOG_TAG[log_lv],logger.log_type,os.date("%Y-%m-%d %H:%M:%S",os.time()),log)
+	end
+		
 	logger_channel:send("handler.logger_handler","log",{logger.log_type,content})
 end
 

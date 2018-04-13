@@ -22,8 +22,8 @@ event.fork(function ()
 
     end)
     if not httpd then
-        event.error(string.format("center server listen:%s failed",addr))
+        event.error(string.format("center server listen:%s failed",env.center))
         os.exit(1)
     end
-    event.error(string.format("center server listen client:%s success",addr))
+    event.error(string.format("center server listen client:%s success",env.center))
 end)

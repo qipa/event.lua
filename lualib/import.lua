@@ -17,11 +17,6 @@ local function loadfile(file,fullfile,env)
 	fd:close()
 
 	local func,localvar = util.load_script(buffer,string.format("@user.%s",file),env)
-	local tips = string.format("%s local var:",file)
-	for var,linedefine in pairs(localvar) do
-		tips = tips..string.format("%s:%d,",var,linedefine)
-	end
-	event.error(tips)
 	func()
 	return attr.change
 end

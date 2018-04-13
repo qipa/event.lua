@@ -2,16 +2,11 @@
 local _M = {}
 
 
-local _load_module = {}
-
 function _M.dispatch(file,method,...)
-	local lm = _load_module[file]
+
+	local lm = import(file)
 	if not lm then
-		lm = import(file)
-		if not lm then
-			error(string.format("no such file:%s",file))
-		end
-		_load_module[file] = lm
+		error(string.format("no such file:%s",file))
 	end
 
 	local func = lm[method]
