@@ -1,4 +1,4 @@
-local object = import "object"
+local object = import "module.object"
 
 cls_collection = object.cls_base:inherit("database_collection")
 

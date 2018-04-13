@@ -1,4 +1,4 @@
-local object = import "object"
+local object = import "module.object"
 local object_mgr = import "object_manager"
 
 local cls_fuck = object.cls_base:inherit("fuck","id")

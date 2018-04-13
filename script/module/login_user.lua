@@ -4,7 +4,7 @@ local model = require "model"
 local util = require "util"
 local protocol = require "protocol"
 
-local database_object = import "database_object"
+local database_object = import "module.database_object"
 local server_manager = import "module.server_manager"
 
 cls_login_user = database_object.cls_database:inherit("login_user","account")
@@ -65,7 +65,7 @@ function cls_login_user:auth()
 	self:send_client("s2c_login_auth",{list = result})
 end
 
-function cls_login_user:create_role(career,name)
+function cls_login_user:create_role(career)
 
 end
 

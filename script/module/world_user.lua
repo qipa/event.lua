@@ -3,7 +3,7 @@ local cjson = require "cjson"
 local model = require "model"
 local util = require "util"
 
-local database_object = import "database_object"
+local database_object = import "module.database_object"
 
 cls_world_user = database_object.cls_database:inherit("world_user","uid")
 

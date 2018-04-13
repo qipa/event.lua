@@ -1389,3 +1389,49 @@ stack traceback:
 [E:runtime][2018-04-13 14:19:33 @./script/server/agent.lua:58] agent start success
 [E:runtime][2018-04-13 14:19:33 @./script/server/agent.lua:58] agent start success
 [E:runtime][2018-04-13 14:19:36 @user.handler.login_handler:20] cid:4999 addr:127.0.0.1:48476 enter
+[E:runtime][2018-04-13 14:43:09 @./script/server/login.lua:68] login listen client success
+[E:runtime][2018-04-13 14:43:09 @user.server.startup:49] server/scene connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 14:43:09 @./lualib/event.lua:71] ./lualib/import.lua:12: no such file:database_object,path:./script/database_object.lua
+stack traceback:
+	[C]: in function 'error'
+	./lualib/import.lua:12: in upvalue 'loadfile'
+	./lualib/import.lua:34: in function 'import.import'
+	user.module.login_user:7: in local 'func'
+	./lualib/import.lua:20: in upvalue 'loadfile'
+	./lualib/import.lua:34: in function 'import.import'
+	user.handler.login_handler:7: in local 'func'
+	./lualib/import.lua:20: in upvalue 'loadfile'
+	./lualib/import.lua:34: in function 'import.import'
+	./script/server/login.lua:71: in upvalue 'func'
+	./lualib/event.lua:49: in function <./lualib/event.lua:48>
+[E:runtime][2018-04-13 14:43:09 @./script/server/agent.lua:58] agent start success
+[E:runtime][2018-04-13 14:43:09 @./script/server/agent.lua:58] agent start success
+[E:runtime][2018-04-13 14:43:56 @./script/server/login.lua:68] login listen client success
+[E:runtime][2018-04-13 14:43:56 @./lualib/event.lua:71] ./lualib/import.lua:12: no such file:database_object,path:./script/database_object.lua
+stack traceback:
+	[C]: in function 'error'
+	./lualib/import.lua:12: in upvalue 'loadfile'
+	./lualib/import.lua:34: in function 'import.import'
+	user.module.login_user:7: in local 'func'
+	./lualib/import.lua:20: in upvalue 'loadfile'
+	./lualib/import.lua:34: in function 'import.import'
+	user.handler.login_handler:7: in local 'func'
+	./lualib/import.lua:20: in upvalue 'loadfile'
+	./lualib/import.lua:34: in function 'import.import'
+	./script/server/login.lua:71: in upvalue 'func'
+	./lualib/event.lua:49: in function <./lualib/event.lua:48>
+[E:runtime][2018-04-13 14:43:56 @user.server.startup:49] server/scene connect server:master ipc://master.ipc failed:Connection refused
+[E:runtime][2018-04-13 14:43:57 @user.server.startup:49] server/agent connect server:master ipc://master.ipc failed:Connection refused
+[E:runtime][2018-04-13 14:43:57 @user.server.startup:49] server/agent connect server:master ipc://master.ipc failed:Connection refused
+[E:runtime][2018-04-13 14:43:58 @./script/server/agent.lua:58] agent start success
+[E:runtime][2018-04-13 14:43:58 @./script/server/agent.lua:58] agent start success
+[E:runtime][2018-04-13 14:44:11 @user.server.startup:49] server/scene connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 14:44:11 @./script/server/login.lua:68] login listen client success
+[E:runtime][2018-04-13 14:44:12 @./script/server/agent.lua:58] agent start success
+[E:runtime][2018-04-13 14:44:12 @./script/server/agent.lua:58] agent start success
+[E:runtime][2018-04-13 14:44:49 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 14:44:49 @user.server.startup:49] server/scene connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 14:44:49 @./script/server/login.lua:68] login listen client success
+[E:runtime][2018-04-13 14:44:49 @user.server.startup:49] server/agent connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 14:44:50 @./script/server/agent.lua:58] agent start success
+[E:runtime][2018-04-13 14:44:50 @./script/server/agent.lua:58] agent start success
