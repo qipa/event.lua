@@ -1799,3 +1799,262 @@ stack traceback:
 [E:runtime][2018-04-13 16:52:08 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
 [E:runtime][2018-04-13 16:52:08 @./script/server/login.lua:68] login listen client success
 [E:runtime][2018-04-13 16:52:08 @user.server.startup:49] server/agent connect server:master ipc://master.ipc failed:Connection refused
+[E:runtime][2018-04-13 16:58:43 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 16:58:43 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 16:58:44 @./script/server/login.lua:68] login listen client success
+[E:runtime][2018-04-13 16:58:44 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 16:59:18 @./script/server/login.lua:68] login listen client success
+[E:runtime][2018-04-13 16:59:18 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:No such file or directory
+[E:runtime][2018-04-13 16:59:18 @user.server.startup:49] server/agent connect server:master ipc://master.ipc failed:Connection refused
+[E:runtime][2018-04-13 16:59:18 @user.server.startup:49] server/scene connect server:master ipc://master.ipc failed:Connection refused
+[E:runtime][2018-04-13 16:59:43 @user.server.startup:49] server/scene connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 16:59:43 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 16:59:44 @./script/server/login.lua:68] login listen client success
+[E:runtime][2018-04-13 16:59:44 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 17:00:39 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:00:40 @./script/server/login.lua:68] login listen client success
+[E:runtime][2018-04-13 17:00:40 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 17:01:36 @./script/server/login.lua:68] login listen client success
+[E:runtime][2018-04-13 17:01:36 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 17:01:36 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 17:01:47 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:01:47 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:01:47 @user.server.startup:49] server/scene connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:01:47 @./script/server/login.lua:68] login listen client success
+[E:runtime][2018-04-13 17:01:48 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 17:03:00 @user.server.startup:49] server/agent connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:03:00 @user.server.startup:49] server/scene connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:03:00 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:03:00 @./script/server/login.lua:68] login listen client success
+[E:runtime][2018-04-13 17:03:44 @./script/server/login.lua:68] login listen client success
+[E:runtime][2018-04-13 17:03:44 @user.server.startup:49] server/scene connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:03:44 @user.server.startup:49] server/agent connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:03:44 @user.server.startup:49] server/agent connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:03:45 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 17:03:57 @user.server.startup:49] server/agent connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:03:57 @./script/server/login.lua:68] login listen client success
+[E:runtime][2018-04-13 17:03:57 @user.server.startup:49] server/scene connect server:master ipc://master.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:03:57 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 17:03:58 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 17:04:00 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:No such file or directory
+[E:runtime][2018-04-13 17:04:00 @./script/server/login.lua:68] login listen client success
+[E:runtime][2018-04-13 17:04:00 @user.server.startup:49] server/scene connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:04:01 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 17:04:26 @user.server.startup:49] server/scene connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:04:26 @user.server.startup:49] server/agent connect server:master ipc://master.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:04:26 @./script/server/login.lua:68] login listen client success
+[E:runtime][2018-04-13 17:04:27 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 17:04:33 @user.server.startup:49] server/scene connect server:world ipc://world.ipc failed:No such file or directory
+[E:runtime][2018-04-13 17:04:33 @./script/server/login.lua:68] login listen client success
+[E:runtime][2018-04-13 17:04:33 @./lualib/event.lua:71] ./lualib/http.lua:229: assertion failed!
+stack traceback:
+	[C]: in function 'assert'
+	./lualib/http.lua:229: in function 'http.post_master'
+	./script/server/agent.lua:50: in upvalue 'func'
+	./lualib/event.lua:49: in function <./lualib/event.lua:48>
+[E:runtime][2018-04-13 17:04:33 @./lualib/event.lua:71] ./lualib/http.lua:229: assertion failed!
+stack traceback:
+	[C]: in function 'assert'
+	./lualib/http.lua:229: in function 'http.post_master'
+	./script/server/agent.lua:50: in upvalue 'func'
+	./lualib/event.lua:49: in function <./lualib/event.lua:48>
+[E:runtime][2018-04-13 17:04:46 @./script/server/login.lua:68] login listen client success
+[E:runtime][2018-04-13 17:04:46 @user.server.startup:49] server/scene connect server:master ipc://master.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:04:46 @user.server.startup:49] server/agent connect server:master ipc://master.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:04:46 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 17:05:44 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:05:44 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:05:45 @./script/server/login.lua:68] login listen client success
+[E:runtime][2018-04-13 17:05:45 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 17:05:59 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:05:59 @./script/server/login.lua:68] login listen client success
+[E:runtime][2018-04-13 17:05:59 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 17:06:00 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 17:06:03 @./script/server/login.lua:68] login listen client success
+[E:runtime][2018-04-13 17:06:03 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 17:06:03 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 17:06:05 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:06:05 @user.server.startup:49] server/scene connect server:master ipc://master.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:06:05 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:06:06 @./script/server/login.lua:68] login listen client success
+[E:runtime][2018-04-13 17:06:24 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:06:24 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:06:25 @./script/server/login.lua:68] login listen client success
+[E:runtime][2018-04-13 17:06:25 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 17:06:25 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 17:06:44 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:06:44 @./script/server/login.lua:68] login listen client success
+[E:runtime][2018-04-13 17:06:44 @user.server.startup:49] server/scene connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:06:44 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:06:45 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 17:06:45 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 17:07:04 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:07:04 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:07:04 @./script/server/login.lua:68] login listen client success
+[E:runtime][2018-04-13 17:07:05 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 17:07:05 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 17:07:20 @./script/server/login.lua:68] login listen client success
+[E:runtime][2018-04-13 17:07:20 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 17:07:24 @./script/server/login.lua:68] login listen client success
+[E:runtime][2018-04-13 17:07:24 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 17:07:44 @user.server.startup:49] server/agent connect server:master ipc://master.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:07:44 @./script/server/login.lua:68] login listen client success
+[E:runtime][2018-04-13 17:07:47 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 17:07:50 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 17:07:52 @user.server.startup:49] server/scene connect server:master ipc://master.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:07:52 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:07:52 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:07:52 @./script/server/login.lua:68] login listen client success
+[E:runtime][2018-04-13 17:08:09 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 17:08:21 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 17:08:23 @user.server.startup:49] server/agent connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:08:23 @./script/server/login.lua:68] login listen client success
+[E:runtime][2018-04-13 17:09:19 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 17:09:24 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 17:09:34 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:09:34 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:09:34 @user.server.startup:49] server/scene connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:09:34 @./script/server/login.lua:68] login listen client success
+[E:runtime][2018-04-13 17:09:49 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 17:09:56 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 17:10:06 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:10:06 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:10:06 @user.server.startup:49] server/scene connect server:master ipc://master.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:10:06 @./script/server/login.lua:68] login listen client success
+[E:runtime][2018-04-13 17:10:07 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 17:10:21 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:10:21 @./script/server/login.lua:68] login listen client success
+[E:runtime][2018-04-13 17:10:21 @user.server.startup:49] server/agent connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:10:21 @user.server.startup:49] server/scene connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:10:22 @./script/server/agent.lua:67] agent start success
+[E:runtime][2018-04-13 17:10:36 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:10:36 @./script/server/login.lua:68] login listen client success
+[E:runtime][2018-04-13 17:10:36 @user.server.startup:49] server/scene connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:10:36 @./script/server/agent.lua:66] agent start success
+[E:runtime][2018-04-13 17:10:48 @user.server.startup:49] server/scene connect server:world ipc://world.ipc failed:No such file or directory
+[E:runtime][2018-04-13 17:10:48 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:10:48 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:10:48 @./script/server/login.lua:68] login listen client success
+[E:runtime][2018-04-13 17:10:49 @./script/server/agent.lua:66] agent start success
+[E:runtime][2018-04-13 17:10:49 @./script/server/agent.lua:66] agent start success
+[E:runtime][2018-04-13 17:11:20 @user.server.startup:49] server/scene connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:11:20 @./script/server/login.lua:68] login listen client success
+[E:runtime][2018-04-13 17:11:20 @user.server.startup:49] server/agent connect server:master ipc://master.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:11:20 @./script/server/agent.lua:66] agent start success
+[E:runtime][2018-04-13 17:11:21 @./script/server/agent.lua:66] agent start success
+[E:runtime][2018-04-13 17:11:23 @./script/server/login.lua:68] login listen client success
+[E:runtime][2018-04-13 17:11:23 @user.server.startup:49] server/agent connect server:master ipc://master.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:11:23 @user.server.startup:49] server/scene connect server:master ipc://master.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:11:24 @./script/server/agent.lua:66] agent start success
+[E:runtime][2018-04-13 17:11:29 @./script/server/login.lua:68] login listen client success
+[E:runtime][2018-04-13 17:11:29 @user.server.startup:49] server/agent connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:11:29 @./script/server/agent.lua:66] agent start success
+[E:runtime][2018-04-13 17:11:30 @./script/server/agent.lua:66] agent start success
+[E:runtime][2018-04-13 17:11:31 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:11:31 @user.server.startup:49] server/scene connect server:master ipc://master.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:11:31 @./script/server/login.lua:68] login listen client success
+[E:runtime][2018-04-13 17:11:31 @./script/server/agent.lua:66] agent start success
+[E:runtime][2018-04-13 17:11:32 @./script/server/agent.lua:66] agent start success
+[E:runtime][2018-04-13 17:11:34 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:11:34 @user.server.startup:49] server/agent connect server:master ipc://master.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:11:34 @./script/server/login.lua:68] login listen client success
+[E:runtime][2018-04-13 17:11:34 @user.server.startup:49] server/scene connect server:master ipc://master.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:11:35 @./script/server/agent.lua:66] agent start success
+[E:runtime][2018-04-13 17:11:44 @user.server.startup:49] server/scene connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:11:44 @user.server.startup:49] server/agent connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:11:44 @./script/server/login.lua:68] login listen client success
+[E:runtime][2018-04-13 17:11:44 @user.server.startup:49] server/agent connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:11:45 @./script/server/agent.lua:66] agent start success
+[E:runtime][2018-04-13 17:14:09 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:14:10 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:14:10 @./script/server/login.lua:68] login listen client success
+[E:runtime][2018-04-13 17:14:10 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:14:11 @user.server.startup:49] server/scene connect server:master ipc://master.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:14:12 @user.server.startup:49] server/agent connect server:master ipc://master.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:14:12 @user.server.startup:49] server/scene connect server:master ipc://master.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:14:12 @user.server.startup:49] server/agent connect server:master ipc://master.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:14:13 @user.server.startup:49] server/scene connect server:master ipc://master.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:14:13 @user.server.startup:49] server/agent connect server:master ipc://master.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:14:20 @./script/server/agent.lua:66] agent start success
+[E:runtime][2018-04-13 17:14:20 @./script/server/agent.lua:66] agent start success
+[E:runtime][2018-04-13 17:14:25 @./script/server/login.lua:68] login listen client success
+[E:runtime][2018-04-13 17:14:25 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:14:25 @./script/server/agent.lua:66] agent start success
+[E:runtime][2018-04-13 17:16:40 @user.server.startup:49] server/scene connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:16:40 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:16:40 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:16:40 @./script/server/login.lua:68] login listen client success
+[E:runtime][2018-04-13 17:16:41 @./script/server/agent.lua:66] agent start success
+[E:runtime][2018-04-13 17:16:52 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:16:52 @./script/server/login.lua:68] login listen client success
+[E:runtime][2018-04-13 17:16:52 @user.server.startup:49] server/agent connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:16:52 @user.server.startup:49] server/scene connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:16:59 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:16:59 @./script/server/login.lua:68] login listen client success
+[E:runtime][2018-04-13 17:16:59 @user.server.startup:49] server/scene connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:16:59 @./script/server/agent.lua:66] agent start success
+[E:runtime][2018-04-13 17:17:04 @user.server.startup:49] server/scene connect server:master ipc://master.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:17:04 @./script/server/login.lua:68] login listen client success
+[E:runtime][2018-04-13 17:17:04 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:17:04 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:20:00 @./script/server/login.lua:68] login listen client success
+[E:runtime][2018-04-13 17:20:00 @user.server.startup:49] server/agent connect server:master ipc://master.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:20:00 @user.server.startup:49] server/scene connect server:master ipc://master.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:20:00 @user.server.startup:49] server/agent connect server:master ipc://master.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:20:01 @./script/server/agent.lua:66] agent start success
+[E:runtime][2018-04-13 17:20:01 @./script/server/agent.lua:66] agent start success
+[E:runtime][2018-04-13 17:20:02 @./script/server/login.lua:68] login listen client success
+[E:runtime][2018-04-13 17:20:02 @./script/server/agent.lua:66] agent start success
+[E:runtime][2018-04-13 17:20:02 @./script/server/agent.lua:66] agent start success
+[E:runtime][2018-04-13 17:20:04 @./script/server/login.lua:68] login listen client success
+[E:runtime][2018-04-13 17:20:04 @./script/server/agent.lua:66] agent start success
+[E:runtime][2018-04-13 17:20:04 @./script/server/agent.lua:66] agent start success
+[E:runtime][2018-04-13 17:20:06 @user.server.startup:49] server/scene connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:20:06 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:20:06 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:20:06 @./script/server/login.lua:68] login listen client success
+[E:runtime][2018-04-13 17:20:07 @./script/server/agent.lua:66] agent start success
+[E:runtime][2018-04-13 17:20:07 @./script/server/agent.lua:66] agent start success
+[E:runtime][2018-04-13 17:20:08 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:20:08 @./script/server/login.lua:68] login listen client success
+[E:runtime][2018-04-13 17:20:08 @./script/server/agent.lua:66] agent start success
+[E:runtime][2018-04-13 17:20:09 @./script/server/agent.lua:66] agent start success
+[E:runtime][2018-04-13 17:20:11 @./script/server/login.lua:68] login listen client success
+[E:runtime][2018-04-13 17:20:11 @./script/server/agent.lua:66] agent start success
+[E:runtime][2018-04-13 17:20:11 @./script/server/agent.lua:66] agent start success
+[E:runtime][2018-04-13 17:20:51 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:20:51 @user.server.startup:49] server/scene connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:20:51 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:20:51 @./script/server/login.lua:68] login listen client success
+[E:runtime][2018-04-13 17:20:52 @./script/server/agent.lua:66] agent start success
+[E:runtime][2018-04-13 17:20:52 @./script/server/agent.lua:66] agent start success
+[E:runtime][2018-04-13 17:21:21 @user.server.startup:49] server/scene connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:21:21 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:21:21 @./script/server/login.lua:68] login listen client success
+[E:runtime][2018-04-13 17:21:21 @./script/server/agent.lua:66] agent start success
+[E:runtime][2018-04-13 17:21:22 @./script/server/agent.lua:66] agent start success
+[E:runtime][2018-04-13 17:21:47 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:21:47 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:21:47 @user.server.startup:49] server/scene connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:21:47 @./script/server/login.lua:68] login listen client success
+[E:runtime][2018-04-13 17:21:48 @./script/server/agent.lua:66] agent start success
+[E:runtime][2018-04-13 17:21:48 @./script/server/agent.lua:66] agent start success
+[E:runtime][2018-04-13 17:22:41 @user.server.startup:49] server/agent connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:22:41 @./script/server/login.lua:68] login listen client success
+[E:runtime][2018-04-13 17:22:41 @user.server.startup:49] server/scene connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:22:41 @./script/server/agent.lua:66] agent start success
+[E:runtime][2018-04-13 17:22:42 @./script/server/agent.lua:66] agent start success
+[E:runtime][2018-04-13 17:23:00 @user.server.startup:49] server/agent connect server:login ipc://login.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:23:00 @user.server.startup:49] server/agent connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:23:00 @./script/server/login.lua:68] login listen client success
+[E:runtime][2018-04-13 17:23:01 @./script/server/agent.lua:66] agent start success
+[E:runtime][2018-04-13 17:23:01 @./script/server/agent.lua:66] agent start success
+[E:runtime][2018-04-13 17:23:55 @./script/server/login.lua:68] login listen client success
+[E:runtime][2018-04-13 17:23:55 @user.server.startup:49] server/scene connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:23:55 @user.server.startup:49] server/agent connect server:world ipc://world.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:23:56 @./script/server/agent.lua:66] agent start success
+[E:runtime][2018-04-13 17:23:56 @./script/server/agent.lua:66] agent start success
+[E:runtime][2018-04-13 17:24:49 @./script/server/login.lua:68] login listen client success
+[E:runtime][2018-04-13 17:24:49 @user.server.startup:49] server/agent connect server:master ipc://master.ipc failed:Connection refused
+[E:runtime][2018-04-13 17:24:49 @./script/server/agent.lua:66] agent start success
+[E:runtime][2018-04-13 17:24:50 @./script/server/agent.lua:66] agent start success

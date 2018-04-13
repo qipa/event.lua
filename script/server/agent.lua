@@ -46,7 +46,6 @@ event.fork(function ()
 	end
 	model.set_client_manager(client_manager)
 
-	print("!!!!!!!!")
 	local result,reason = http.post_master("/apply_id")
 	if not result then
 		print(reason)

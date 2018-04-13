@@ -134,8 +134,12 @@ function httpc_channel:init()
 	self.parser = http_parser.new(1)
 end
 
+function httpc_channel:disconnect()
+	print("!!disconnect!")
+end
+
 function httpc_channel:dispatch(method,url,header,body)
-	self:close_immediately()
+	-- self:close_immediately()
 	if self.callback then
 		self.callback(self,method,url,header,body)
 	else
@@ -144,6 +148,7 @@ function httpc_channel:dispatch(method,url,header,body)
 end
 
 function httpc_channel:data()
+	print("httpc_channel:data")
 	while true do
 		if not self.ctx then
 			self.ctx = {header = {},body = {}}
@@ -225,7 +230,6 @@ function _M.post_master(method,content)
 	local url = method
 	local header = header or {}
 	header["Content-Type"] = "application/json"
-
 	local channel,err = event.connect(env.master_http,0,false,httpc_channel)
 	if not channel then
 		return false,err
