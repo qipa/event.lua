@@ -37,6 +37,12 @@ function cls_login_user:db_index()
 	return {account = self.account}
 end
 
+function cls_login_user:send_client(proto,args)
+	local client_manager = model.get_client_manager()
+	local data = protocol.encode[proto](args)
+	client_manager:send(self.cid,data)
+end
+
 function cls_login_user:auth()
 	local db_channel = model.get_db_channel()
 	self:load(db_channel)
