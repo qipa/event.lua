@@ -1,6 +1,7 @@
 
 local event = require "event"
 local channel = require "channel"
+local cjson = require "cjson"
 local http_parser = require "http.parser"
 
 local http_status_msg = {
@@ -65,6 +66,7 @@ function httpd_channel:data()
 			local data = self:read_util("\r\n\r\n")
 			local ok,more = self.parser:execute(self.ctx,data)
 			if not ok then
+				print("http parser error",more)
 				self:close_immediately()
 				return
 			end
@@ -116,8 +118,6 @@ function httpd_channel:reply(statuscode,info)
 		table.insert(content,string.format("%s: %s\r\n", k,v))
 	end
 
-	table.print(content)
-
 	if info then
 		table.insert(content,string.format("Content-Length: %d\r\n\r\n", #info))
 		table.insert(content,info)
@@ -135,8 +135,12 @@ function httpc_channel:init()
 end
 
 function httpc_channel:dispatch(method,url,header,body)
-	self.callback(self,method,url,header,body)
 	self:close_immediately()
+	if self.callback then
+		self.callback(self,method,url,header,body)
+	else
+		event.wakeup(self.session,body)
+	end
 end
 
 function httpc_channel:data()
@@ -194,7 +198,7 @@ function _M.post(host,url,header,form,callback)
 		table.insert(body, string.format("%s=%s",escape(k),escape(v)))
 	end
 
-	local channel,err = event.connect(string.format("tcp://%s",host),0,httpc_channel)
+	local channel,err = event.connect(string.format("tcp://%s",host),0,false,httpc_channel)
 	if not channel then
 		return false,err
 	end
@@ -215,6 +219,36 @@ function _M.post(host,url,header,form,callback)
 		data = string.format("%s %s HTTP/1.1\r\n%sContent-Length:0\r\n\r\n", "POST", url, header_content)
 		channel:write(data)
 	end
+end
+
+function _M.post_master(method,content)
+	local url = method
+	local header = header or {}
+	header["Content-Type"] = "application/json"
+
+	local channel,err = event.connect(env.master_http,0,false,httpc_channel)
+	if not channel then
+		return false,err
+	end
+	channel.session = event.gen_session()
+
+	local header_content = ""
+	for k,v in pairs(header) do
+		header_content = string.format("%s%s:%s\r\n", header_content, k, v)
+	end
+
+	if content then
+		content = cjson.encode(content)
+		local data = string.format("%s %s HTTP/1.1\r\n%sContent-Length:%d\r\n\r\n", "POST", url, header_content, #content)
+		channel:write(data)
+		channel:write(content)
+	else
+		local data = string.format("%s %s HTTP/1.1\r\n%sContent-Length:0\r\n\r\n", "POST", url, header_content)
+		channel:write(data)
+	end
+
+	local result = event.wait(channel.session)
+	return cjson.decode(result)
 end
 
 return _M

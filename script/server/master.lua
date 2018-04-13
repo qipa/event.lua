@@ -5,6 +5,8 @@ local protocol = require "protocol"
 local mongo = require "mongo"
 local route = require "route"
 local channel = require "channel"
+local cjson = require "cjson"
+local http = require "http"
 local startup = import "server.startup"
 local server_manager = import "module.server_manager"
 
@@ -36,4 +38,20 @@ event.fork(function ()
 		event.breakout(reason)
 		return
 	end
+	local httpd,reason = http.listen(env.master_http,function (channel,method,url,header,body)
+		local split = url:split("/")
+		local func = server_manager[split[#split]]
+		if not func then
+			channel:reply(404,"not found")
+			return
+		end
+		local result = func(channel,body)
+		local content = cjson.encode(result)
+        channel:reply(200,content)
+    end)
+    if not httpd then
+        event.error(string.format("master server listen http:%s failed",env.master_http))
+        os.exit(1)
+    end
+
 end)

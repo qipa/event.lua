@@ -555,6 +555,7 @@ _listen(lua_State* L) {
 	lua_getfield(L, 4, "file");
 
 	struct sockaddr* addr;
+	int addrlen = 0;
 	if (!lua_isnil(L, -1)) {
 		const char* file = luaL_checkstring(L, -1);
 		lua_pop(L, 1);
@@ -565,6 +566,7 @@ _listen(lua_State* L) {
 		strcpy(su.sun_path, file);
 
 		addr = (struct sockaddr*)&su;
+		addrlen = sizeof(su);
 	} else {
 		lua_pop(L, 1);
 		lua_getfield(L, 4, "ip");
@@ -581,6 +583,7 @@ _listen(lua_State* L) {
 		si.sin_port = htons(port);
 
 		addr = (struct sockaddr*)&si;
+		addrlen = sizeof(si);
 	}
 
 	struct lua_ev_listener* lev_listener = lua_newuserdata(L, sizeof(*lev_listener));
@@ -592,7 +595,7 @@ _listen(lua_State* L) {
 	if (multi)
 		flag |= SOCKET_OPT_REUSEABLE_PORT;
 
-	lev_listener->listener = ev_listener_bind(loop,addr,sizeof(*addr),16,flag,accept_socket,lev_listener);
+	lev_listener->listener = ev_listener_bind(loop,addr,addrlen,16,flag,accept_socket,lev_listener);
 	if (!lev_listener->listener) {
 		lua_pushboolean(L, 0);
 		lua_pushstring(L, strdup(strerror(errno)));
@@ -618,6 +621,7 @@ _connect(lua_State* L) {
 	lua_getfield(L, 4, "file");
 
 	struct sockaddr* addr;
+	int addrlen = 0;
 	if (!lua_isnil(L, -1)) {
 		const char* file = luaL_checkstring(L, -1);
 		lua_pop(L, 1);
@@ -627,6 +631,7 @@ _connect(lua_State* L) {
 		strcpy(su.sun_path, file);
 
 		addr = (struct sockaddr*)&su;
+		addrlen = sizeof(su);
 	} else {
 		lua_pop(L, 1);
 		lua_getfield(L, 4, "ip");
@@ -643,6 +648,7 @@ _connect(lua_State* L) {
 		si.sin_port = htons(port);
 
 		addr = (struct sockaddr*)&si;
+		addrlen = sizeof(si);
 	}
 
 	int block = 1;
@@ -653,7 +659,7 @@ _connect(lua_State* L) {
 	struct lua_ev_session* lev_session = session_create(L,lev,-1,header);
 	lev_session->lev = lev;
 	lev_session->wait = wait;
-	lev_session->session = ev_session_connect(lev->loop,addr,sizeof(*addr),block,&status);
+	lev_session->session = ev_session_connect(lev->loop,addr,addrlen,block,&status);
 
 	if (status == CONNECT_STATUS_CONNECT_FAIL) {
 		lua_pushboolean(L,0);

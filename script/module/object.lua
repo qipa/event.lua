@@ -233,3 +233,4 @@ function class.detect_leak()
 end
 
 _G["class"] = class
+rawset(_G,"class",class)

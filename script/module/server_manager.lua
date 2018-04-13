@@ -6,8 +6,16 @@ _agent_server_counter = _agent_server_counter or 1
 _scene_server_manager = _scene_server_manager or {}
 _scene_server_counter = _scene_server_counter or 1
 
+_server_counter = 1
+
 function __init__(self)
 
+end
+
+function apply_id(channel)
+	local id = _server_counter
+	_server_counter = _server_counter + 1
+	return {id = id}
 end
 
 function register_agent_server(channel,args)
@@ -16,7 +24,6 @@ function register_agent_server(channel,args)
 	channel.name = "agent"
 	channel.id = _agent_server_counter
 	_agent_server_counter = _agent_server_counter + 1
-	table.print(args,"register_agent_server")
 	return true
 end
 
@@ -64,7 +71,6 @@ function register_scene_server(channel,addr)
 	channel.name = "scene"
 	channel.id = _scene_server_counter
 	_scene_server_counter = _scene_server_counter + 1
-	table.print(addr,"register_scene_server")
 	return true
 end
 

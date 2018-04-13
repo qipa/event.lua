@@ -19,7 +19,6 @@ event.fork(function ()
                 channel:reply(200,info)
             end
         end)
-
     end)
     if not httpd then
         event.error(string.format("center server listen:%s failed",env.center))

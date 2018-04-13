@@ -2,7 +2,7 @@ local event = require "event"
 local util = require "util"
 local model = require "model"
 local protocol = require "protocol"
-
+local http = require "http"
 local route = require "route"
 local channel = require "channel"
 local startup = import "server.startup"
@@ -45,6 +45,15 @@ event.fork(function ()
 		os.exit(1)
 	end
 	model.set_client_manager(client_manager)
+
+	print("!!!!!!!!")
+	local result,reason = http.post_master("/apply_id")
+	if not result then
+		print(reason)
+		os.exit(1)
+	end
+	env.dist_id = result.id
+	print("env.dist_id",env.dist_id)
 
 	local login_channel = model.get_login_channel()
 	login_channel:send("module.server_manager","register_agent_server",{ip = "0.0.0.0",port = port})
