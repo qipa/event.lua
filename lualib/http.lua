@@ -135,7 +135,6 @@ function httpc_channel:init()
 end
 
 function httpc_channel:disconnect()
-	print("!!disconnect!")
 end
 
 function httpc_channel:dispatch(method,url,header,body)

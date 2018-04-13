@@ -5,6 +5,7 @@ local protocol = require "protocol"
 local mongo = require "mongo"
 local route = require "route"
 local channel = require "channel"
+local http = require "http"
 local startup = import "server.startup"
 local server_manager = import "module.server_manager"
 
@@ -26,6 +27,13 @@ event.fork(function ()
 		event.breakout(reason)
 		return
 	end
+
+	local result,reason = http.post_master("/apply_id")
+	if not result then
+		print(reason)
+		os.exit(1)
+	end
+	env.dist_id = result.id
 
 	local ip,port = listener:addr()
 	local addr_info = {}

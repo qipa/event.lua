@@ -5,6 +5,7 @@ local protocol = require "protocol"
 local mongo = require "mongo"
 local channel = require "channel"
 local route = require "route"
+local http = require "http"
 local startup = import "server.startup"
 
 local server_manager = import "module.server_manager"
@@ -51,6 +52,13 @@ end
 
 event.fork(function ()
 	startup.run(env.mongodb)
+
+	local result,reason = http.post_master("/apply_id")
+	if not result then
+		print(reason)
+		os.exit(1)
+	end
+	env.dist_id = result.id
 
 	local ok,reason = event.listen(env.login,4,channel_accept,common_channel)
 	if not ok then

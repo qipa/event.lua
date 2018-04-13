@@ -52,7 +52,7 @@ event.fork(function ()
 		os.exit(1)
 	end
 	env.dist_id = result.id
-	print("env.dist_id",env.dist_id)
+
 
 	local login_channel = model.get_login_channel()
 	login_channel:send("module.server_manager","register_agent_server",{ip = "0.0.0.0",port = port})
