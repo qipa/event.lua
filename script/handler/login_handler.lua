@@ -50,21 +50,23 @@ function req_enter(cid,args)
 
 	local user = model.fetch_login_user_with_account(account)
 	if user then
-		user:leave(function ()
+		if user:leave() then
 			local last_cid = table.remove(queue)
 			local client_manager = model.get_client_manager()
 			for _,cid in pairs(queue) do
-				client_manager:close(cid)
-				leave(cid)
+				if last_cid ~= cid then
+					client_manager:close(cid)
+					_login_ctx[cid] = nil
+				end
 			end
 			_account_queue[account] = nil
 			local info = _login_ctx[last_cid]
 			if info then
 				info.account = account
-				user:new(last_cid,account)
+				local user = login_user.cls_login_user:new(last_cid,account)
 				user:auth()
 			end
-		end)
+		end
 	else
 		assert(#queue == 1)
 		_account_queue[account] = nil
@@ -89,16 +91,36 @@ end
 function req_enter_game(client_id,args)
 	local account = args.account
 	local user_id = args.user_id
-	local json = cjson.encode({account = account,user_id = user_id})
-	local md5 = util.md5(json)
-	local now = util.time()
-	local token = util.rc4(json,now)
-end
-
-function rpc_enter_agent(self,args)
-	local user = model.fetch_login_user_with_account(args.account)
+	local user = model.fetch_login_user_with_account(account)
+	user:enter_agent(user_id)
 end
 
 function rpc_leave_agent(self,args)
 	local user = model.fetch_login_user_with_account(args.account)
+	if not user then
+		return
+	end
+	user:leave_agent()
+
+	local queue = _account_queue[user.account]
+	if not queue then
+		return
+	end
+
+	local last_cid = table.remove(queue)
+	local client_manager = model.get_client_manager()
+	for _,cid in pairs(queue) do
+		if last_cid ~= cid then
+			client_manager:close(cid)
+			_login_ctx[cid] = nil
+		end
+	end
+	_account_queue[account] = nil
+	local info = _login_ctx[last_cid]
+	if info then
+		info.account = account
+		local user = login_user.cls_login_user:new(last_cid,account)
+		user:auth()
+	end
+
 end

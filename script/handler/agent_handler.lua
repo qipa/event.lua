@@ -54,6 +54,9 @@ function leave(cid)
 		updater["$inc"] = {version = 1}
 		updater["$set"] = {time = os.time()}
 		db_channel:findAndModify("save_version",{query = {uid = user.uid},update = updater})
+
+		local login_channel = model.get_login_channel()
+		login_channel:send("handler.login_handler","rpc_leave_agent",{account = user.account})
 	end)
 end
 
@@ -92,8 +95,6 @@ function user_kick(args)
 	local user = model.fetch_agent_user_with_uid(args.uid)
 	local client_manager = model.get_client_manager()
 	client_manager:close(cid)
-	user:leave_game()
-	user:release()
-	model.unbind_agent_user_with_cid(cid)
+	leave(user.cid)
 end
 

@@ -104,30 +104,26 @@ function cls_login_user:destroy()
 	model.unbind_login_user_with_account(self.account)
 end
 
-function cls_login_user:leave(callback)
+function cls_login_user:leave()
 	if self.phase < PHASE.AGENT_PREPARE then
 		self:release()
-		if callback then
-			callback()
-		end
-		return
+		return true
 	end
 	
 	if self.phase == PHASE.AGENT_ENTER then
 		local client_manager = model.get_client_manager()
 		client_manager:close(self.cid)
 		self.phase = PHASE.AGENT_LEAVING
-		server_manager:send_agent(self.agent,"handler.agent_handler","user_kick",{uid = uid},function ()
-			self:release()
-			if callback then
-				callback()
-			end
-		end)
-		return
+		server_manager:send_agent(self.agent,"handler.agent_handler","user_kick",{uid = uid})
 	elseif self.phase == PHASE.AGENT_LEAVING then
-		return
+
 	end
-	
+	return false
+end
+
+function cls_login_user:leave_agent()
+	self.phase = PHASE.AGENT_LEAVED
+	self:release()
 end
 
 function cls_login_user:enter_agent(uid)
