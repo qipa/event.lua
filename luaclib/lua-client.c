@@ -164,6 +164,12 @@ accept_client(struct ev_listener *listener, int fd, const char* addr, void *ud) 
 	manager->accept_func(manager->ud,client->id,addr);
 }
 
+static void
+close_complete(struct ev_session* ev_session, void* ud) {
+	struct ev_client* client = ud;
+	close_client(0,client);
+}
+
 struct client_manager*
 client_manager_create(struct ev_loop* loop,size_t max,void* ud) {
 	struct client_manager* manager = malloc(sizeof(*manager));
@@ -213,12 +219,18 @@ client_manager_stop(struct client_manager* manager) {
 }
 
 int
-client_manager_close(struct client_manager* manager,int client_id) {
+client_manager_close(struct client_manager* manager,int client_id,int grace) {
 	struct ev_client* client = container_get(manager->container,client_id);
 	if (!client) {
 		return -1;
 	}
-	close_client(0,client);
+	if (!grace)
+		close_client(0,client);
+	else {
+		ev_session_setcb(client->session, NULL, close_complete, error_happen, client);
+		ev_session_disable(client->session,EV_READ);
+		ev_session_enable(client->session, EV_WRITE);
+	}
 	return 0;
 }
 
@@ -324,10 +336,11 @@ static int
 lclient_manager_close(lua_State* L) {
 	struct lclient_manager* client_manager = lua_touserdata(L, 1);
 	int client_id = luaL_checkinteger(L, 2);
+	int grace = luaL_optinteger(L, 3, 0);
 	struct ev_client* client = container_get(client_manager->manager->container,client_id);
 	if (!client)
 		luaL_error(L,"client manager send failed,no such client:%d",client_id);
-	client_manager_close(client_manager->manager,client_id);
+	client_manager_close(client_manager->manager,client_id,grace);
 	return 0;
 }
 

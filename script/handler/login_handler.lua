@@ -59,6 +59,8 @@ function req_enter(cid,args)
 				local user = login_user.cls_login_user:new(cid,account)
 				user:auth()
 			end
+		else
+			user:kick_agent()
 		end
 	else
 		assert(#queue == 1)
