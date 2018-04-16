@@ -12,7 +12,7 @@ local tmp_offset = {
 }
 
 local dist_offset = 1000
-local id_section = 100
+local id_section = 1000
 
 function init(self,dist_id)
 	if dist_id >= dist_offset then

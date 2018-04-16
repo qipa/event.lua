@@ -5,6 +5,6 @@ buidler:init(1)
 
 util.time_diff(function ()
 	for i = 1,1024*1024 do
-		print(buidler.alloc_user_uid())
+		buidler.alloc_user_uid()
 	end
 end)
