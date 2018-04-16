@@ -11,7 +11,7 @@ function _M:open(db)
 	local ctx = setmetatable({},{__index = self})
 	local list = db:split("/")
 
-	ctx.db = "./tmp/"..table.concat(list,"/").."/"
+	ctx.db = "./data/"..table.concat(list,"/").."/"
 
 	local dir = ""
 	local paths = ctx.db:split("/")

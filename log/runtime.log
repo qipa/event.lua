@@ -1,6 +1,0 @@
-[E:runtime][2018-04-16 16:50:09 @user.server.startup:50] server/agent connect server:login ipc://login.ipc failed:Connection refused
-[E:runtime][2018-04-16 16:50:09 @user.server.startup:50] server/agent connect server:login ipc://login.ipc failed:Connection refused
-[E:runtime][2018-04-16 16:50:09 @user.server.startup:50] server/scene connect server:world ipc://world.ipc failed:Connection refused
-[E:runtime][2018-04-16 16:50:09 @./script/server/login.lua:77] login listen client success
-[E:runtime][2018-04-16 16:50:10 @./script/server/agent.lua:71] agent start success
-[E:runtime][2018-04-16 16:50:10 @./script/server/agent.lua:71] agent start success
