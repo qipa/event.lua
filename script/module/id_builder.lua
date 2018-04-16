@@ -22,7 +22,7 @@ function init(self,dist_id)
 	
 	for field,offset in pairs(unique_offset) do
 		local uname = string.format("%s%d",field,dist_id)
-		local attr = lfs.attributes(string.format("./tmp/id_builder/%s",uname))
+		local attr = lfs.attributes(string.format("./data/id_builder/%s",uname))
 		local fs = persistence:open("id_builder")
 		local save_info
 		if not attr then

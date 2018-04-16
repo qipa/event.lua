@@ -1,0 +1,36 @@
+[W:monitor][2018-04-16 19:55:56] server/logger:lua mem:197.863281kb,c mem:17165.554688kb
+server/logger:handler.logger_handler:log time diff:average:0.000058,min:0.000005,max:0.000283,count:6
+server/logger:handler.logger_handler:log input flow:average:230.333333,min:204,max:254,count:6
+[W:monitor][2018-04-16 19:56:06] server/logger:lua mem:206.534180kb,c mem:17212.335938kb
+server/logger:handler.logger_handler:log time diff:average:0.000039,min:0.000005,max:0.000283,count:12
+server/logger:handler.logger_handler:log input flow:average:376.583333,min:204,max:676,count:12
+[W:monitor][2018-04-16 19:56:16] server/logger:lua mem:215.363281kb,c mem:17243.148438kb
+server/logger:handler.logger_handler:log time diff:average:0.000032,min:0.000005,max:0.000283,count:18
+server/logger:handler.logger_handler:log input flow:average:436.055556,min:204,max:773,count:18
+[W:monitor][2018-04-16 19:56:26] server/logger:lua mem:224.192383kb,c mem:17277.851562kb
+server/logger:handler.logger_handler:log time diff:average:0.000028,min:0.000005,max:0.000283,count:24
+server/logger:handler.logger_handler:log input flow:average:465.791667,min:204,max:773,count:24
+[W:monitor][2018-04-16 19:56:36] server/logger:lua mem:233.021484kb,c mem:17306.585938kb
+server/logger:handler.logger_handler:log time diff:average:0.000025,min:0.000005,max:0.000283,count:30
+server/logger:handler.logger_handler:log input flow:average:483.633333,min:204,max:773,count:30
+[W:monitor][2018-04-16 19:56:46] server/logger:lua mem:241.850586kb,c mem:17337.960938kb
+server/logger:handler.logger_handler:log time diff:average:0.000024,min:0.000005,max:0.000283,count:36
+server/logger:handler.logger_handler:log input flow:average:495.527778,min:204,max:773,count:36
+[W:monitor][2018-04-16 19:56:56] server/logger:lua mem:250.679688kb,c mem:17369.335938kb
+server/logger:handler.logger_handler:log time diff:average:0.000023,min:0.000005,max:0.000283,count:42
+server/logger:handler.logger_handler:log input flow:average:504.023810,min:204,max:773,count:42
+[W:monitor][2018-04-16 19:57:06] server/logger:lua mem:259.508789kb,c mem:17400.710938kb
+server/logger:handler.logger_handler:log time diff:average:0.000022,min:0.000005,max:0.000283,count:48
+server/logger:handler.logger_handler:log input flow:average:510.395833,min:204,max:773,count:48
+[W:monitor][2018-04-16 19:57:16] server/logger:lua mem:268.337891kb,c mem:17432.085938kb
+server/logger:handler.logger_handler:log time diff:average:0.000022,min:0.000005,max:0.000283,count:54
+server/logger:handler.logger_handler:log input flow:average:515.351852,min:204,max:773,count:54
+[W:monitor][2018-04-16 19:57:26] server/logger:lua mem:277.170898kb,c mem:17462.835938kb
+server/logger:handler.logger_handler:log time diff:average:0.000021,min:0.000005,max:0.000283,count:60
+server/logger:handler.logger_handler:log input flow:average:519.350000,min:204,max:773,count:60
+[W:monitor][2018-04-16 19:57:36] server/logger:lua mem:286.007812kb,c mem:17494.992188kb
+server/logger:handler.logger_handler:log time diff:average:0.000021,min:0.000005,max:0.000283,count:66
+server/logger:handler.logger_handler:log input flow:average:522.651515,min:204,max:773,count:66
+[W:monitor][2018-04-16 19:57:46] server/logger:lua mem:294.848633kb,c mem:17525.710938kb
+server/logger:handler.logger_handler:log time diff:average:0.000020,min:0.000005,max:0.000283,count:72
+server/logger:handler.logger_handler:log input flow:average:525.430556,min:204,max:774,count:72

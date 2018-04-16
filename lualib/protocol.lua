@@ -145,7 +145,7 @@ function _M.dumpfile()
 		return l.name < r.name
 	end)
 
-	local FILE = io.open("tmp/protocol.dump","w")
+	local FILE = io.open("./data/protocol.dump","w")
 	FILE:write(dump.tostring(meta))
 	FILE:close()
 end
