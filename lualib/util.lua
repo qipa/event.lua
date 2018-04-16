@@ -198,5 +198,10 @@ function _M.same_week(ti0,ti1,sep)
 
 end
 
+function _M.time_diff(func)
+    local now = _M.time()
+    func()
+    print("time diff:",_M.time() - now)
+end
 
 return _M

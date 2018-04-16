@@ -147,7 +147,6 @@ function httpc_channel:dispatch(method,url,header,body)
 end
 
 function httpc_channel:data()
-	print("httpc_channel:data")
 	while true do
 		if not self.ctx then
 			self.ctx = {header = {},body = {}}

@@ -19,7 +19,7 @@ function init(self,dist_id)
 		local fs = persistence:open("id_builder")
 		local save_info
 		if not attr then
-			save_info = {begin = 10000 + dist_id,offset = 100}
+			save_info = {begin = 1,offset = 100}
 			fs:save(uname,save_info)
 		else
 			save_info = fs:load(uname)
@@ -33,7 +33,7 @@ function init(self,dist_id)
 		local cursor = save_info.begin
 		local max = save_info.begin + save_info.offset
 		self[string.format("alloc_%s_uid",field)] = function ()
-			local uid = cursor
+			local uid = cursor * 10000 + dist_id
 			cursor = cursor + 1
 			if cursor >= max then
 				save_info.begin = cursor

@@ -18,6 +18,8 @@ local LOG_TAG = {
 
 local logger_container = {}
 
+local tmp_FILE
+
 local _M = {}
 
 function _M:create(log_type,depth)
@@ -45,11 +47,6 @@ local function get_debug_info(logger)
 end
 
 local function append_log(logger,log_lv,...)
-	local logger_channel = model.get_logger_channel()
-	if not logger_channel then
-		return
-	end
-
 	local log = table.concat({...},"\t")
 	local content
 	if log_lv == LOG_LV_ERROR then
@@ -58,8 +55,18 @@ local function append_log(logger,log_lv,...)
 	else
 		content = string.format("[%s:%s][%s] %s",LOG_TAG[log_lv],logger.log_type,os.date("%Y-%m-%d %H:%M:%S",os.time()),log)
 	end
-		
-	logger_channel:send("handler.logger_handler","log",{logger.log_type,content})
+
+	local logger_channel = model.get_logger_channel()
+	if not logger_channel then
+		if not tmp_FILE then
+			local name = string.format("./log/tmp_%d.log",util.thread_id())
+			tmp_FILE = assert(io.open(name,"a+"))
+		end
+		tmp_FILE:write(content.."\r\n")
+		tmp_FILE:flush()
+		return
+	end
+	logger_channel:send("handler.logger_handler","log",{log_lv,logger.log_type,content})
 end
 
 function _M:DEBUG(...)

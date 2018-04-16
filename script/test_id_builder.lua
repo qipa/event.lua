@@ -1,7 +1,10 @@
-
+local util = require "util"
 env.dist_id = 100
 local buidler = import "module.id_builder"
+buidler:init(100)
 
-for i = 1,1 do
-	print(buidler.alloc_user_uid())
-end
+util.time_diff(function ()
+	for i = 1,1024*1024 do
+		buidler.alloc_user_uid()
+	end
+end)
