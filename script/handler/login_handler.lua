@@ -51,19 +51,12 @@ function req_enter(cid,args)
 	local user = model.fetch_login_user_with_account(account)
 	if user then
 		if user:leave() then
-			local last_cid = table.remove(queue)
-			local client_manager = model.get_client_manager()
-			for _,cid in pairs(queue) do
-				if last_cid ~= cid then
-					client_manager:close(cid)
-					_login_ctx[cid] = nil
-				end
-			end
+			assert(#queue == 1)
 			_account_queue[account] = nil
-			local info = _login_ctx[last_cid]
+			local info = _login_ctx[cid]
 			if info then
 				info.account = account
-				local user = login_user.cls_login_user:new(last_cid,account)
+				local user = login_user.cls_login_user:new(cid,account)
 				user:auth()
 			end
 		end
@@ -107,7 +100,6 @@ function rpc_leave_agent(self,args)
 		return
 	end
 
-	local last_cid = table.remove(queue)
 	local client_manager = model.get_client_manager()
 	for _,cid in pairs(queue) do
 		if last_cid ~= cid then
