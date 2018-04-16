@@ -1,7 +1,7 @@
 local persistence = require "persistence"
 require "lfs"
 
-local save_offset = {
+local unique_offset = {
 	user = 1,
 	item = 2
 }
@@ -13,7 +13,7 @@ local tmp_offset = {
 
 
 function init(self,dist_id)
-	for field,offset in pairs(save_offset) do
+	for field,offset in pairs(unique_offset) do
 		local uname = string.format("%s%d",field,dist_id)
 		local attr = lfs.attributes(string.format("./tmp/id_builder/%s",uname))
 		local fs = persistence:open("id_builder")
