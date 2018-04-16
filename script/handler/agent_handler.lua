@@ -14,6 +14,49 @@ function __reload__(self)
 
 end
 
+function enter(cid,addr)
+
+end
+
+function leave(cid)
+	local uid = _enter_user[cid]
+	_enter_user[cid] = nil
+	if not uid then
+		return
+	end
+	local user = model.fetch_agent_user_with_uid(uid)
+	if not user then
+		return
+	end
+
+	event.fork(function ()
+		local ok,err = xpcall(user.leave_game,debug.traceback,user)
+		if not ok then
+			event.error(err)
+		end
+
+		local world_channel = model.get_world_channel()
+		if world_channel then
+			world_channel:call("handler.world_handler","leave_world",{uid = user.uid})
+		end
+
+		local master_channel = model.get_master_channel()
+		if master_channel then
+			master_channel:call("handler.master_handler","leave_scene",{uid = user.uid})
+		end
+
+		user:save()
+		user:release()
+
+		local db_channel = model.get_db_channel()
+		db_channel:db(user:get_type())
+		local updater = {}
+		updater["$inc"] = {version = 1}
+		updater["$set"] = {time = os.time()}
+		db_channel:findAndModify("save_version",{query = {uid = user.uid},update = updater})
+	end)
+end
+
 function req_enter(cid,args)
 	local token = args.token
 	if not _user_token[token] then
@@ -35,23 +78,14 @@ function req_enter(cid,args)
 	local user = agent_user.cls_agent_user:new(cid,info.uid)
 	user:load(db_channel)
 	user:enter_game()
-	model.bind_agent_user_with_cid(cid,user)
+
+	_enter_user[cid] = info.uid
 end
 
 function user_register(args)
 	local token = args.token
 	local time = args.time
 	_user_token[token] = time
-end
-
-function user_leave(cid)
-	local user = _enter_user[cid]
-	if not user then
-		return
-	end
-	user:leave_game()
-	user:release()
-	model.unbind_agent_user_with_cid(cid)
 end
 
 function user_kick(args)
@@ -63,4 +97,3 @@ function user_kick(args)
 	model.unbind_agent_user_with_cid(cid)
 end
 
-function 

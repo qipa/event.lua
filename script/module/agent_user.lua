@@ -43,11 +43,7 @@ function cls_agent_user:enter_game()
 end
 
 function cls_agent_user:leave_game()
-	local world = model.get_world_channel()
-	world:call("handler.world_handler","leave_world",{uid = self.uid})
-
-	local scene_master = model.get_master_channel()
-	scene_master:call("handler.master_handler","leave_scene",{uid = self.uid})
+	
 end
 
 function cls_agent_user:enter_scene(scene_id,pos)

@@ -12,6 +12,7 @@ function cls_database:db_index()
 end
 
 function cls_database:load(db_channel)
+	db_channel:db(self:get_type())
 	for field in pairs(self.__save_fields) do
 		local result = db_channel:findOne(field,{query = self:db_index()})
 		if result then
@@ -26,10 +27,10 @@ function cls_database:load(db_channel)
 end
 
 function cls_database:save(db_channel)
+	db_channel:db(self:get_type())
 	for field in pairs(self.__dirty) do
 		if self.__save_fields[field] then
 			local data = self[field]
-			print(field,data)
 			if data then
 				local updater = {}
 				if data.save_data then

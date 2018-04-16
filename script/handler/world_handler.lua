@@ -19,8 +19,11 @@ end
 function leave_world(channel,args)
 	local user = model.fetch_world_user_with_uid(args.uid)
 	if not user then
-		return
+		return false
 	end
 	user:leave()
+	local db_channel = model.get_db_channel()
+	user:save(db_channel)
 	user:release()
+	return true
 end

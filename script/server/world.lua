@@ -8,6 +8,7 @@ local http = require "http"
 local channel = require "channel"
 local startup = import "server.startup"
 local server_manager = import "module.server_manager"
+local world_server = import "module.world_server"
 local id_builder = import "module.id_builder"
 
 local common_channel = channel:inherit()
@@ -41,4 +42,6 @@ event.fork(function ()
 		event.breakout(reason)
 		return
 	end
+
+	world_server:start()
 end)

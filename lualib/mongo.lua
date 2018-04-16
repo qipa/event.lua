@@ -16,6 +16,14 @@ function mongo_channel:init(db)
 	self.session_ctx = {}
 end
 
+function mongo_channel:db(db)
+	if not db then
+		return self.db
+	end
+	self.db = db
+	return self.db
+end
+
 function mongo_channel:data(data,size)
 	local result = {}
 	local succ,	session, document, cursor, _ = driver.reply(string.copy(data,size),result)
