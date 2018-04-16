@@ -30,6 +30,7 @@ function init(self,dist_id)
 			fs:save(uname,save_info)
 		else
 			save_info = fs:load(uname)
+			save_info.offset = id_section
 			save_info.begin = save_info.begin + save_info.offset
 			fs:save(uname,save_info)
 		end
