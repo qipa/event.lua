@@ -4,6 +4,7 @@ local model = require "model"
 local channel = require "channel"
 local mongo = require "mongo"
 local protocol = require "protocol"
+local monitor = require "monitor"
 
 local rpc_channel = channel:inherit()
 function rpc_channel:disconnect()
@@ -18,8 +19,6 @@ end
 
 function run(db_addr)
 	connect_server("logger")
-
-	import "module.monitor"
 	
 	local runtime_logger = logger:create("runtime",5)
 	event.error = function (...)

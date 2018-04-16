@@ -1,6 +1,7 @@
 local co_core = require "co.core"
 local route = require "route"
 local event = require "event"
+local monitor = require "monitor"
 
 local channel = {}
 
@@ -14,7 +15,6 @@ function channel:new(buffer,addr)
 	ctx.buffer = buffer
 	ctx.addr = addr or "unknown"
 	ctx.session_ctx = {}
-	ctx.monitor = {}
 	return ctx
 end
 
@@ -57,28 +57,7 @@ function channel:read_util(sep)
 end
 
 local function call_method(channel,session,file,method,args)
-	co_core.start()
-	
 	local ok,result = xpcall(route.dispatch,debug.traceback,file,method,channel,args)
-	
-	local diff = co_core.stop()
-	local name = string.format("%s:%s",file,method)
-	local info = channel.monitor[name]
-	if not info then
-		info = {count = 0,min = nil,max = nil,total = 0}
-		channel.monitor[name] = info
-	end
-	if not info.min or diff < info.min then
-		info.min = diff
-	end
-	if not info.max or diff > info.max then
-		info.max = diff
-	end
-	info.count = info.count + 1
-	info.total = info.total + diff
-
-	table.print(channel.monitor)
-
 	if not ok then
 		event.error(result)
 	end
@@ -91,7 +70,18 @@ local function call_method(channel,session,file,method,args)
 	end
 end
 
-function channel:dispatch(message)
+local function diff_method(channel,session,file,method,args)
+	co_core.start()
+
+	call_method(channel,session,file,method,args)
+
+	local diff = co_core.stop()
+
+	monitor.report_diff(file,method,diff)
+	
+end
+
+function channel:dispatch(message,size)
 	if message.ret then
 		local call_ctx = self.session_ctx[message.session]
 		if call_ctx.callback then
@@ -101,13 +91,14 @@ function channel:dispatch(message)
 		end
 		self.session_ctx[message.session] = nil
 	else
-		event.fork(call_method,self,message.session,message.file,message.method,message.args)
+		monitor.report_input(message.file,message.method,size)
+		event.fork(diff_method,self,message.session,message.file,message.method,message.args)
 	end
 end
 
 function channel:data(data,size)
 	local message = table.decode(data,size)
-	self:dispatch(message)
+	self:dispatch(message,size)
 end
 
 local function pack_table(tbl)
@@ -127,6 +118,9 @@ function channel:send(file,method,args,callback)
 	end
 	local str = pack_table({file = file,method = method,session = 0,args = args})
 	self:write(str)
+	
+	monitor.report_output(file,method,#str)
+
 	if session ~= 0 then
 		self.session_ctx[session] = {callback = callback}
 	end
@@ -137,6 +131,8 @@ function channel:call(file,method,args)
 	self.session_ctx[session] = {}
 	local str = pack_table({file = file,method = method,session = session,args = args})
 	self:write(str)
+
+	monitor.report_output(file,method,#str)
 
 	local ok,err = event.wait(session)
 	if not ok then

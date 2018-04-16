@@ -56,8 +56,7 @@ local function append_log(logger,log_lv,...)
 		content = string.format("[%s:%s][%s] %s",LOG_TAG[log_lv],logger.log_type,os.date("%Y-%m-%d %H:%M:%S",os.time()),log)
 	end
 
-	local logger_channel = model.get_logger_channel()
-	if not logger_channel then
+	if not model.get_logger_channel or not model.get_logger_channel() then
 		if not tmp_FILE then
 			local name = string.format("./log/tmp_%d.log",util.thread_id())
 			tmp_FILE = assert(io.open(name,"a+"))
@@ -66,6 +65,7 @@ local function append_log(logger,log_lv,...)
 		tmp_FILE:flush()
 		return
 	end
+	local logger_channel = model.get_logger_channel()
 	logger_channel:send("handler.logger_handler","log",{log_lv,logger.log_type,content})
 end
 
