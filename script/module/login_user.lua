@@ -17,9 +17,10 @@ end
 local PHASE = {
 	LOADING = 1
 	LOGIN = 2,
-	AGENT = 3,
-	AGENT_LEAVING = 4,
-	AGENT_LEAVED = 5,
+	AGENT_PREPARE = 3,
+	AGENT_ENTER = 4,
+	AGENT_LEAVING = 5,
+	AGENT_LEAVED = 6,
 }
 
 function cls_login_user:create(cid,account)
@@ -104,7 +105,15 @@ function cls_login_user:destroy()
 end
 
 function cls_login_user:leave(callback)
-	if self.phase == PHASE.AGENT then
+	if self.phase < PHASE.AGENT_PREPARE then
+		self:release()
+		if callback then
+			callback()
+		end
+		return
+	end
+	
+	if self.phase == PHASE.AGENT_ENTER then
 		local client_manager = model.get_client_manager()
 		client_manager:close(self.cid)
 		self.phase = PHASE.AGENT_LEAVING
@@ -118,10 +127,7 @@ function cls_login_user:leave(callback)
 	elseif self.phase == PHASE.AGENT_LEAVING then
 		return
 	end
-	self:release()
-	if callback then
-		callback()
-	end
+	
 end
 
 function cls_login_user:enter_agent(uid)

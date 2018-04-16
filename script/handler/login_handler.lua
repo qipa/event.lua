@@ -96,10 +96,9 @@ function req_enter_game(client_id,args)
 end
 
 function rpc_enter_agent(self,args)
-
-
+	local user = model.fetch_login_user_with_account(args.account)
 end
 
 function rpc_leave_agent(self,args)
-
+	local user = model.fetch_login_user_with_account(args.account)
 end
