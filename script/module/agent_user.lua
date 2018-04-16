@@ -4,7 +4,7 @@ local model = require "model"
 local util = require "util"
 
 local database_object = import "module.database_object"
-local module_item_mgr = import "module.item_mgr"
+local module_item_mgr = import "module.item_manager"
 
 
 cls_agent_user = database_object.cls_database:inherit("agent_user","uid","cid")

@@ -1,3 +1,4 @@
+local co_core = require "co.core"
 local route = require "route"
 local event = require "event"
 
@@ -13,6 +14,7 @@ function channel:new(buffer,addr)
 	ctx.buffer = buffer
 	ctx.addr = addr or "unknown"
 	ctx.session_ctx = {}
+	ctx.monitor = {}
 	return ctx
 end
 
@@ -55,7 +57,28 @@ function channel:read_util(sep)
 end
 
 local function call_method(channel,session,file,method,args)
+	co_core.start()
+	
 	local ok,result = xpcall(route.dispatch,debug.traceback,file,method,channel,args)
+	
+	local diff = co_core.stop()
+	local name = string.format("%s:%s",file,method)
+	local info = channel.monitor[name]
+	if not info then
+		info = {count = 0,min = nil,max = nil,total = 0}
+		channel.monitor[name] = info
+	end
+	if not info.min or diff < info.min then
+		info.min = diff
+	end
+	if not info.max or diff > info.max then
+		info.max = diff
+	end
+	info.count = info.count + 1
+	info.total = info.total + diff
+
+	table.print(channel.monitor)
+
 	if not ok then
 		event.error(result)
 	end

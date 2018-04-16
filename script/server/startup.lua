@@ -19,6 +19,8 @@ end
 function run(db_addr)
 	connect_server("logger")
 
+	import "module.monitor"
+	
 	local runtime_logger = logger:create("runtime",5)
 	event.error = function (...)
 		runtime_logger:ERROR(...)

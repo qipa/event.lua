@@ -13,7 +13,6 @@ function __init__()
 	protocol.handler["c2s_login_auth"] = req_enter
 	protocol.handler["c2s_login_enter"] = req_enter_game
 	protocol.handler["c2s_create_role"] = req_create_role
-	
 end
 
 function enter(cid,addr)

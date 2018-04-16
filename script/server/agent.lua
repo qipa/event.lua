@@ -7,7 +7,6 @@ local route = require "route"
 local channel = require "channel"
 local startup = import "server.startup"
 local id_builder = import "module.id_builder"
-local agent_handler = import "handler.agent_handler"
 
 model.register_binder("scene_channel","id")
 model.register_binder("client","id")
@@ -25,11 +24,13 @@ end
 
 local function client_accept(id,addr)
 	model.bind_client_with_id(id,{login = false,addr = addr})
+	local agent_handler = import "handler.agent_handler"
 	agent_handler.enter(id,addr)
 end
 
 local function client_close(id)
 	model.unbind_client_with_id(id)
+	local agent_handler = import "handler.agent_handler"
 	agent_handler.leave(id)
 end
 

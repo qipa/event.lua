@@ -2,7 +2,7 @@ local object = import "module.object"
 
 cls_collection = object.cls_base:inherit("database_collection")
 
-function __init__()
+function __init__(self)
 	self.cls_collection:save_field("__name")
 end
 

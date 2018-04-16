@@ -15,7 +15,7 @@ function __init__(self)
 end
 
 local PHASE = {
-	LOADING = 1
+	LOADING = 1,
 	LOGIN = 2,
 	AGENT_ENTER = 4,
 	AGENT_LEAVING = 5,

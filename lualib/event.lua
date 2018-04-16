@@ -1,5 +1,7 @@
 local event_core = require "ev.core"
+local co_core = require "co.core"
 local profiler_core = require "profiler.core"
+
 
 local _event
 
@@ -26,8 +28,8 @@ local _channel_base
 local _stream_base
 
 local co_running = coroutine.running
-local co_yield = coroutine.yield
-local co_resume = profiler_core.resume
+local co_yield = co_core.yield
+local co_resume = co_core.resume
 
 local tinsert = table.insert
 local tremove = table.remove

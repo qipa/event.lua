@@ -16,7 +16,7 @@ function mongo_channel:init(db)
 	self.session_ctx = {}
 end
 
-function mongo_channel:db(db)
+function mongo_channel:set_db(db)
 	if not db then
 		return self.db
 	end
