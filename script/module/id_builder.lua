@@ -11,15 +11,22 @@ local tmp_offset = {
 	monster = 2
 }
 
+local dist_offset = 1000
+local id_section = 100
 
 function init(self,dist_id)
+	if dist_id >= dist_offset then
+		print(string.format("error dist id:%d",dist_id))
+		os.exit(1)
+	end
+	
 	for field,offset in pairs(unique_offset) do
 		local uname = string.format("%s%d",field,dist_id)
 		local attr = lfs.attributes(string.format("./tmp/id_builder/%s",uname))
 		local fs = persistence:open("id_builder")
 		local save_info
 		if not attr then
-			save_info = {begin = 1,offset = 100}
+			save_info = {begin = 1,offset = id_section}
 			fs:save(uname,save_info)
 		else
 			save_info = fs:load(uname)
@@ -33,7 +40,7 @@ function init(self,dist_id)
 		local cursor = save_info.begin
 		local max = save_info.begin + save_info.offset
 		self[string.format("alloc_%s_uid",field)] = function ()
-			local uid = cursor * 10000 + dist_id
+			local uid = cursor * dist_offset + dist_id
 			cursor = cursor + 1
 			if cursor >= max then
 				save_info.begin = cursor
@@ -47,7 +54,7 @@ function init(self,dist_id)
 	for field,offset in pairs(tmp_offset) do
 		local step = 1
 		self[string.format("alloc_%s_tid",field)] = function ()
-			local tid = step * 10000 + dist_id
+			local tid = step * dist_offset + dist_id
 			step = step + 1
 			return tid
 		end
