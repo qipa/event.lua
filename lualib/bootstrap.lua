@@ -59,10 +59,13 @@ if not func then
 	error(err)
 end
 
+
 env.name = name
 env.tid = util.thread_id()
 
-local command = string.format("%s@%d",name,env.uid)
+local list = name:split("/")
+
+local command = string.format("%s@%07d",list[#list],env.uid)
 util.thread_name(command)
 
 if main then

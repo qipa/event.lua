@@ -66,7 +66,7 @@ function httpd_channel:data()
 			local data = self:read_util("\r\n\r\n")
 			local ok,more = self.parser:execute(self.ctx,data)
 			if not ok then
-				print("http parser error",more)
+				event.error(string.format("httpd parser error:%s",more))
 				self:close_immediately()
 				return
 			end
@@ -78,6 +78,7 @@ function httpd_channel:data()
 			local data = self:read()
 			local ok,more = self.parser:execute(self.ctx,data)
 			if not ok then
+				event.error(string.format("httpd parser error:%s",more))
 				self:close_immediately()
 				return
 			end
@@ -153,6 +154,7 @@ function httpc_channel:data()
 			local data = self:read_util("\r\n\r\n")
 			local ok,more = self.parser:execute(self.ctx,data)
 			if not ok then
+				event.error(string.format("httpc parser error:%s",more))
 				self:close_immediately()
 				return
 			end
@@ -164,6 +166,7 @@ function httpc_channel:data()
 			local data = self:read()
 			local ok,more = self.parser:execute(self.ctx,data)
 			if not ok then
+				event.error(string.format("httpc parser error:%s",more))
 				self:close_immediately()
 				return
 			end
