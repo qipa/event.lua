@@ -5,6 +5,7 @@ local channel = require "channel"
 local mongo = require "mongo"
 local protocol = require "protocol"
 local monitor = require "monitor"
+local util = require "util"
 
 local rpc_channel = channel:inherit()
 function rpc_channel:disconnect()
@@ -18,6 +19,13 @@ function mongodb_channel:disconnect()
 end
 
 function run(db_addr)
+	if not util.attributes("./log") then
+		util.mkdir("./log")
+	end
+	if not util.attributes("./data") then
+		util.mkdir("./data")
+	end
+
 	connect_server("logger")
 	
 	local runtime_logger = logger:create("runtime",5)

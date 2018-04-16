@@ -1,0 +1,22 @@
+[W:monitor][2018-04-16 19:49:42] server/login:lua mem:351.327148kb,c mem:17162.820312kb
+server/login:module.server_manager:register_agent_server time diff:average:0.000006,min:0.000002,max:0.000009,count:2
+server/login:module.server_manager:register_agent_server input flow:average:157.000000,min:157,max:157,count:2
+server/login:handler.logger_handler:log output flow:average:216.000000,min:216,max:216,count:1
+[W:monitor][2018-04-16 19:49:42] server/agent:lua mem:278.752930kb,c mem:17170.523438kb
+server/agent:handler.logger_handler:log output flow:average:233.000000,min:208,max:258,count:2
+server/agent:module.server_manager:register_agent_server output flow:average:161.000000,min:161,max:161,count:3
+[W:monitor][2018-04-16 19:49:42] server/master:lua mem:271.009766kb,c mem:17176.507812kb
+server/master:module.server_manager:register_agent_server time diff:average:0.000003,min:0.000002,max:0.000004,count:2
+server/master:module.server_manager:register_scene_server time diff:average:0.000005,min:0.000005,max:0.000005,count:1
+server/master:module.server_manager:register_agent_server input flow:average:157.000000,min:157,max:157,count:2
+server/master:module.server_manager:register_scene_server input flow:average:141.000000,min:141,max:141,count:1
+[W:monitor][2018-04-16 19:49:42] server/scene:lua mem:275.588867kb,c mem:17185.257812kb
+server/scene:module.server_manager:register_scene_server output flow:average:145.000000,min:145,max:145,count:2
+[W:monitor][2018-04-16 19:49:42] server/world:lua mem:277.028320kb,c mem:17190.789062kb
+server/world:module.server_manager:register_scene_server time diff:average:0.000006,min:0.000006,max:0.000006,count:1
+server/world:module.server_manager:register_agent_server time diff:average:0.000004,min:0.000004,max:0.000005,count:2
+server/world:module.server_manager:register_scene_server input flow:average:141.000000,min:141,max:141,count:1
+server/world:module.server_manager:register_agent_server input flow:average:157.000000,min:157,max:157,count:2
+[W:monitor][2018-04-16 19:49:42] server/agent:lua mem:278.752930kb,c mem:17199.273438kb
+server/agent:handler.logger_handler:log output flow:average:233.000000,min:208,max:258,count:2
+server/agent:module.server_manager:register_agent_server output flow:average:161.000000,min:161,max:161,count:3
