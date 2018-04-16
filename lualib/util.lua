@@ -201,7 +201,7 @@ end
 function _M.time_diff(func)
     local now = _M.time()
     func()
-    print("time diff:",_M.time() - now)
+    print(string.format("time diff:%f",(_M.time() - now) * 10))
 end
 
 return _M

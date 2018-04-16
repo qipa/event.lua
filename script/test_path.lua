@@ -3,8 +3,9 @@ local util = require "util"
 
 local finder = core.create(101,"nav.tile")
 
-local now = util.time()
-for i = 1,10000 do
-	finder:find(19,118,118,27)
-end
-print("time diff:",(util.time() - now) * 10)
+util.time_diff(function ()
+	for i = 1,10000 do
+		finder:find(22,109,124,18)
+	end
+
+end)
