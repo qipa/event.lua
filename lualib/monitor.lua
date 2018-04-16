@@ -13,25 +13,26 @@ local output_monitor = {}
 local _M = {}
 
 local function update()
-	
+	local logs = {}
+
 	local lua_mem = collectgarbage("count")
-	logger:WARN(string.format("%s:lua mem:%fkb,c mem:%fkb",env.name,lua_mem,helper.allocated()/1024))
+	table.insert(logs,string.format("%s:lua mem:%fkb,c mem:%fkb",env.name,lua_mem,helper.allocated()/1024))
 
 	for name,info in pairs(diff_monitor) do
 		local average = info.total / info.count
-		logger:WARN(string.format("%s:%s time diff:average:%f,min:%f,max:%f,count:%d",env.name,name,average,info.min,info.max,info.count))
+		table.insert(logs,string.format("%s:%s time diff:average:%f,min:%f,max:%f,count:%d",env.name,name,average,info.min,info.max,info.count))
 	end
 
 	for name,info in pairs(input_monitor) do
 		local average = info.total / info.count
-		logger:WARN(string.format("%s:%s input flow:average:%f,min:%d,max:%d,count:%d",env.name,name,average,info.min,info.max,info.count))
+		table.insert(logs,string.format("%s:%s input flow:average:%f,min:%d,max:%d,count:%d",env.name,name,average,info.min,info.max,info.count))
 	end
 
 	for name,info in pairs(output_monitor) do
 		local average = info.total / info.count
-		logger:WARN(string.format("%s:%s output flow:average:%f,min:%d,max:%d,count:%d",env.name,name,average,info.min,info.max,info.count))
+		table.insert(logs,string.format("%s:%s output flow:average:%f,min:%d,max:%d,count:%d",env.name,name,average,info.min,info.max,info.count))
 	end
-
+	logger:WARN(table.concat(logs,"\n"))
 end
 
 function _M.report_diff(file,method,diff)
