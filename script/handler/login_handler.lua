@@ -93,5 +93,13 @@ function req_enter_game(client_id,args)
 	local md5 = util.md5(json)
 	local now = util.time()
 	local token = util.rc4(json,now)
+end
+
+function rpc_enter_agent(self,args)
+
+
+end
+
+function rpc_leave_agent(self,args)
 
 end

@@ -15,9 +15,11 @@ function __init__(self)
 end
 
 local PHASE = {
-	LOGIN = 1,
-	AGENT = 2,
-	AGENT_LEAVING = 3,
+	LOADING = 1
+	LOGIN = 2,
+	AGENT = 3,
+	AGENT_LEAVING = 4,
+	AGENT_LEAVED = 5,
 }
 
 function cls_login_user:create(cid,account)
@@ -49,7 +51,10 @@ end
 function cls_login_user:auth()
 	print("cls_login_user:auth")
 	local db_channel = model.get_db_channel()
+	
+	self.phase = PHASE.LOADING
 	self:load(db_channel)
+	self.phase = PHASE.LOGIN
 
 	local self = model.fetch_login_user_with_account(self.account)
 	if not self then
