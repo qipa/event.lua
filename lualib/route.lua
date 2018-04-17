@@ -1,12 +1,13 @@
 local protocol = require "protocol"
 local event = require "event"
+local import = require "import"
 
 local _M = {}
 
 
 function _M.dispatch(file,method,...)
 
-	local lm = import(file)
+	local lm = import.get_module(file)
 	if not lm then
 		error(string.format("no such file:%s",file))
 	end

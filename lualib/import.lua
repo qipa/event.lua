@@ -71,4 +71,11 @@ function _M.get_script_ctx()
 	return _script_ctx
 end
 
+function _M.get_module(file)
+	local ctx = _script_ctx[file]
+	if ctx then
+		return ctx.env
+	end
+end
+
 return _M
