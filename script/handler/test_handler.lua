@@ -28,25 +28,16 @@ end
 
 function test_thread_rpc0(args)
 	local now = util.time()
-	local count = 1024
-	for i = 1,count do
-		worker.call_worker(1,"handler.test_handler","test_thread_rpc1",{fuck = "you"},function ()
-			if i == count then
-				print("done",util.time() - now,i)
-				-- worker.quit()
-			end
-		end)
-	end
+	util.time_diff("diff",function ()
+		local count = 1024 * 1024 * 10
+		for i = 1,count do
+			worker.call_worker(1,"handler.test_handler","test_thread_rpc1",{fuck = "you"})
+		end
+	end)
 	return "rpc ok"
 end
 
 function test_thread_rpc1(args)
-	count = count + 1
-	if count%10000 == 0 then
-		print(count)
-		-- worker.quit()
-	end
-
 	return "ok"
 end
 
