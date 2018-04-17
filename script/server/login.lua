@@ -53,12 +53,7 @@ end
 event.fork(function ()
 	startup.run(env.mongodb)
 
-	local result,reason = http.post_master("/apply_id")
-	if not result then
-		print(reason)
-		os.exit(1)
-	end
-	env.dist_id = result.id
+	env.dist_id = startup.apply_id()
 	id_builder:init(env.dist_id)
 	
 	local ok,reason = event.listen(env.login,4,channel_accept,common_channel)

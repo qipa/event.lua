@@ -1,7 +1,8 @@
 local model = require "model"
+local persistence = require "persistence"
+local util = require "util"
 
 _agent_server_manager = _agent_server_manager or {}
-_agent_server_counter = _agent_server_counter or 1
 
 _scene_server_manager = _scene_server_manager or {}
 _scene_server_counter = _scene_server_counter or 1
@@ -9,21 +10,30 @@ _scene_server_counter = _scene_server_counter or 1
 _server_counter = 1
 
 function __init__(self)
-
+	self.fs = persistence:open("master")
+	local attr = util.attributes("./data/master/dist_id")
+	if not attr then
+		self._server_counter = 1
+		self.fs:save("dist_id",{id = self._server_counter})
+	else
+		local dist_info = self.fs:load("dist_id")
+		self._server_counter = dist_info.id
+	end
 end
 
 function apply_id(channel)
 	local id = _server_counter
 	_server_counter = _server_counter + 1
+	fs:save("dist_id",{id = _server_counter})
 	return {id = id}
 end
 
 function register_agent_server(channel,args)
-	local agent = {channel = channel,count = 0,ip = args.ip,port = args.port}
-	_agent_server_manager[_agent_server_counter] = agent
+	local agent = {channel = channel,count = 0,ip = args.ip,port = args.port,id = args.id}
+	assert(_agent_server_manager[args.id] == nil,args.id)
+	_agent_server_manager[args.id] = agent
 	channel.name = "agent"
-	channel.id = _agent_server_counter
-	_agent_server_counter = _agent_server_counter + 1
+	channel.id = args.id
 	return true
 end
 
@@ -65,12 +75,12 @@ function call_agent(self,agent_server_id,file,method,args)
 	return agent.channel:call(file,method,args,callback)
 end
 
-function register_scene_server(channel,addr)
-	local scene_server = {channel = channel,count = 0,addr = addr}
-	_scene_server_manager[_scene_server_counter] = scene_server
+function register_scene_server(channel,args)
+	local scene_server = {channel = channel,count = 0,addr = args.addr,id = args.id}
+	assert(_scene_server_manager[args.id] == nil,args.id)
+	_scene_server_manager[args.id] = scene_server
 	channel.name = "scene"
-	channel.id = _scene_server_counter
-	_scene_server_counter = _scene_server_counter + 1
+	channel.id = args.id
 	return true
 end
 

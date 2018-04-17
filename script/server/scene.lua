@@ -23,20 +23,21 @@ event.fork(function ()
 	startup.connect_server("world")
 	startup.connect_server("master")
 
-	local listener,reason = event.listen(env.scene,4,channel_accept,agent_channel)
+	env.dist_id = startup.apply_id()
+	id_builder:init(env.dist_id)
+
+	local addr
+	if env.scene == "ipc" then
+		addr = string.format("ipc://scene%02d.ipc",env.dist_id)
+	else
+		addr = "tcp://127.0.0.1:0"
+	end
+	local listener,reason = event.listen(addr,4,channel_accept,agent_channel)
 	if not listener then
 		event.breakout(reason)
 		return
 	end
 
-	local result,reason = http.post_master("/apply_id")
-	if not result then
-		print(reason)
-		os.exit(1)
-	end
-	env.dist_id = result.id
-	id_builder:init(env.dist_id)
-	
 	local ip,port = listener:addr()
 	local addr_info = {}
 	if port == 0 then
@@ -47,8 +48,8 @@ event.fork(function ()
 	end
 
 	local master_channel = model.get_master_channel()
-	master_channel:send("module.server_manager","register_scene_server",addr_info)
+	master_channel:send("module.server_manager","register_scene_server",{id = env.dist_id,addr = addr_info})
 
 	local world_channel = model.get_world_channel()
-	world_channel:send("module.server_manager","register_scene_server",addr_info)
+	world_channel:send("module.server_manager","register_scene_server",{id = env.dist_id,addr = addr_info})
 end)

@@ -6,10 +6,12 @@ local mongo = require "mongo"
 local protocol = require "protocol"
 local monitor = require "monitor"
 local util = require "util"
+local http = require "http"
 
 local rpc_channel = channel:inherit()
 function rpc_channel:disconnect()
 	model[string.format("set_%s_channel",self.name)](nil)
+	event.wakeup(self.monitor)
 end
 
 local mongodb_channel = mongo:inherit()
@@ -48,6 +50,23 @@ function run(db_addr)
 	protocol.load()
 end
 
+function apply_id()
+	local count = 0
+	local result,reason
+	while not result do
+		result,reason = http.post_master("/apply_id")
+		if not result then
+			event.error(string.format("apply id error:%s",reason))
+			count = count + 1
+			event.sleep(1)
+		end
+	end
+	if not result then
+		os.exit(1)
+	end
+	return result.id
+end
+
 function connect_server(name)
 	model.register_value(string.format("%s_channel",name))
 	local channel,reason
@@ -70,7 +89,6 @@ function connect_server(name)
 
 	event.fork(function ( ... )
 		event.wait(channel.monitor)
-
 		while true do
 			local channel,reason
 			while not channel do
