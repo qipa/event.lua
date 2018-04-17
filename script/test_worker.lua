@@ -5,11 +5,10 @@ local util = require "util"
 event.fork(function ()
 	print(worker.create("worker_main"))
 	print(worker.create("worker_main"))
-	-- print(worker.create(mailbox:fd(),"test.lua"))
 
 	local now = util.time()
 	local count = 1024 * 1024
-	for i = 1,1 do
+	for i = 1,count do
 		local result = worker.main_call(0,"handler.test_handler","test_thread_rpc0",{fuck = "you"})
 		-- local result = worker.main_call(0,"handler.test_handler","test_thread_rpc1",{fuck = "you"})
 		if i == count then
