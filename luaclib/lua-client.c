@@ -54,6 +54,7 @@ close_client(int id,void* data) {
 	struct ev_client* client = data;
 	ev_session_free(client->session);
 	ev_timer_stop(client->manager->loop,(struct ev_timer*)&client->timer);
+	container_remove(client->manager->container,client->id);
 	free(client);
 }
 

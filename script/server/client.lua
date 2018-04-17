@@ -20,7 +20,9 @@ local _M = {}
 function _M.login(channel,account)
 	channel:write(channel.packet:pack(protocol.encode.c2s_login_auth({account = account})))
 	event.sleep(1)
-	channel:write(channel.packet:pack(protocol.encode.c2s_create_role({career = 1})))
+	-- channel:write(channel.packet:pack(protocol.encode.c2s_create_role({career = 1})))
+	channel:write(channel.packet:pack(protocol.encode.c2s_login_enter({account = account,uid = 3001016})))
+	
 end
 
 event.fork(function ()

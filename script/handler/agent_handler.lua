@@ -85,13 +85,13 @@ function req_enter(cid,args)
 	_enter_user[cid] = info.uid
 end
 
-function user_register(args)
+function user_register(_,args)
 	local token = args.token
 	local time = args.time
 	_user_token[token] = time
 end
 
-function user_kick(args)
+function user_kick(_,args)
 	local user = model.fetch_agent_user_with_uid(args.uid)
 	local client_manager = model.get_client_manager()
 	client_manager:close(cid)

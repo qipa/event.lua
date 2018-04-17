@@ -36,8 +36,8 @@ typedef struct workder_ctx {
 	lua_State* L;
 
 	int fd;
-	struct pipe_message* message_first;
-	struct pipe_message* message_last;
+	struct pipe_message* first;
+	struct pipe_message* last;
 } worker_ctx_t;
 
 typedef struct worker_manager {
@@ -150,9 +150,9 @@ worker_release(worker_ctx_t* ctx) {
 	queue_free(ctx->queue);
 	pthread_mutex_destroy(&ctx->mutex);
 	pthread_cond_destroy(&ctx->cond);
-	while(ctx->message_first) {
-		struct pipe_message* message = ctx->message_first;
-		ctx->message_first = ctx->message_first->next;
+	while(ctx->first) {
+		struct pipe_message* message = ctx->first;
+		ctx->first = ctx->first->next;
 		if (message->data)
 			free(message->data);
 		free(message);
@@ -162,8 +162,8 @@ worker_release(worker_ctx_t* ctx) {
 
 int
 worker_send_pipe(worker_ctx_t* ctx) {
-	while(ctx->message_first) {
-		struct pipe_message* message = ctx->message_first;
+	while(ctx->first) {
+		struct pipe_message* message = ctx->first;
 		struct pipe_message* next_message = message->next;
 		for (;;) {
 			int n = write(ctx->fd, &message, sizeof(message));
@@ -180,9 +180,9 @@ worker_send_pipe(worker_ctx_t* ctx) {
 			assert(n == sizeof(message));
 			break;
 		}
-		ctx->message_first = next_message;
+		ctx->first = next_message;
 	}
-	ctx->message_first = ctx->message_last = NULL;
+	ctx->first = ctx->last = NULL;
 	return 0;
 }
 
@@ -317,11 +317,11 @@ send_pipe(lua_State* L) {
 	message->session = session;
 	message->data = data;
 	message->size = size;
-	if (ctx->message_first == NULL) {
-		ctx->message_first = ctx->message_last = message;
+	if (ctx->first == NULL) {
+		ctx->first = ctx->last = message;
 	} else {
-		ctx->message_last->next = message;
-		ctx->message_last = message;
+		ctx->last->next = message;
+		ctx->last = message;
 	}
 	return 0;
 }

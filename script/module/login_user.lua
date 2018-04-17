@@ -62,27 +62,29 @@ function cls_login_user:auth()
 	end
 
 	if not self.role_list then
-		self.role_list = {}
+		self.role_list = {list = {}}
 		self:dirty_field("role_list")
 	end
 
 	local result = {}
-	for _,role in pairs(self.role_list) do
+	for _,role in pairs(self.role_list.list) do
 		table.insert(result,{uid = role.uid,name = role.name})
 	end
+	table.print(result,"auth")
 	self:send_client("s2c_login_auth",{list = result})
 end
 
 function cls_login_user:create_role(career)
 	print("cls_login_user:create_role")
 	local role = {career = career,name = "mrq",uid = id_builder:alloc_user_uid()}
-	table.insert(self.role_list,role)
+	table.insert(self.role_list.list,role)
 	self:dirty_field("role_list")
 
 	local result = {}
-	for _,role in pairs(self.role_list) do
+	for _,role in pairs(self.role_list.list) do
 		table.insert(result,{uid = role.uid,name = role.name})
 	end
+	table.print(result,"create role")
 	self:send_client("s2c_create_role",{list = result})
 end
 

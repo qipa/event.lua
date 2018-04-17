@@ -17,6 +17,8 @@ function log(_,args)
 	end
 	FILE:write(log.."\r\n")
 	FILE:flush()
-	util.print(log_lv,log)
+	if log_type ~= "monitor" then
+		util.print(log_lv,log)
+	end
 end
 

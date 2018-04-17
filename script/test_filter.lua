@@ -2,16 +2,20 @@ local core = require "filter.core"
 local dump = require "dump.core"
 local util = require "util"
 local event = require "event"
+local helper = require "helper"
+
 local FILE = assert(io.open("filter.lua","r"))
 local content = FILE:read("*a")
 FILE:close()
 
 local filter_list = dump.unpack(content)
 
-filter = core.create()
+local filter = core.create()
 for _,word in pairs(filter_list.ForBiddenCharInName) do
 	filter:add(word)
 end
+local lua_mem = collectgarbage("count")
+event.error(string.format("lua mem:%fkb,c mem:%fkb",lua_mem,helper.allocated()/1024))
 
 
 -- filter:dump()

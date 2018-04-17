@@ -8,6 +8,7 @@ local channel = require "channel"
 local startup = import "server.startup"
 local id_builder = import "module.id_builder"
 
+
 model.register_binder("scene_channel","id")
 model.register_binder("client","id")
 model.register_value("client_manager")
@@ -63,5 +64,7 @@ event.fork(function ()
 	local world_channel = model.get_world_channel()
 	world_channel:send("module.server_manager","register_agent_server",{ip = "0.0.0.0",port = port,id = env.dist_id})
 
+	import "handler.agent_handler"
+	
 	event.error("agent start success")
 end)

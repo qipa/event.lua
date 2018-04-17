@@ -27,6 +27,7 @@ protocol s2c_create_role
 
 protocol c2s_login_enter
 {
+	string account
 	int uid
 }
 
