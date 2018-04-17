@@ -91,9 +91,6 @@ if main then
 	event.prepare()
 else
 	worker.dispatch(args[#args])
-	event.error = function (...)
-		worker.send_mail("handler.logger_handler","log_worker",{...})
-	end
 end
 
 local ok,err = xpcall(func,debug.traceback,table.unpack(args,3))

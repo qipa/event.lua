@@ -15,7 +15,7 @@
 #include "lauxlib.h"
 
 #include "message_queue.h"
-#include "mail_box.h"
+#include "pipe_message.h"
 
 struct startup_args {
 	int fd;
@@ -36,8 +36,8 @@ typedef struct workder_ctx {
 	lua_State* L;
 
 	int fd;
-	struct mail_message* mail_first;
-	struct mail_message* mail_last;
+	struct pipe_message* message_first;
+	struct pipe_message* message_last;
 } worker_ctx_t;
 
 typedef struct worker_manager {
@@ -150,39 +150,39 @@ worker_release(worker_ctx_t* ctx) {
 	queue_free(ctx->queue);
 	pthread_mutex_destroy(&ctx->mutex);
 	pthread_cond_destroy(&ctx->cond);
-	while(ctx->mail_first) {
-		struct mail_message* mail = ctx->mail_first;
-		ctx->mail_first = ctx->mail_first->next;
-		if (mail->data)
-			free(mail->data);
-		free(mail);
+	while(ctx->message_first) {
+		struct pipe_message* message = ctx->message_first;
+		ctx->message_first = ctx->message_first->next;
+		if (message->data)
+			free(message->data);
+		free(message);
 	}
 	lua_close(ctx->L);
 }
 
 int
-worker_send_mail(worker_ctx_t* ctx) {
-	while(ctx->mail_first) {
-		struct mail_message* mail = ctx->mail_first;
-		struct mail_message* next_mail = mail->next;
+worker_send_pipe(worker_ctx_t* ctx) {
+	while(ctx->message_first) {
+		struct pipe_message* message = ctx->message_first;
+		struct pipe_message* next_message = message->next;
 		for (;;) {
-			int n = write(ctx->fd, &mail, sizeof(mail));
+			int n = write(ctx->fd, &message, sizeof(message));
 			if (n < 0) {
 				if (errno == EINTR) {
 					continue;
 				} else if (errno == EAGAIN ) {
 					return -1;
 				} else {
-					fprintf(stderr,"worker send mail error %s.\n", strerror(errno));
+					fprintf(stderr,"worker send message error %s.\n", strerror(errno));
 					assert(0);
 				}
 			}
-			assert(n == sizeof(mail));
+			assert(n == sizeof(message));
 			break;
 		}
-		ctx->mail_first = next_mail;
+		ctx->message_first = next_message;
 	}
-	ctx->mail_first = ctx->mail_last = NULL;
+	ctx->message_first = ctx->message_last = NULL;
 	return 0;
 }
 
@@ -238,10 +238,10 @@ worker_dispatch(worker_ctx_t* ctx) {
 			pthread_mutex_unlock(&ctx->mutex);
 
 			ctx->nversion++;
-			worker_send_mail(ctx);
+			worker_send_pipe(ctx);
 		} else {
 			worker_callback(ctx,message->source,message->session,message->data,message->size);
-			worker_send_mail(ctx);
+			worker_send_pipe(ctx);
 			if (ctx->quit) {
 				workder_quit(ctx);
 				break;
@@ -288,7 +288,7 @@ module_push(lua_State* L) {
 }
 
 int
-send_mail(lua_State* L) {
+send_pipe(lua_State* L) {
 	worker_ctx_t* ctx = lua_touserdata(L, 1);
 	int session = lua_tointeger(L,2);
 
@@ -311,17 +311,17 @@ send_mail(lua_State* L) {
 			luaL_error(L,"unkown type:%s",lua_typename(L,lua_type(L,3)));
 	}
 
-	struct mail_message* mail = malloc(sizeof(*mail));
-	mail->next = NULL;
-	mail->source = ctx->id;
-	mail->session = session;
-	mail->data = data;
-	mail->size = size;
-	if (ctx->mail_first == NULL) {
-		ctx->mail_first = ctx->mail_last = mail;
+	struct pipe_message* message = malloc(sizeof(*message));
+	message->next = NULL;
+	message->source = ctx->id;
+	message->session = session;
+	message->data = data;
+	message->size = size;
+	if (ctx->message_first == NULL) {
+		ctx->message_first = ctx->message_last = message;
 	} else {
-		ctx->mail_last->next = mail;
-		ctx->mail_last = mail;
+		ctx->message_last->next = message;
+		ctx->message_last = message;
 	}
 	return 0;
 }
@@ -351,7 +351,7 @@ _worker(void* ud) {
 	luaL_newmetatable(L, "meta_worker");
 	const luaL_Reg meta_worker[] = {
 		{ "push", module_push },
-		{ "send_mail", send_mail },
+		{ "send_pipe", send_pipe },
 		{ "quit", quit },
 		{ "dispatch", dispatch },
 		{ NULL, NULL },

@@ -21,7 +21,7 @@ local _listener_ctx = setmetatable({},{__mode = "k"})
 local _channel_ctx = setmetatable({},{__mode = "k"})
 local _timer_ctx = setmetatable({},{__mode = "k"})
 local _udp_ctx = setmetatable({},{__mode = "k"})
-local _mailbox_ctx = setmetatable({},{__mode = "k"})
+local _pipe_ctx = setmetatable({},{__mode = "k"})
 local _client_manager_ctx = setmetatable({},{__mode = "k"})
 
 local _channel_base
@@ -188,12 +188,12 @@ function _M.udp(size,callback,ip,port)
 	return udp_session,err
 end
 
-function _M.mailbox(func)
-	local mailbox,fd = _event:mailbox(func)
-	if mailbox then
-		_mailbox_ctx[mailbox] = fd
+function _M.pipe(func)
+	local pipe,fd = _event:pipe(func)
+	if pipe then
+		_pipe_ctx[pipe] = fd
 	end
-	return mailbox,fd
+	return pipe,fd
 end
 
 function _M.client_manager(max)
@@ -288,9 +288,9 @@ function _M.dispatch()
 		end
 	end
 
-	for mailbox in pairs(_mailbox_ctx) do
-		if mailbox:alive() then
-			mailbox:release()
+	for pipe in pairs(_pipe_ctx) do
+		if pipe:alive() then
+			pipe:release()
 		end
 	end
 

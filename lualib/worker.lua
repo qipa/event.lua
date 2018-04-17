@@ -7,8 +7,8 @@ local _M = {}
 local _session_callback = {}
 
 --for creator
-local _maibox
-local _mailbox_fd
+local _pipe
+local _pipe_fd
 local _worker_group = {}
 
 --for worker
@@ -29,8 +29,8 @@ function _M.main_call(target,file,method,args,func)
 end
 
 function _M.create(args)
-	if not _maibox then
-		_maibox,_mailbox_fd = event.mailbox(function (mailbox,source,session,data,size)
+	if not _pipe then
+		_pipe,_pipe_fd = event.pipe(function (pipe,source,session,data,size)
 			local message = table.decode(data,size)
 			if message.ret then
 				if _session_callback[session] then
@@ -57,7 +57,7 @@ function _M.create(args)
 			end
 		end)
 	end
-	local pid = worker.create(_mailbox_fd,args)
+	local pid = worker.create(_pipe_fd,args)
 	table.insert(_worker_group,pid)
 	return pid
 end
@@ -90,9 +90,9 @@ function _M.dispatch(worker_ud)
 				if session ~= 0 then
 					if source < 0 then
 						if not ok then
-							_worker_userdata:send_mail(session,table.tostring({ret = true,err = result}))
+							_worker_userdata:send_pipe(session,table.tostring({ret = true,err = result}))
 						else
-							_worker_userdata:send_mail(session,table.tostring({ret = true,args = result}))
+							_worker_userdata:send_pipe(session,table.tostring({ret = true,args = result}))
 						end
 					else
 						if not ok then
@@ -129,13 +129,13 @@ function _M.call_worker(target,file,method,args,func)
 	return result
 end
 
-function _M.send_mail(file,method,args)
-	_worker_userdata:send_mail(0,table.tostring({file = file,method = method,args = args}))
+function _M.send_pipe(file,method,args)
+	_worker_userdata:send_pipe(0,table.tostring({file = file,method = method,args = args}))
 end
 
-function _M.call_mail(file,method,args,func)
+function _M.call_pipe(file,method,args,func)
 	local session = event.gen_session()
-	_worker_userdata:send_mail(session,table.tostring({file = file,method = method,args = args}))
+	_worker_userdata:send_pipe(session,table.tostring({file = file,method = method,args = args}))
 	if func then
 		_session_callback[session] = func
 		return
