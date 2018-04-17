@@ -198,10 +198,10 @@ function _M.same_week(ti0,ti1,sep)
 
 end
 
-function _M.time_diff(func)
+function _M.time_diff(desc,func)
     local now = _M.time()
     func()
-    print(string.format("time diff:%f",(_M.time() - now) * 10))
+    print(string.format("%s:%f",desc,(_M.time() - now) * 10))
 end
 
 return _M
