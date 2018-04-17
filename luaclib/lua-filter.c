@@ -24,7 +24,7 @@ struct word_tree {
 	int index;
 };
 
-int
+static inline int
 split_utf8(const char* word,size_t size,int offset) {
 	int i;
 	for(i = offset;i < size;i++) {
@@ -50,7 +50,7 @@ word_add(struct word_tree* root_tree, const char* word,size_t size) {
 	int i;
 	int index = 0;
 	for(i = 0;i < size;) {
-		char ch[5] = {0};
+		char ch[8] = {0};
 		index++;
 		int length = split_utf8(word,size,i);
 		memcpy(ch,&word[i],length);
@@ -103,7 +103,7 @@ word_filter(struct word_tree* root_tree,const char* word,size_t size,int replace
 
 	int i;
 	for(i = 0;i < size;) {
-		char ch[5] = {0};
+		char ch[8] = {0};
 		
 		int length = split_utf8(word,size,i);
 		memcpy(ch,&word[i],length);
@@ -111,9 +111,6 @@ word_filter(struct word_tree* root_tree,const char* word,size_t size,int replace
 
 		switch(phase) {
 			case PHASE_SEARCH: {
-				char tmp[5] = {0};
-				memcpy(tmp,ch,5);
-
 				khiter_t k = kh_get(word, tree->hash, ch);
 				int miss = (k == kh_end(tree->hash));
 				if (!miss) {
@@ -123,7 +120,7 @@ word_filter(struct word_tree* root_tree,const char* word,size_t size,int replace
 					over = -1;
 				} else {
 					if (replace) {
-						memcpy(block + block_offset, tmp, length);
+						memcpy(block + block_offset, ch, length);
 						block_offset += length;
 					}
 				}
