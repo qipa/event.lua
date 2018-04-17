@@ -139,19 +139,20 @@ word_filter(struct word_tree* root_tree,const char* word,size_t size,int replace
 					//回滚一个word
 					i -= length;
 					if (over != -1 && start != over) {
-						if (!replace)
+						if (replace) {
+							//匹配成功,start~over
+							// memset(block + start, '*', over - start + 1);
+							memset(block + block_offset, '*', len);
+							block_offset += len;
+						} else {
 							return NULL;
-						//匹配成功,start~over
-						// memset(block + start, '*', over - start + 1);
-						
-						memset(block + block_offset, '*', len);
-						block_offset += len;
+						}
 					} else {
-						if (!replace)
-							return NULL;
 						//匹配失败
-						memcpy(block + block_offset, word + start, i - start);
-						block_offset += i - start;
+						if (replace) {
+							memcpy(block + block_offset, word + start, i - start);
+							block_offset += i - start;
+						}
 					}
 					
 					tree = root_tree;
