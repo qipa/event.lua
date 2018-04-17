@@ -147,6 +147,8 @@ word_filter(struct word_tree* root_tree,const char* word,size_t size,int replace
 						memset(block + block_offset, '*', len);
 						block_offset += len;
 					} else {
+						if (!replace)
+							return NULL;
 						//匹配失败
 						memcpy(block + block_offset, word + start, i - start);
 						block_offset += i - start;

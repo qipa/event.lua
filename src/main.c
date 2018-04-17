@@ -104,7 +104,7 @@ int main(int argc,const char* argv[]) {
 	assert(argc >= 2);
 
 	ignore_signal(SIGPIPE);
-	ignore_signal(SIGPROF);
+	// ignore_signal(SIGPROF);
 	register_signal(SIGUSR1,signal_deadloop);
 
 	if (argc > 2) {
