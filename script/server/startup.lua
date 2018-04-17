@@ -21,13 +21,6 @@ function mongodb_channel:disconnect()
 end
 
 function run(db_addr)
-	if not util.attributes("./log") then
-		util.mkdir("./log")
-	end
-	if not util.attributes("./data") then
-		util.mkdir("./data")
-	end
-
 	connect_server("logger")
 	
 	local runtime_logger = logger:create("runtime",5)

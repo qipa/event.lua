@@ -1,4 +1,12 @@
 
+if [ ! -d "./data" ];then
+	mkdir ./data
+fi
+
+if [ ! -d "./log" ];then
+	mkdir ./log
+fi
+
 if [ -f "./data/master/dist_id" ];then
 	rm -rf ./data/master/dist_id
 fi
