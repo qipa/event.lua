@@ -49,7 +49,7 @@ function leave(cid)
 		user:release()
 
 		local db_channel = model.get_db_channel()
-		db_channel:db(user:get_type())
+		db_channel:set_db("agent_user")
 		local updater = {}
 		updater["$inc"] = {version = 1}
 		updater["$set"] = {time = os.time()}
