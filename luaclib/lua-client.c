@@ -28,7 +28,7 @@ typedef void (*data_callback)(void* ud,int client_id,int message_id,void* data,s
 __thread char CACHED_BUFFER[CACHED_SIZE];
 
 struct client_manager {
-	struct ev_loop* loop;
+	struct ev_loop_ctx* loop_ctx;
 	struct ev_listener* listener;
 	struct object_container* container;
 	accept_callback accept_func;
@@ -53,7 +53,7 @@ static void
 close_client(int id,void* data) {
 	struct ev_client* client = data;
 	ev_session_free(client->session);
-	ev_timer_stop(client->manager->loop,(struct ev_timer*)&client->timer);
+	ev_timer_stop(loop_ctx_get(client->manager->loop_ctx),(struct ev_timer*)&client->timer);
 	container_remove(client->manager->container,client->id);
 	free(client);
 }
@@ -111,7 +111,7 @@ read_complete(struct ev_session* ev_session, void* ud) {
 			    	client->order++;
 			    }
 			    client->freq++;
-			    client->tick = ev_now(client->manager->loop);
+			    client->tick = loop_ctx_now(client->manager->loop_ctx);
 			    client->manager->data_func(client->manager->ud,client->id,id,&data[6],client->need - 6);
 
 			    if (data != CACHED_BUFFER)
@@ -132,7 +132,7 @@ timeout(struct ev_loop* loop,struct ev_timer* io,int revents) {
 		error_happen(NULL, client);
 	}
 	client->freq = 0;
-	if (client->tick != 0 && ev_now(client->manager->loop) - client->tick > ALIVE_TIME) {
+	if (client->tick != 0 && loop_ctx_now(client->manager->loop_ctx) - client->tick > ALIVE_TIME) {
 		error_happen(NULL, client);
 	}
 }
@@ -148,7 +148,7 @@ accept_client(struct ev_listener *listener, int fd, const char* addr, void *ud) 
 	struct ev_client* client = malloc(sizeof(*client));
 	memset(client,0,sizeof(*client));
 	client->manager = manager;
-	client->session = ev_session_bind(manager->loop,fd);
+	client->session = ev_session_bind(manager->loop_ctx,fd);
 	client->id = container_add(manager->container,client);
 	if (client->id == -1) {
 		ev_session_free(client->session);
@@ -160,7 +160,7 @@ accept_client(struct ev_listener *listener, int fd, const char* addr, void *ud) 
 
 	client->timer.data = client;
 	ev_timer_init(&client->timer,timeout,1,1);
-	ev_timer_start(manager->loop,&client->timer);
+	ev_timer_start(loop_ctx_get(manager->loop_ctx),&client->timer);
 
 	manager->accept_func(manager->ud,client->id,addr);
 }
@@ -172,11 +172,11 @@ close_complete(struct ev_session* ev_session, void* ud) {
 }
 
 struct client_manager*
-client_manager_create(struct ev_loop* loop,size_t max,void* ud) {
+client_manager_create(struct ev_loop_ctx* loop_ctx,size_t max,void* ud) {
 	struct client_manager* manager = malloc(sizeof(*manager));
 	memset(manager,0,sizeof(*manager));
 	manager->container = container_create(max);
-	manager->loop = loop;
+	manager->loop_ctx = loop_ctx;
 	manager->ud = ud;
 	return manager;
 }
@@ -189,7 +189,7 @@ client_manager_start(struct client_manager* manager,const char* ip,int port) {
 	si.sin_port = htons(port);
 
 	int flag = SOCKET_OPT_NOBLOCK | SOCKET_OPT_CLOSE_ON_EXEC | SOCKET_OPT_REUSEABLE_ADDR;
-	manager->listener = ev_listener_bind(manager->loop,(struct sockaddr*)&si,sizeof(si),16,flag,accept_client,manager);
+	manager->listener = ev_listener_bind(manager->loop_ctx,(struct sockaddr*)&si,sizeof(si),16,flag,accept_client,manager);
 	if (!manager->listener) {
 		return -1;
 	}
@@ -412,9 +412,9 @@ lclient_manager_release(lua_State* L) {
 }
 
 int
-lcreate_client_manager(lua_State* L,struct ev_loop* loop,size_t max) {
+lcreate_client_manager(lua_State* L,struct ev_loop_ctx* loop_ctx,size_t max) {
 	struct lclient_manager* client_manager = lua_newuserdata(L, sizeof(*client_manager));
-	client_manager->manager = client_manager_create(loop,max,client_manager);
+	client_manager->manager = client_manager_create(loop_ctx,max,client_manager);
 	client_manager->alive = 1;
 	client_manager->L = G(L)->mainthread;//callback must be run in main thread
 

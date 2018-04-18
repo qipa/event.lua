@@ -20,9 +20,13 @@ typedef struct ev_buffer {
 	int total;
 } ev_buffer_t;
 
+typedef struct ev_loop_ctx {
+	struct ev_loop* loop;
+	data_buffer_t* freelist;
+} ev_loop_ctx_t;
 
 typedef struct ev_listener {
-	struct ev_loop* loop;
+	struct ev_loop_ctx* loop_ctx;
 	struct ev_io rio;
 	int fd;
 	listener_callback accept_cb;
@@ -30,7 +34,7 @@ typedef struct ev_listener {
 } ev_listener_t;
 
 typedef struct ev_session {
-	struct ev_loop* loop;
+	struct ev_loop_ctx* loop_ctx;
 	struct ev_io rio;
 	struct ev_io wio;
 	
@@ -41,8 +45,6 @@ typedef struct ev_session {
 	ev_buffer_t input;
 	ev_buffer_t output;
 
-	data_buffer_t* freelist;
-	
 	ev_session_callback read_cb;
 	ev_session_callback write_cb;
 	ev_session_callback event_cb;
@@ -54,11 +56,11 @@ void ev_session_free(ev_session_t* ev_session);
 void ev_session_disable(ev_session_t* ev_session,int ev);
 
 static inline struct data_buffer*
-buffer_next(ev_session_t* ev_session) {
+buffer_next(ev_loop_ctx_t* loop_ctx) {
 	data_buffer_t* db = NULL;
-	if (ev_session->freelist != NULL) {
-		db = ev_session->freelist;
-		ev_session->freelist = db->next;
+	if (loop_ctx->freelist != NULL) {
+		db = loop_ctx->freelist;
+		loop_ctx->freelist = db->next;
 	} else {
 		db = malloc(sizeof(*db));
 	}
@@ -72,9 +74,9 @@ buffer_next(ev_session_t* ev_session) {
 }
 
 static inline void
-buffer_reclaim(ev_session_t* ev_session,data_buffer_t* db) {
-	db->next = ev_session->freelist;
-	ev_session->freelist = db;
+buffer_reclaim(ev_loop_ctx_t* loop_ctx,data_buffer_t* db) {
+	db->next = loop_ctx->freelist;
+	loop_ctx->freelist = db;
 }
 
 static inline void
@@ -118,7 +120,7 @@ static void
 _ev_read_cb(struct ev_loop* loop,struct ev_io* io,int revents) {
 	ev_session_t* ev_session = io->data;
 
-	struct data_buffer* rdb = buffer_next(ev_session);
+	struct data_buffer* rdb = buffer_next(ev_session->loop_ctx);
 	rdb->data = malloc(ev_session->threshold);
 	rdb->size = ev_session->threshold;
 	int total = 0;
@@ -154,7 +156,7 @@ _ev_read_cb(struct ev_loop* loop,struct ev_io* io,int revents) {
 
 				buffer_append(&ev_session->input,rdb);
 
-				struct data_buffer* next_rdb = buffer_next(ev_session);
+				struct data_buffer* next_rdb = buffer_next(ev_session->loop_ctx);
 				next_rdb->data = malloc(ev_session->threshold);
 				next_rdb->size = ev_session->threshold;
 
@@ -202,7 +204,7 @@ _ev_write_cb(struct ev_loop* loop,struct ev_io* io,int revents) {
 			if (total == left) {
 				free(wdb->data);
 				ev_session->output.head = wdb->next;
-				buffer_reclaim(ev_session,wdb);
+				buffer_reclaim(ev_session->loop_ctx,wdb);
 				if (ev_session->output.head == NULL) {
 					ev_session->output.head = ev_session->output.tail = NULL;
 					break;
@@ -221,21 +223,60 @@ _ev_write_cb(struct ev_loop* loop,struct ev_io* io,int revents) {
 	}
 }
 
+ev_loop_ctx_t*
+loop_ctx_create() {
+	ev_loop_ctx_t* loop_ctx = malloc(sizeof(*loop_ctx));
+	memset(loop_ctx,0,sizeof(*loop_ctx));
+	loop_ctx->loop = ev_loop_new(0);
+	return loop_ctx;
+}
+
+void
+loop_ctx_release(ev_loop_ctx_t* loop_ctx) {
+	ev_loop_destroy(loop_ctx->loop);
+
+	while(loop_ctx->freelist) {
+		data_buffer_t* tmp = loop_ctx->freelist;
+		loop_ctx->freelist = loop_ctx->freelist->next;
+		free(tmp);
+	}
+}
+
+struct ev_loop*
+loop_ctx_get(ev_loop_ctx_t* loop_ctx) {
+	return loop_ctx->loop;
+}
+
+void
+loop_ctx_dispatch(ev_loop_ctx_t* loop_ctx) {
+	ev_loop(loop_ctx->loop,0);
+}
+
+void
+loop_ctx_break(ev_loop_ctx_t* loop_ctx) {
+	ev_break(loop_ctx->loop,EVBREAK_ALL);
+}
+
+double
+loop_ctx_now(ev_loop_ctx_t* loop_ctx) {
+	return ev_now(loop_ctx->loop);
+}
+
 ev_listener_t*
-ev_listener_bind(struct ev_loop* loop,struct sockaddr* addr, int addrlen,int backlog,int flag,listener_callback accept_cb,void* userdata) {
+ev_listener_bind(struct ev_loop_ctx* loop_ctx,struct sockaddr* addr, int addrlen,int backlog,int flag,listener_callback accept_cb,void* userdata) {
 	int fd = socket_listen(addr, addrlen, backlog, flag);
 	if (fd < 0) {
 		return NULL;
 	}
 	ev_listener_t* listener = malloc(sizeof(*listener));
-	listener->loop = loop;
+	listener->loop_ctx = loop_ctx;
 	listener->fd = fd;
 	listener->accept_cb = accept_cb;
 	listener->userdata = userdata;
 
 	listener->rio.data = listener;
 	ev_io_init(&listener->rio,_ev_accept_cb,fd,EV_READ);
-	ev_io_start(loop,&listener->rio);
+	ev_io_start(loop_ctx->loop,&listener->rio);
 
 	return listener;
 }
@@ -256,17 +297,17 @@ ev_listener_addr(ev_listener_t* listener,char* addr,size_t length,int* port) {
 void
 ev_listener_free(ev_listener_t* listener) {
 	if (ev_is_active(&listener->rio)) {
-		ev_io_stop(listener->loop, &listener->rio);
+		ev_io_stop(listener->loop_ctx->loop, &listener->rio);
 	}
 	close(listener->fd);
 	free(listener);
 }
 
 ev_session_t*
-ev_session_bind(struct ev_loop* loop,int fd) {
+ev_session_bind(struct ev_loop_ctx* loop_ctx,int fd) {
 	ev_session_t* ev_session = malloc(sizeof(*ev_session));
 	memset(ev_session,0,sizeof(*ev_session));
-	ev_session->loop = loop;
+	ev_session->loop_ctx = loop_ctx;
 	ev_session->fd = fd;
 	ev_session->threshold = MIN_BUFFER_SIZE;
 
@@ -282,14 +323,14 @@ ev_session_bind(struct ev_loop* loop,int fd) {
 }
 
 ev_session_t*
-ev_session_connect(struct ev_loop* loop,struct sockaddr* addr, int addrlen, int block,int* status) {
+ev_session_connect(struct ev_loop_ctx* loop_ctx,struct sockaddr* addr, int addrlen, int block,int* status) {
 	int result = 0;
 	int fd = socket_connect(addr,addrlen,block,&result);
 	if (fd < 0) {
 		*status = CONNECT_STATUS_CONNECT_FAIL;
 		return NULL;
 	}
-	ev_session_t* ev_session = ev_session_bind(loop,fd);
+	ev_session_t* ev_session = ev_session_bind(loop_ctx,fd);
 
 	//if connect op is block,result here must be true
 	*status = CONNECT_STATUS_CONNECTING;
@@ -305,11 +346,6 @@ ev_session_free(ev_session_t* ev_session) {
 	close(ev_session->fd);
 	ev_session_disable(ev_session,EV_READ | EV_WRITE);
 
-	while(ev_session->freelist) {
-		data_buffer_t* tmp = ev_session->freelist;
-		ev_session->freelist = ev_session->freelist->next;
-		free(tmp);
-	}
 	buffer_release(&ev_session->input);
 	buffer_release(&ev_session->output);
 
@@ -328,12 +364,12 @@ void
 ev_session_enable(ev_session_t* ev_session,int ev) {
 	if (ev & EV_READ) {
 		if (!ev_is_active(&ev_session->rio)) {
-			ev_io_start(ev_session->loop, &ev_session->rio);
+			ev_io_start(ev_session->loop_ctx->loop, &ev_session->rio);
 		}
 	} 
 	if (ev & EV_WRITE) {
 		if (!ev_is_active(&ev_session->wio)) {
-			ev_io_start(ev_session->loop, &ev_session->wio);
+			ev_io_start(ev_session->loop_ctx->loop, &ev_session->wio);
 		}
 	} 
 }
@@ -342,12 +378,12 @@ void
 ev_session_disable(ev_session_t* ev_session,int ev) {
 	if (ev & EV_READ) {
 		if (ev_is_active(&ev_session->rio)) {
-			ev_io_stop(ev_session->loop, &ev_session->rio);
+			ev_io_stop(ev_session->loop_ctx->loop, &ev_session->rio);
 		}
 	} 
 	if (ev & EV_WRITE) {
 		if (ev_is_active(&ev_session->wio)) {
-			ev_io_stop(ev_session->loop, &ev_session->wio);
+			ev_io_stop(ev_session->loop_ctx->loop, &ev_session->wio);
 		}
 	} 
 }
@@ -438,7 +474,7 @@ ev_session_read(struct ev_session* ev_session,char* result,size_t size) {
 				assert(need == 0);
 			}
 
-			buffer_reclaim(ev_session,tmp);
+			buffer_reclaim(ev_session->loop_ctx,tmp);
 		}
 	}
 	ev_session->input.total -= size;
@@ -480,18 +516,18 @@ ev_session_write(ev_session_t* ev_session,char* data,size_t size) {
 					ev_session->write_cb(ev_session,ev_session->userdata);
 				}
 			} else {
-				struct data_buffer* wdb = buffer_next(ev_session);
+				struct data_buffer* wdb = buffer_next(ev_session->loop_ctx);
 				wdb->data = data;
 				wdb->rpos = total;
 				wdb->wpos = size;
 				wdb->size = size;
 				buffer_append(&ev_session->output,wdb);
-				ev_io_start(ev_session->loop,&ev_session->wio);
+				ev_io_start(ev_session->loop_ctx->loop,&ev_session->wio);
 			}
 			return total;
 		}
 	} else {
-		struct data_buffer* wdb = buffer_next(ev_session);
+		struct data_buffer* wdb = buffer_next(ev_session->loop_ctx);
 		wdb->data = data;
 		wdb->rpos = 0;
 		wdb->wpos = size;
