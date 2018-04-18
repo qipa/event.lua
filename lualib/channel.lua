@@ -3,6 +3,7 @@ local route = require "route"
 local event = require "event"
 local monitor = require "monitor"
 
+local WARN_FLOW = 1024 * 1024
 local channel = {}
 
 function channel:inherit()
@@ -15,6 +16,7 @@ function channel:new(buffer,addr)
 	ctx.buffer = buffer
 	ctx.addr = addr or "unknown"
 	ctx.session_ctx = {}
+	ctx.threhold = WARN_FLOW
 	return ctx
 end
 
@@ -108,7 +110,21 @@ local function pack_table(tbl)
 end
 
 function channel:write(...)
-	self.buffer:write(...)
+	local ok,total = self.buffer:write(...)
+	if ok then
+		if total >= self.threhold then
+			local mb = math.modf(total/WARN_FLOW)
+			event.error(string.format("channel:%s more than %dmb data need to send out",self.addr,mb))
+			self.threhold = self.threhold + WARN_FLOW
+		else
+			if total < self.threhold / 2 then
+				self.threhold = self.threhold - WARN_FLOW
+				if self.threhold < WARN_FLOW then
+					self.threhold = WARN_FLOW
+				end
+			end
+		end
+	end
 end
 
 function channel:send(file,method,args,callback)

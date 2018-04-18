@@ -469,10 +469,13 @@ _session_write(lua_State* L) {
 	if (ev_session_write(lev_session->session, data, size) == -1) {
 		free(data);
 		lua_pushboolean(L,0);
-	} else {
-		lua_pushboolean(L,1);
+		return 1;
 	}
-	return 1;
+
+	lua_pushboolean(L,1);
+	lua_pushinteger(L,ev_session_output_size(lev_session->session));
+	
+	return 2;
 }
 
 static int
@@ -970,6 +973,7 @@ _clean(lua_State* L) {
 		lev->freelist = lev->freelist->next;
 		luaL_unref(L, LUA_REGISTRYINDEX, timer->ref);
 	}
+	return 0;
 }
 
 static int
