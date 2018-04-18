@@ -2,7 +2,7 @@ local helper = require "helper"
 local event = require "event"
 local persistence = require "persistence"
 local util = require "util"
-require "lfs" 
+
 
 local tohex = util.hex_encode
 local fromhex = util.hex_decode
@@ -19,6 +19,12 @@ local LOG_PATH = "./tmp"
 local OP = {UPDATE = 1,SET = 2}
 local lru = {}
 
+
+function __init__(self)
+	--启动的时候先从日志文件里恢复
+	log_recover(true)
+	self.timer = event.timer(10,update)
+end
 
 function lru:new(name,max,unload)
 	local ctx = setmetatable({},{__index = self})
@@ -130,16 +136,15 @@ local function log_recover(validate)
 		if not name then
 			break
 		end
-		local id = FILE:read()
+		local id = tonumber(FILE:read())
 		local op = tonumber(FILE:read())
 		local md5_origin = FILE:read()
-		local size = FILE:read()
-		local content = FILE:read(tonumber(size))
+		local size = tonumber(FILE:read())
+		local content = FILE:read(size)
 		if validate then
-			local md5_content = tohex(MD5(content))
-			if md5_origin ~= md5_content then
-				print("log recover failed")
-				os.exit(1)
+			local md5_current = tohex(MD5(content))
+			if md5_origin ~= md5_current then
+				util.abort("log recover failed")
 			end
 		end
 
@@ -149,7 +154,7 @@ local function log_recover(validate)
 				info = {}
 				need_dump_disk[name] = info
 			end
-			info[tonumber(id)] = table.decode(content)
+			info[id] = table.decode(content)
 		else
 			local info = need_dump_disk[name]
 			if not info then
@@ -157,15 +162,15 @@ local function log_recover(validate)
 				need_dump_disk[name] = info
 			end
 
-			local data = info[tonumber(id)]
+			local data = info[id]
 			if data then
-				data = find_cached(name,tonumber(id))
+				data = find_cached(name,id)
 				if not data then
 					local fs = get_persistence(name)
-					data = fs:load(tonumber(id))
+					data = fs:load(id)
 				end
 				if data then
-					info[tonumber(id)] = data
+					info[id] = data
 				end
 			end
 			assert(data ~= nil,id)
@@ -188,13 +193,14 @@ local function log_recover(validate)
 end
 
 local function log_flush()
+	if _log_ctx.size == 0 then
+		return
+	end
+	
 	_log_ctx.FILE:close()
 	log_recover(false)
 	os.remove(string.format("%s/data.log",LOG_PATH))
 	local FILE = assert(io.open(string.format("%s/data.log",LOG_PATH),"a+"))
-	if not FILE then
-		os.exit(1)
-	end
 	_log_ctx = {}
 	_log_ctx.FILE = FILE
 	_log_ctx.size = 0
@@ -208,29 +214,36 @@ local function log_data(name,id,data,op)
 	end
 	info[id] = true
 
+	
 	if not _log_ctx then
-		local FILE = assert(io.open(string.format("%s/data.log",LOG_PATH),"a+"))
 		_log_ctx = {}
-		_log_ctx.FILE = FILE
+		_log_ctx.FILE = assert(io.open(string.format("%s/data.log",LOG_PATH),"a+"))
 		_log_ctx.size = 0
 	end
+
+	local FILE = _log_ctx.FILE
 	local content = table.tostring(data)
 	local content_size = #content
 	local md5 = MD5(content)
 	local hex = tohex(md5)
-	_log_ctx.FILE:write(name.."\n")
-	_log_ctx.FILE:write(id.."\n")
-	_log_ctx.FILE:write(op.."\n")
-	_log_ctx.FILE:write(hex.."\n")
-	_log_ctx.FILE:write(content_size.."\n")
-	_log_ctx.FILE:write(content)
-	_log_ctx.FILE:flush()
+	
+	FILE:write(name.."\n")
+	FILE:write(id.."\n")
+	FILE:write(op.."\n")
+	FILE:write(hex.."\n")
+	FILE:write(content_size.."\n")
+	FILE:write(content)
+	FILE:flush()
+
 	_log_ctx.size = _log_ctx.size + content_size
 	if _log_ctx.size >= LOG_MAX_TO_DIST then
 		log_flush()
 	end
 end
 
+function update()
+	log_flush()
+end
 
 function load(args)
 	local name = args.name
@@ -287,13 +300,4 @@ function stop()
 	os.remove(string.format("%s/data.log",LOG_PATH))
 end
 
---启动的时候先从日志文件里恢复
-log_recover(true)
 
-event.fork(function ()
-	event.timer(1,function ()
-		collectgarbage("collect")
-		local lua_mem = collectgarbage("count")
-		print(string.format("lua mem:%fkb,c mem:%fkb",lua_mem,helper.allocated()/1024))
-	end)
-end)
