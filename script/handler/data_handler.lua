@@ -14,17 +14,11 @@ _log_ctx = _log_ctx or nil
 _data_in_log = _data_in_log or {}
 
 local LOG_MAX_TO_DIST = 16 * 1024 * 1024
-local LOG_PATH = "./tmp"
+local LOG_PATH = "./data"
 
 local OP = {UPDATE = 1,SET = 2}
 local lru = {}
 
-
-function __init__(self)
-	--启动的时候先从日志文件里恢复
-	log_recover(true)
-	self.timer = event.timer(10,update)
-end
 
 function lru:new(name,max,unload)
 	local ctx = setmetatable({},{__index = self})
@@ -141,6 +135,8 @@ local function log_recover(validate)
 		local md5_origin = FILE:read()
 		local size = tonumber(FILE:read())
 		local content = FILE:read(size)
+		FILE:read()
+
 		if validate then
 			local md5_current = tohex(MD5(content))
 			if md5_origin ~= md5_current then
@@ -183,6 +179,8 @@ local function log_recover(validate)
 
 	FILE:close()
 
+	os.remove(string.format("%s/data.log",LOG_PATH))
+
 	for name,info in pairs(need_dump_disk) do
 		local fs = get_persistence(name)
 		for id,data in pairs(info) do
@@ -193,13 +191,11 @@ local function log_recover(validate)
 end
 
 local function log_flush()
-	if _log_ctx.size == 0 then
+	if not _log_ctx or  _log_ctx.size == 0 then
 		return
 	end
-	
 	_log_ctx.FILE:close()
 	log_recover(false)
-	os.remove(string.format("%s/data.log",LOG_PATH))
 	local FILE = assert(io.open(string.format("%s/data.log",LOG_PATH),"a+"))
 	_log_ctx = {}
 	_log_ctx.FILE = FILE
@@ -214,7 +210,6 @@ local function log_data(name,id,data,op)
 	end
 	info[id] = true
 
-	
 	if not _log_ctx then
 		_log_ctx = {}
 		_log_ctx.FILE = assert(io.open(string.format("%s/data.log",LOG_PATH),"a+"))
@@ -224,15 +219,18 @@ local function log_data(name,id,data,op)
 	local FILE = _log_ctx.FILE
 	local content = table.tostring(data)
 	local content_size = #content
-	local md5 = MD5(content)
-	local hex = tohex(md5)
+	local md5 = tohex(MD5(content))
 	
-	FILE:write(name.."\n")
-	FILE:write(id.."\n")
-	FILE:write(op.."\n")
-	FILE:write(hex.."\n")
-	FILE:write(content_size.."\n")
-	FILE:write(content)
+	local data = {}
+	table.insert(data,name)
+	table.insert(data,id)
+	table.insert(data,op)
+	table.insert(data,md5)
+	table.insert(data,content_size)
+	table.insert(data,content)
+
+	FILE:write(table.concat(data,"\n"))
+	FILE:write("\n")
 	FILE:flush()
 
 	_log_ctx.size = _log_ctx.size + content_size
@@ -241,7 +239,7 @@ local function log_data(name,id,data,op)
 	end
 end
 
-function update()
+function timeout()
 	log_flush()
 end
 
@@ -278,7 +276,7 @@ function load(args)
 	return result
 end
 
-function update(args)
+function update(_,args)
 	local name = args.name
 	local id = args.id
 	local data = args.data
@@ -286,7 +284,7 @@ function update(args)
 	log_data(name,id,data,OP.UPDATE)
 end
 
-function set(args)
+function set(_,args)
 	local name = args.name
 	local id = args.id
 	local setter = args.setter
@@ -301,3 +299,8 @@ function stop()
 end
 
 
+function __init__(self)
+	--启动的时候先从日志文件里恢复
+	log_recover(true)
+	self.timer = event.timer(10,timeout)
+end
