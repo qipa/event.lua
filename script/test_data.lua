@@ -11,6 +11,7 @@ event.fork(function ()
 
 
 	while true do
+		event.clean()
 		collectgarbage("collect")
 		helper.free()
 		local lua_mem = collectgarbage("count")

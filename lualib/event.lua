@@ -253,10 +253,6 @@ function _M.gen_session()
 	return session
 end
 
-function _M.co_clean()
-	_co_pool = {}
-end
-
 function _M.error(...)
 	print(...)
 end
@@ -300,6 +296,11 @@ function _M.dispatch()
 	
 	_event:release()
 	return code
+end
+
+function _M.clean()
+	_co_pool = {}
+	_event:clean()
 end
 
 function _M.breakout(reason)

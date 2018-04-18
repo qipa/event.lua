@@ -262,6 +262,15 @@ loop_ctx_now(ev_loop_ctx_t* loop_ctx) {
 	return ev_now(loop_ctx->loop);
 }
 
+void 
+loop_ctx_clean(ev_loop_ctx_t* loop_ctx) {
+	while(loop_ctx->freelist) {
+		data_buffer_t* tmp = loop_ctx->freelist;
+		loop_ctx->freelist = loop_ctx->freelist->next;
+		free(tmp);
+	}
+}
+
 ev_listener_t*
 ev_listener_bind(struct ev_loop_ctx* loop_ctx,struct sockaddr* addr, int addrlen,int backlog,int flag,listener_callback accept_cb,void* userdata) {
 	int fd = socket_listen(addr, addrlen, backlog, flag);

@@ -14,7 +14,7 @@ function mem()
 end
 
 function gc()
-	event.co_clean()
+	event.clean()
 	collectgarbage("collect")
 	helper.free()
 	local mem = collectgarbage("count")

@@ -962,6 +962,17 @@ _break(lua_State* L) {
 }
 
 static int
+_clean(lua_State* L) {
+	struct lua_ev* lev = (struct lua_ev*)lua_touserdata(L, 1);
+	loop_ctx_clean(lev->loop_ctx);
+	while(lev->freelist) {
+		struct lua_ev_timer* timer = lev->freelist;
+		lev->freelist = lev->freelist->next;
+		luaL_unref(L, LUA_REGISTRYINDEX, timer->ref);
+	}
+}
+
+static int
 _event_new(lua_State* L) {
 	luaL_checktype(L,1,LUA_TFUNCTION);
 	int callback = luaL_ref(L,LUA_REGISTRYINDEX);
@@ -992,6 +1003,7 @@ luaopen_ev_core(lua_State* L) {
 		{ "client_manager", _client_manager_new },
 		{ "breakout", _break },
 		{ "dispatch", _dispatch },
+		{ "clean", _clean },
 		{ "release", _release },
 		{ NULL, NULL },
 	};

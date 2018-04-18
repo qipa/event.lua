@@ -21,6 +21,7 @@ struct ev_loop* loop_ctx_get(struct ev_loop_ctx* loop_ctx);
 double loop_ctx_now(struct ev_loop_ctx* loop_ctx);
 void loop_ctx_dispatch(struct ev_loop_ctx* loop_ctx);
 void loop_ctx_break(struct ev_loop_ctx* loop_ctx);
+void loop_ctx_clean(struct ev_loop_ctx* loop_ctx);
 
 struct ev_listener* ev_listener_bind(struct ev_loop_ctx* loop_ctx,struct sockaddr* addr, int addrlen,int backlog,int flag,listener_callback accept_cb,void* userdata);
 int ev_listener_fd(struct ev_listener* listener);
