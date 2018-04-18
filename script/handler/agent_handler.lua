@@ -2,6 +2,7 @@ local util = require "util"
 local protocol = require "protocol"
 
 local agent_user = import "module.agent_user"
+local common = import "common.common"
 
 _user_token = _user_token or {}
 _enter_user = _enter_user or {}
@@ -24,8 +25,14 @@ function leave(cid)
 	if not uid then
 		return
 	end
+
 	local user = model.fetch_agent_user_with_uid(uid)
 	if not user then
+		return
+	end
+
+	if user.phase == common.AGENT_PHASE.LOAD then
+		user.phase = common.AGENT_PHASE.LEAVE
 		return
 	end
 
@@ -68,19 +75,36 @@ function req_enter(cid,args)
 		return
 	end
 
+	local info = _user_token[token]
+	_user_token[token] = nil
+
 	local now = util.time()
-	local time = _user_token[token]
-	if now - time >= 60 * 100 then
+	if now - info.time >= 60 * 100 then
 		local client_manager = model.get_client_manager()
 		client_manager:close(cid)
 		return
 	end
-	local info = util.authcode(token,time,0)
+
+	local info = util.authcode(token,info.time,0)
+	if info.uid ~= info.uid then
+		local client_manager = model.get_client_manager()
+		client_manager:close(cid)
+		return
+	end
 
 	local db_channel = model.get_mongodb()
 	local user = agent_user.cls_agent_user:new(cid,info.uid)
+	
+	user.phase = common.AGENT_PHASE.LOAD
 	user:load(db_channel)
+	
+	if user.phase == common.AGENT_PHASE.LEAVE then
+		user:release()
+		return
+	end
+	
 	user:enter_game()
+	user.phase = common.AGENT_PHASE.ENTER
 
 	_enter_user[cid] = info.uid
 end
@@ -88,7 +112,7 @@ end
 function user_register(_,args)
 	local token = args.token
 	local time = args.time
-	_user_token[token] = time
+	_user_token[token] = {time = args.time,uid = args.uid}
 end
 
 function user_kick(_,args)

@@ -136,7 +136,7 @@ function cls_login_user:enter_agent(uid)
 	local time = util.time()
 	local json = cjson.encode({account = self.account,uid = uid})
 	local token = util.authcode(json,tostring(time),1)
-	server_manager:send_agent(agent,"handler.agent_handler","user_register",{token = token,time = time})
+	server_manager:send_agent(agent,"handler.agent_handler","user_register",{token = token,time = time,uid = uid})
 
 	local client_manager = model.get_client_manager()
 	client_manager:close(self.cid,1)
