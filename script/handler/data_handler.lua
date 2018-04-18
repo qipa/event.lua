@@ -10,11 +10,11 @@ local MD5 = util.md5
 
 _persistence_ctx = _persistence_ctx or {}
 _cached_data = _cached_data or {}
-_log_ctx = _log_ctx or nil
 _data_in_log = _data_in_log or {}
 
 local LOG_MAX_TO_DIST = 16 * 1024 * 1024
 local LOG_PATH = "./data"
+local LOG_FILE = nil
 
 local OP = {UPDATE = 1,SET = 2}
 local lru = {}
@@ -123,6 +123,14 @@ local function log_recover(validate)
 		return
 	end
 
+	if FILE:seek("end") == 0 then
+		FILE:close()
+		os.remove(string.format("%s/data.log",LOG_PATH))
+		return
+	end
+
+	FILE:seek("set")
+
 	local need_dump_disk = {}
 
 	while true do
@@ -191,15 +199,14 @@ local function log_recover(validate)
 end
 
 local function log_flush()
-	if not _log_ctx or  _log_ctx.size == 0 then
+	if not LOG_FILE then
 		return
 	end
-	_log_ctx.FILE:close()
+	LOG_FILE:close()
+
 	log_recover(false)
-	local FILE = assert(io.open(string.format("%s/data.log",LOG_PATH),"a+"))
-	_log_ctx = {}
-	_log_ctx.FILE = FILE
-	_log_ctx.size = 0
+
+	LOG_FILE = assert(io.open(string.format("%s/data.log",LOG_PATH),"a+"))
 end
 
 local function log_data(name,id,data,op)
@@ -210,13 +217,10 @@ local function log_data(name,id,data,op)
 	end
 	info[id] = true
 
-	if not _log_ctx then
-		_log_ctx = {}
-		_log_ctx.FILE = assert(io.open(string.format("%s/data.log",LOG_PATH),"a+"))
-		_log_ctx.size = 0
+	if not LOG_FILE then
+		LOG_FILE = assert(io.open(string.format("%s/data.log",LOG_PATH),"a+"))
 	end
 
-	local FILE = _log_ctx.FILE
 	local content = table.tostring(data)
 	local content_size = #content
 	local md5 = tohex(MD5(content))
@@ -229,14 +233,9 @@ local function log_data(name,id,data,op)
 	table.insert(data,content_size)
 	table.insert(data,content)
 
-	FILE:write(table.concat(data,"\n"))
-	FILE:write("\n")
-	FILE:flush()
-
-	_log_ctx.size = _log_ctx.size + content_size
-	if _log_ctx.size >= LOG_MAX_TO_DIST then
-		log_flush()
-	end
+	LOG_FILE:write(table.concat(data,"\n"))
+	LOG_FILE:write("\n")
+	LOG_FILE:flush()
 end
 
 function timeout()
@@ -293,9 +292,8 @@ function set(_,args)
 end
 
 function stop()
-	_log_ctx.FILE:close()
+	LOG_FILE:close()
 	log_recover(false)
-	os.remove(string.format("%s/data.log",LOG_PATH))
 end
 
 
