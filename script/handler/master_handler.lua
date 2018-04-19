@@ -91,7 +91,7 @@ function enter_scene(channel,args)
 	if not user_info then
 		try_enter_scene(user_uid,user_agent,scene_id,scene_uid,scene_pos,fighter)
 	else
-		server_manager:send_scene(user_info.server,"handler.scene_handler","leave_scene",{scene_uid = scene_uid,user_uid = user_uid},function (user_uid)
+		server_manager:send_scene(user_info.server,"handler.scene_handler","leave_scene",{scene_uid = scene_uid,user_uid = user_uid,switch = true},function (user_uid)
 			_user_ctx[user_uid] = nil
 			try_enter_scene(user_uid,user_agent,scene_id,scene_uid,scene_pos,fighter)
 		end)
@@ -101,7 +101,7 @@ end
 function leave_scene(channel,args)
 	local user_uid = args.uid
 	local user_info = _user_ctx[user_uid]
-	server_manager:call_scene(user_info.scene_server_id,"handler.scene_handler","leave_scene",{scene_uid = user_info.scene_uid,user_uid = user_uid})
+	server_manager:call_scene(user_info.scene_server_id,"handler.scene_handler","leave_scene",{scene_uid = user_info.scene_uid,user_uid = user_uid,switch = false})
 	_user_ctx[user_uid] = nil
 	return true
 end

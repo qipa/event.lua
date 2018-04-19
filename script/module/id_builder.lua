@@ -3,12 +3,12 @@ require "lfs"
 
 local unique_offset = {
 	user = 1,
-	item = 2
+	item = 2,
+	scene = 3,
 }
 
 local tmp_offset = {
-	scene = 1,
-	monster = 2
+	monster = 1
 }
 
 local dist_offset = 1000

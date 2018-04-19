@@ -53,11 +53,11 @@ function leave(cid)
 			master_channel:call("handler.master_handler","leave_scene",{uid = user.uid})
 		end
 
-		user:save()
+		local db_channel = model.get_db_channel()
+		
+		user:save(db_channel)
 		user:release()
 
-		local db_channel = model.get_db_channel()
-		db_channel:set_db("agent_user")
 		local updater = {}
 		updater["$inc"] = {version = 1}
 		updater["$set"] = {time = os.time()}
