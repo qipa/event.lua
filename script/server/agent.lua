@@ -7,32 +7,23 @@ local route = require "route"
 local channel = require "channel"
 local startup = import "server.startup"
 local id_builder = import "module.id_builder"
+local agent_server = import "module.agent_server"
 
 
 model.register_binder("scene_channel","id")
-model.register_binder("client","id")
 model.register_value("client_manager")
 
 
 local function client_data(cid,message_id,data,size)
-	local user = model.fetch_agent_user_with_cid(cid)
-	if not user then
-		route.dispatch_client(message_id,data,size,cid)
-	else
-		route.dispatch_client(message_id,data,size,user)
-	end
+	agent_server:dispatch_client(message_id,data,size,cid)
 end
 
 local function client_accept(id,addr)
-	model.bind_client_with_id(id,{login = false,addr = addr})
-	local agent_handler = import "handler.agent_handler"
-	agent_handler.enter(id,addr)
+	agent_server:enter(id,addr)
 end
 
 local function client_close(id)
-	model.unbind_client_with_id(id)
-	local agent_handler = import "handler.agent_handler"
-	agent_handler.leave(id)
+	agent_server:leave(id)
 end
 
 
@@ -84,5 +75,6 @@ event.fork(function ()
 	end
 	model.set_client_manager(client_manager)
 
+	agent_server:start()
 	event.error("start success")
 end)

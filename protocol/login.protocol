@@ -37,3 +37,8 @@ protocol s2c_login_enter
 	string ip
 	int port
 }
+
+protocol c2s_agent_auth
+{
+	string token
+}

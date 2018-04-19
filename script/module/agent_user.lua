@@ -10,7 +10,7 @@ local module_item_mgr = import "module.item_manager"
 
 cls_agent_user = database_object.cls_database:inherit("agent_user","uid","cid")
 
-client_manager = model.get_client_manager()
+
 
 function __init__(self)
 	self.cls_agent_user:save_field("user_info")
@@ -38,6 +38,7 @@ function cls_agent_user:send_client(proto,args)
 end
 
 function cls_agent_user:forward_client(message_id,data)
+	local client_manager = model.get_client_manager()
 	client_manager:send(self.cid,message_id,data)
 end
 
