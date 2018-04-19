@@ -4,19 +4,19 @@ local model = require "model"
 local util = require "util"
 local protocol = require "protocol"
 
-local database_object = import "module.database_object"
+local fighter = import "module.fighter"
 local scene_server = import "module.scene_server"
 local server_manager = import "module.server_manager"
 
-cls_scene_user = database_object.cls_database:inherit("scene_user","uid")
+cls_scene_user = fighter.cls_fighter:inherit("scene_user","uid")
 
 function __init__(self)
 	self.cls_scene_user:save_field("fighter_info")
+	self.cls_scene_user:save_field("scene_info")
 end
 
-
-function cls_scene_user:create(uid,cid)
-	self.uid = uid
+function cls_scene_user:init(data)
+	fighter.cls_fighter.init(self,data)
 end
 
 function cls_scene_user:destroy()
