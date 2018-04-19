@@ -23,15 +23,15 @@ function leave_scene(_,args)
 
 	local scene = scene_server:get_scene(fighter.scene_info.scene_uid)
 	scene:leave(fighter)
-	if args.switch == false then
-		local db_channel = model.get_db_channel()
-		fighter:save(db_channel)
 
-		local updater = {}
-		updater["$inc"] = {version = 1}
-		updater["$set"] = {time = os.time()}
-		db_channel:findAndModify("save_version",{query = {uid = user.uid},update = updater})
-	end	
+	local db_channel = model.get_db_channel()
+	fighter:save(db_channel)
+
+	local updater = {}
+	updater["$inc"] = {version = 1}
+	updater["$set"] = {time = os.time()}
+	db_channel:findAndModify("save_version",{query = {uid = user.uid},update = updater})
+	
 	fighter:release()
 	return true
 end
