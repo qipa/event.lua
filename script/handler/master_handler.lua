@@ -20,10 +20,18 @@ function __init__(self)
 end
 
 function agent_down(self,server_id)
+	local set = {}
 	for uid,user_info in pairs(_user_ctx) do
 		if user_info.agent == server_id then
-			server_manager:send_scene(user_info.server,"handler.scene_handler","leave_scene",{scene_uid = user_info.scene_uid,user_uid = user_uid},function (user_uid)
-				_user_ctx[user_uid] = nil
+			table.insert(user_info.event_queue,{ev = EVENT.LEAVE})
+			table.insert(set,user_info)
+		end
+	end
+
+	for _,user_info in pairs(set) do
+		if user_info.phase == PHASE.INIT then
+			event.fork(function ()
+				run_next_event(user_info)
 			end)
 		end
 	end
