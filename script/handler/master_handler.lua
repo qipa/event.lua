@@ -6,10 +6,12 @@ _user_ctx = _user_ctx or {}
 
 local PAHSE = {
 	INIT = 1,
-	ENTER = 2,
-	LEAVING = 3,
-	LEAVE = 4,
-	EXIT = 5
+	EXECUTE = 2
+}
+
+local EVENT = {
+	ENTER = 1,
+	LEAVE = 2
 }
 
 function __init__(self)
@@ -67,6 +69,60 @@ function add_scene(scene_id,scene_uid,server)
 	scene_info[scene_uid] = {server = server,count = 0}
 end
 
+function execute_enter_scene(user_info,fighter,scene_id,scene_uid,scene_pos)
+	user_info.phase = PHASE.EXECUTE
+
+	if user_info.scene_uid then
+		server_manager:call_scene(user_info.scene_server,"handler.scene_handler","leave_scene",{scene_uid = user_info.scene_uid,
+																								user_uid = user_info.user_uid,
+																								switch = true})
+		user_info.scene_id = nil
+		user_info.scene_uid = nil
+		user_info.scene_server = nil
+	end
+
+	local scene_server = find_scene(scene_id,scene_uid)
+	if not scene_server then
+		scene_server = server_manager:find_min_scene_server()
+		scene_uid = server_manager:send_scene(scene_server,"handler.scene_handler","create_scene",{scene_id = scene_id})
+		add_scene(scene_id,scene_uid,scene_server)
+	end
+
+	server_manager:send_scene(scene_server_id,"handler.scene_channel","enter_scene",{scene_uid = scene_uid,pos = scene_pos,user_uid = user_uid,user_agent = user_agent,fighter = fighter})
+
+	user_info.scene_id = scene_id
+	user_info.scene_uid = scene_uid
+	user_info.scene_server = scene_server
+
+	user_info.phase = PHASE.INIT
+
+	run_next_event(user_info)
+end
+
+function execute_leave_scene(user_info)
+	user_info.phase = PHASE.EXECUTE
+	server_manager:call_scene(user_info.scene_server_id,"handler.scene_handler","leave_scene",{scene_uid = user_info.scene_uid,
+																							   user_uid = user_info.user_uid,
+																							   switch = false})
+
+
+	user_info.phase = PHASE.INIT
+
+	run_next_event(user_info)
+end
+
+function run_next_event(user_info)
+	local event = table.remove(user_info.event_queue,1)
+	if not event then
+		return
+	end
+	if event.ev == EVENT.ENTER then
+		execute_enter_scene(user_info,event.fighter,event.scene_id,event.scene_uid,event.scene_pos)
+	else
+		execute_leave_scene(user_info)
+	end
+end
+
 function enter_scene(channel,args)
 	local user_uid = args.uid
 	local user_agent = args.agent
@@ -77,65 +133,33 @@ function enter_scene(channel,args)
 
 	local user_info = _user_ctx[user_uid]
 	if not user_info then
-		user_info = {user_agent = user_agent,
+		user_info = {user_uid = user_uid,
+					 user_agent = user_agent,
 					 phase = PHASE.INIT,
-					 user_uid = user_uid}
+					 event_queue = {}}
 		_user_ctx[user_uid] = user_info
 	end
 
+	table.insert(user_info.event_queue,{ev = EVENT.ENTER
+										scene_id = scene_id,
+										scene_uid = scene_uid,
+										scene_pos = scene_pos,
+										fighter = fighter })
+
 	if user_info.phase == PHASE.INIT then
-		local scene_server = find_scene(scene_id,scene_uid)
-		if not scene_server then
-			scene_server = server_manager:find_min_scene_server()
-			scene_uid = server_manager:send_scene(scene_server,"handler.scene_handler","create_scene",{scene_id = scene_id})
-			add_scene(scene_id,scene_uid,scene_server)
-		end
-
-		if user_info.phase == PHASE.EXIT then
-			return
-		end
-
-		server_manager:send_scene(scene_server_id,"handler.scene_channel","enter_scene",{scene_uid = scene_uid,pos = scene_pos,user_uid = user_uid,user_agent = user_agent,fighter = fighter})
-
-		user_info.scene_id = scene_id
-		user_info.scene_uid = scene_uid
-		user_info.scene_server = scene_server
-		user_info.phase = PHASE.ENTER
-	else
-		if user_info.phase == PHASE.ENTER then
-			user_info.phase = PHASE.LEAVING
-			server_manager:call_scene(user_info.server,"handler.scene_handler","leave_scene",{scene_uid = scene_uid,user_uid = user_uid,switch = true})
-			if user_info.phase == PHASE.EXIT then
-				return
-			end
-			user_info.phase = PHASE.LEAVE
-			
-			server_manager:send_scene(scene_server_id,"handler.scene_channel","enter_scene",{scene_uid = scene_uid,pos = scene_pos,user_uid = user_uid,user_agent = user_agent,fighter = fighter})
-
-			user_info.scene_id = scene_id
-			user_info.scene_uid = scene_uid
-			user_info.scene_server = scene_server
-			user_info.phase = PHASE.ENTER
-		end
+		run_next_event(user_info)
 	end
 end
 
 function leave_scene(channel,args)
-	local user_uid = args.uid
-	local user_info = _user_ctx[user_uid]
+	local user_info = _user_ctx[args.uid]
 	if not user_info then
 		return true
 	end
-	_user_ctx[user_uid] = nil
-	if user_info.phase == PHASE.ENTER then
-		user_info.phase = PHASE.EXIT
-		server_manager:call_scene(user_info.scene_server_id,"handler.scene_handler","leave_scene",{scene_uid = user_info.scene_uid,user_uid = user_uid,switch = false})
-	else user_info.phase == PHASE.EXIT then
-		return
-	else
-		user_info.phase = PHASE.EXIT
+	table.insert(user_info.event_queue,{ev = EVENT.LEAVE})
+	if user_info.phase == PHASE.INIT then
+		run_next_event(user_info)
 	end
-	
 	return true
 end
 
