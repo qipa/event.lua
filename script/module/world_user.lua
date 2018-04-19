@@ -12,10 +12,9 @@ function __init__(self)
 end
 
 
-function cls_world_user:create(uid,cid,agent_server_id)
+function cls_world_user:create(uid,user_agent)
 	self.uid = uid
-	self.cid = cid
-	self.agent_server_id = agent_server_id
+	self.user_agent = user_agent
 	model.bind_world_user_with_uid(self.uid)
 end
 

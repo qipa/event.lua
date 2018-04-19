@@ -45,7 +45,7 @@ function leave(cid)
 
 		local world_channel = model.get_world_channel()
 		if world_channel then
-			world_channel:send("handler.world_handler","leave_world",{uid = user.uid})
+			world_channel:send("handler.world_handler","leave_world",{user_uid = user.uid})
 		end
 
 		local master_channel = model.get_master_channel()
@@ -107,7 +107,7 @@ function req_enter(cid,args)
 	user:enter_game()
 
 	local world = model.get_world_channel()
-	world:send("handler.world_handler","enter_world",{uid = self.uid})
+	world:send("handler.world_handler","enter_world",{user_uid = self.uid,user_agent = env.dist_id})
 
 	local fighter = scene_user.cls_scene_user:new(cid,info.uid)
 	fighter:load(db_channel)
