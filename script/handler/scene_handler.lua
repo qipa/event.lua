@@ -10,6 +10,8 @@ end
 function enter_scene(_,args)
 	local fighter = scene_user.cls_scene_user:unpack(args.fighter)
 	model.bind_fighter_with_uid(args.uid,fighter)
+	fighter.user_uid = args.user_uid
+	fighter.user_agent = args.user_agent
 
 	local scene = scene_server:get_scene(args.scene_uid)
 	scene:enter(fighter,args.pos)

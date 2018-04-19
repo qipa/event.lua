@@ -2,12 +2,15 @@ local event = require "event"
 local cjson = require "cjson"
 local model = require "model"
 local util = require "util"
+local protocol = require "protocol"
 
 local database_object = import "module.database_object"
 local module_item_mgr = import "module.item_manager"
 
 
 cls_agent_user = database_object.cls_database:inherit("agent_user","uid","cid")
+
+client_manager = model.get_client_manager()
 
 function __init__(self)
 	self.cls_agent_user:save_field("user_info")
@@ -29,8 +32,16 @@ function cls_agent_user:db_index()
 	return {uid = self.uid}
 end
 
-function cls_agent_user:enter_game()
+function cls_agent_user:send_client(proto,args)
+	local message_id,data = protocol.encode[proto](args)
+	self:forward_client(message_id,data)
+end
 
+function cls_agent_user:forward_client(message_id,data)
+	client_manager:send(self.cid,message_id,data)
+end
+
+function cls_agent_user:enter_game()
 	local item_mgr = self.item_mgr
 	if not item_mgr then
 		item_mgr = module_item_mgr.cls_item_mgr:new(self.uid)

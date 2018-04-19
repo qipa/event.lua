@@ -139,3 +139,10 @@ function user_kick(_,args)
 	leave(user.cid)
 end
 
+function forward_client(_,args)
+	local user = model.fetch_agent_user_with_uid(args.uid)
+	if not user then
+		return
+	end
+	user:forward_client(args.message_id,args.data)
+end

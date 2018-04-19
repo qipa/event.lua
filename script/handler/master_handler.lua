@@ -62,7 +62,7 @@ end
 local function do_enter_scene(user_uid,user_agent,scene_server_id,scene_uid,scene_pos,fighter)
 	local user_enter_info = {scene_id = scene_id,scene_uid = scene_uid,server = scene_server_id,agent = user_agent}
 	_user_ctx[user_uid] = user_enter_info
-	server_manager:send_scene(scene_server_id,"handler.scene_channel","enter_scene",{scene_uid = scene_uid,pos = scene_pos,user_uid = user_uid,fighter = fighter})
+	server_manager:send_scene(scene_server_id,"handler.scene_channel","enter_scene",{scene_uid = scene_uid,pos = scene_pos,user_uid = user_uid,user_agent = user_agent,fighter = fighter})
 end
 
 local function try_enter_scene(user_uid,user_agent,scene_id,scene_uid,scene_pos,fighter)

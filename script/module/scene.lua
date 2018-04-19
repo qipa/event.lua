@@ -17,11 +17,29 @@ end
 function cls_scene:enter(fighter,pos)
 	fighter:do_enter(self.scene_id,self.scene_uid)
 	self.fighter_ctx[fighter.uid] = fighter
+	self.aoi:enter(fighter.uid,fighter.scene_info.pos.x,fighter.scene_info.pos.z,0)
 end
 
 function cls_scene:leave(fighter)
 	fighter:do_leave()
+	self.aoi:leave(fighter.uid)
 	self.fighter_ctx[fighter.uid] = nil
+end
+
+function cls_scene:find_path(from_x,from_z,to_x,to_z)
+	return self.nav:find(from_x,from_z,to_x,to_z)
+end
+
+function cls_scene:raycast(from_x,from_z,to_x,to_z)
+	return self.nav:raycast(from_x,from_z,to_x,to_z)
+end
+
+function cls_scene:pos_movable(x,z)
+	return self.nav:movable(x,z)
+end
+
+function cls_scene:pos_around_movable(x,z,depth)
+	return self.nav:around_movable(x,z,depth)
 end
 
 function cls_scene:update(now)

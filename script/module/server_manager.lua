@@ -72,6 +72,14 @@ function find_agent(self,id)
 	return _agent_server_manager[id]
 end
 
+function get_agent_channel(self,id)
+	local agent_info = _agent_server_manager[id]
+	if not agent_info then
+		return
+	end
+	return agent_info.channel
+end
+
 function find_min_agent(self)
 	local min
 	local best
