@@ -70,8 +70,6 @@ function add_scene(scene_id,scene_uid,server)
 end
 
 function execute_enter_scene(user_info,fighter,scene_id,scene_uid,scene_pos)
-	user_info.phase = PHASE.EXECUTE
-
 	if user_info.scene_uid then
 		server_manager:call_scene(user_info.scene_server,"handler.scene_handler","leave_scene",{scene_uid = user_info.scene_uid,
 																								user_uid = user_info.user_uid,
@@ -93,33 +91,33 @@ function execute_enter_scene(user_info,fighter,scene_id,scene_uid,scene_pos)
 	user_info.scene_id = scene_id
 	user_info.scene_uid = scene_uid
 	user_info.scene_server = scene_server
-
-	user_info.phase = PHASE.INIT
-
-	run_next_event(user_info)
 end
 
 function execute_leave_scene(user_info)
-	user_info.phase = PHASE.EXECUTE
 	server_manager:call_scene(user_info.scene_server_id,"handler.scene_handler","leave_scene",{scene_uid = user_info.scene_uid,
 																							   user_uid = user_info.user_uid,
 																							   switch = false})
-
-
-	user_info.phase = PHASE.INIT
-
-	run_next_event(user_info)
 end
 
 function run_next_event(user_info)
-	local event = table.remove(user_info.event_queue,1)
-	if not event then
-		return
-	end
-	if event.ev == EVENT.ENTER then
-		execute_enter_scene(user_info,event.fighter,event.scene_id,event.scene_uid,event.scene_pos)
-	else
-		execute_leave_scene(user_info)
+	while true do
+		local event = table.remove(user_info.event_queue,1)
+		if not event then
+			return
+		end
+
+		if event.ev == EVENT.ENTER then
+			user_info.phase = PHASE.EXECUTE
+			execute_enter_scene(user_info,event.fighter,event.scene_id,event.scene_uid,event.scene_pos)
+			user_info.phase = PHASE.INIT
+		else
+			user_info.phase = PHASE.EXECUTE
+			execute_leave_scene(user_info)
+			user_info.phase = PHASE.INIT
+			if #user_info.event_queue == 0 then
+				_user_ctx[user_info.user_uid] = nil
+			end
+		end
 	end
 end
 
