@@ -35,8 +35,17 @@ function enter(self,user_uid,user_agent)
 	end
 
 	local db_channel = model.get_db_channel()
-	local user = world_user.cls_world_user:new(auser_uid,user_agent)
+	
+	local user = world_user.cls_world_user:new(user_uid,user_agent)
+	user.loading = true
 	user:load(db_channel)
+	user.loading = false
+
+	local user = model.fetch_world_user_with_uid(user_uid)
+	if not user then
+		return
+	end
+
 	user:enter()
 end
 
@@ -45,7 +54,14 @@ function leave(self,user_uid)
 	if not user then
 		return false
 	end
+	
+	if user.loading then
+		user:release()
+		return
+	end
+
 	user:leave()
+	
 	local db_channel = model.get_db_channel()
 	user:save(db_channel)
 	user:release()

@@ -15,6 +15,7 @@ end
 function cls_world_user:create(uid,user_agent)
 	self.uid = uid
 	self.user_agent = user_agent
+	self.loading = false
 	model.bind_world_user_with_uid(self.uid)
 end
 
