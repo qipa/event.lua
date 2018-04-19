@@ -20,6 +20,8 @@ local logger_container = {}
 
 local tmp_FILE
 
+local source_name
+
 local _M = {}
 
 function _M:create(log_type,depth)
@@ -49,11 +51,17 @@ end
 local function append_log(logger,log_lv,...)
 	local log = table.concat({...},"\t")
 	local content
+
+	if not source_name then
+		local list = env.name:split("/")
+		source_name = list[#list]
+	end
+
 	if log_lv == LOG_LV_ERROR then
 		local source,line = get_debug_info(logger)
-		content = string.format("[%s:%s][%s %s:%s] %s",LOG_TAG[log_lv],logger.log_type,os.date("%Y-%m-%d %H:%M:%S",os.time()),source,tostring(line),log)
+		content = string.format("[%s:%s][%s %s %s:%s] %s",LOG_TAG[log_lv],logger.log_type,os.date("%Y-%m-%d %H:%M:%S",os.time()),source_name,source,tostring(line),log)
 	else
-		content = string.format("[%s:%s][%s] %s",LOG_TAG[log_lv],logger.log_type,os.date("%Y-%m-%d %H:%M:%S",os.time()),log)
+		content = string.format("[%s:%s][%s %s] %s",LOG_TAG[log_lv],logger.log_type,os.date("%Y-%m-%d %H:%M:%S",os.time()),source_name,log)
 	end
 
 	if not model.get_logger_channel or not model.get_logger_channel() then

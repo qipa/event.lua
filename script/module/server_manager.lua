@@ -37,6 +37,14 @@ function howmany_agent()
 	return result
 end
 
+function howmany_scene()
+	local result = {}
+	for id,info in pairs(_scene_server_manager) do
+		table.insert(result,id)
+	end
+	return result
+end
+
 function register_agent_server(channel,args)
 	local agent = {channel = channel,count = 0,ip = args.ip,port = args.port,id = args.id}
 	assert(_agent_server_manager[args.id] == nil,args.id)

@@ -32,7 +32,7 @@ local function update()
 		local average = info.total / info.count
 		table.insert(logs,string.format("%s:%s output flow:average:%f,min:%d,max:%d,count:%d",env.name,name,average,info.min,info.max,info.count))
 	end
-	-- logger:WARN(table.concat(logs,"\n"))
+	logger:WARN(table.concat(logs,"\n"))
 end
 
 function _M.report_diff(file,method,diff)

@@ -33,6 +33,8 @@ _G.import = import.import
 _G.debugger = debugger
 _G.debugger_ctx = {}
 
+import.import "module.object"
+
 _G.env = {}
 local FILE = assert(io.open("./.env","r"))
 assert(load(FILE:read("*a"),"env","text",_G.env))()

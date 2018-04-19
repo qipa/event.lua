@@ -1,9 +1,12 @@
 local event = require "event"
 local util = require "util"
 
-local _M = {}
+_log_ctx = _log_ctx or {}
+_log_FILE = _log_FILE or nil
 
-local _log_ctx = {}
+function __init__(self)
+
+end
 
 function log(_,args)
 	local log_lv = args[1]
@@ -11,13 +14,17 @@ function log(_,args)
 	local log = args[3]
 	local FILE = _log_ctx[log_type]
 	if not FILE then
-		local file = string.format("./log/%s.log",log_type)
-		FILE = assert(io.open(file,"a+"))
-		_log_ctx[log_type] = FILE
+		if env.log_path then
+			local file = string.format("%s/%s.log",env.log_path,log_type)
+			FILE = assert(io.open(file,"a+"))
+			_log_ctx[log_type] = FILE
+		end
 	end
-	FILE:write(log.."\r\n")
-	FILE:flush()
-	if log_type ~= "monitor" then
+
+	if FILE then
+		FILE:write(log.."\r\n")
+		FILE:flush()
+	else
 		util.print(log_lv,log)
 	end
 end

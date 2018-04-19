@@ -37,6 +37,8 @@ function run(db_addr)
 		end
 		db_channel:init("sunset")
 		model.set_db_channel(db_channel)
+
+		event.error(string.format("connect mongodb:%s success",db_addr))
 	end
 
 	protocol.parse("login")
@@ -67,7 +69,7 @@ function connect_server(name)
 	while not channel do
 		channel,reason = event.connect(env[name],4,false,rpc_channel)
 		if not channel then
-			event.error(string.format("%s connect server:%s %s failed:%s",env.name,name,env[name],reason))
+			event.error(string.format("connect server:%s %s failed:%s",name,env[name],reason))
 			count = count + 1
 			if count >= 10 then
 				os.exit(1)
@@ -87,7 +89,7 @@ function connect_server(name)
 			while not channel do
 				channel,reason = event.connect(env[name],4,false,rpc_channel)
 				if not channel then
-					event.error(string.format("%s connect server:%s %s failed:%s",env.name,name,env[name],reason))
+					event.error(string.format("connect server:%s %s failed:%s",name,env[name],reason))
 					event.sleep(1)
 				end
 			end

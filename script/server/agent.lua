@@ -43,15 +43,6 @@ event.fork(function ()
 	startup.connect_server("world")
 	startup.connect_server("master")
 
-	local client_manager = event.client_manager(1024)
-	client_manager:set_callback(client_accept,client_close,client_data)
-	local port,reason = client_manager:start("0.0.0.0",0)
-	if not port then
-		event.breakout(string.format("%s %s",env.name,reason))
-		os.exit(1)
-	end
-	model.set_client_manager(client_manager)
-
 	env.dist_id = startup.apply_id()
 	id_builder:init(env.dist_id)
 
@@ -66,5 +57,32 @@ event.fork(function ()
 
 	import "handler.agent_handler"
 	
-	event.error("agent start success")
+	local scene_set
+	while true do
+		local result,reason  = http.post_master("/howmany_scene")
+		if not result then
+			event.error(string.format("howmany_scene error:%s",reason))
+			event.breakout(reason)
+			return
+		end
+		if #result == 0 then
+			event.sleep(1)
+		else
+			scene_set = result
+			break
+		end
+	end
+
+	event.error(string.format("scene already:%s",table.concat(scene_set,",")))
+
+	local client_manager = event.client_manager(1024)
+	client_manager:set_callback(client_accept,client_close,client_data)
+	local port,reason = client_manager:start("0.0.0.0",0)
+	if not port then
+		event.breakout(string.format("%s %s",env.name,reason))
+		os.exit(1)
+	end
+	model.set_client_manager(client_manager)
+
+	event.error("start success")
 end)

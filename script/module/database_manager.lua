@@ -20,7 +20,7 @@ end
 
 function update()
 	local db_channel = model.get_db_channel()
-	db_channel:db("common")
+	db_channel:set_db("common")
 
 	for data,info in pairs(_dirty_data) do
 		local updater = {}
