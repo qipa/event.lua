@@ -16,21 +16,21 @@ local function update()
 	local logs = {}
 
 	local lua_mem = collectgarbage("count")
-	table.insert(logs,string.format("%s:lua mem:%fkb,c mem:%fkb",env.name,lua_mem,helper.allocated()/1024))
+	table.insert(logs,string.format("lua mem:%fkb,c mem:%fkb",lua_mem,helper.allocated()/1024))
 
 	for name,info in pairs(diff_monitor) do
 		local average = info.total / info.count
-		table.insert(logs,string.format("%s:%s time diff:average:%f,min:%f,max:%f,count:%d",env.name,name,average,info.min,info.max,info.count))
+		table.insert(logs,string.format("%s time diff:average:%f,min:%f,max:%f,count:%d",name,average,info.min,info.max,info.count))
 	end
 
 	for name,info in pairs(input_monitor) do
 		local average = info.total / info.count
-		table.insert(logs,string.format("%s:%s input flow:average:%f,min:%d,max:%d,count:%d",env.name,name,average,info.min,info.max,info.count))
+		table.insert(logs,string.format("%s input flow:average:%f,min:%d,max:%d,count:%d",name,average,info.min,info.max,info.count))
 	end
 
 	for name,info in pairs(output_monitor) do
 		local average = info.total / info.count
-		table.insert(logs,string.format("%s:%s output flow:average:%f,min:%d,max:%d,count:%d",env.name,name,average,info.min,info.max,info.count))
+		table.insert(logs,string.format("%s output flow:average:%f,min:%d,max:%d,count:%d",name,average,info.min,info.max,info.count))
 	end
 	logger:WARN(table.concat(logs,"\n"))
 end
