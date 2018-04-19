@@ -62,6 +62,39 @@ event.fork(function ()
 		return
 	end
 
+	local agent_set
+	while true do
+		local result,reason  = http.post_master("/howmany_agent")
+		if not result then
+			event.error(string.format("howmany_agent error:%s",reason))
+			event.breakout(reason)
+			return
+		end
+		if #result == 0 then
+			event.sleep(1)
+		else
+			agent_set = result
+			break
+		end
+	end
+
+	local agent_ready = true
+	while true do
+		for _,agent_id in pairs(agent_set) do
+			if not server_manager:find_agent(agent_id) then
+				agent_ready = false
+				break
+			end
+		end
+		if agent_ready then
+			break
+		else
+			event.sleep(1)
+		end
+	end
+
+	event.error(string.format("login:all agent ready:%s",table.concat(agent_set,"\t")))
+	
 	local client_manager = event.client_manager(5000)
 	client_manager:set_callback(client_accept,client_close,client_data)
 	local ok,reason = client_manager:start(table.unpack(env.login_addr))

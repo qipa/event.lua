@@ -5,7 +5,6 @@ local util = require "util"
 _agent_server_manager = _agent_server_manager or {}
 
 _scene_server_manager = _scene_server_manager or {}
-_scene_server_counter = _scene_server_counter or 1
 
 _server_counter = 1
 
@@ -26,6 +25,14 @@ function apply_id(channel)
 	_server_counter = _server_counter + 1
 	fs:save("dist_id",{id = _server_counter})
 	return {id = id}
+end
+
+function howmany_agent()
+	local result = {}
+	for id,info in pairs(_agent_server_manager) do
+		table.insert(result,id)
+	end
+	return result
 end
 
 function register_agent_server(channel,args)
@@ -50,6 +57,10 @@ end
 function agent_count_sub(self,agent_server_id)
 	local agent = _agent_server_manager[agent_server_id]
 	agent.count = agent.count - 1
+end
+
+function find_agent(self,id)
+	return _agent_server_manager[id]
 end
 
 function find_min_agent(self)
