@@ -15,15 +15,24 @@ model.register_value("client_manager")
 
 
 local function client_data(cid,message_id,data,size)
-	agent_server:dispatch_client(message_id,data,size,cid)
+	local ok,err = xpcall(agent_server.dispatch_client,debug.traceback,agent_server,cid,message_id,data,size)
+	if not ok then
+		event.error(err)
+	end
 end
 
 local function client_accept(id,addr)
-	agent_server:enter(id,addr)
+	local ok,err = xpcall(agent_server.enter,debug.traceback,agent_server,cid,addr)
+	if not ok then
+		event.error(err)
+	end
 end
 
-local function client_close(id)
-	agent_server:leave(id)
+local function client_close(cid)
+	local ok,err = xpcall(agent_server.leave,debug.traceback,agent_server,cid)
+	if not ok then
+		event.error(err)
+	end
 end
 
 
@@ -75,6 +84,6 @@ event.fork(function ()
 	end
 	model.set_client_manager(client_manager)
 
-	agent_server:start()
+	agent_server:start(client_manager)
 	event.error("start success")
 end)

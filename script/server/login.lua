@@ -9,7 +9,7 @@ local http = require "http"
 local startup = import "server.startup"
 local id_builder = import "module.id_builder"
 local server_manager = import "module.server_manager"
-
+local login_server = import "module.login_server"
 model.register_value("client_manager")
 model.register_binder("agent_channel","id")
 
@@ -29,22 +29,21 @@ local function channel_accept(_,channel)
 end
 
 local function client_data(cid,message_id,data,size)
-	event.fork(function ()
-		route.dispatch_client(message_id,data,size,cid)
-	end)
+	local ok,err = xpcall(login_server.dispatch_client,debug.traceback,login_server,cid,message_id,data,size)
+	if not ok then
+		event.error(err)
+	end
 end
 
 local function client_accept(cid,addr)
-	local login_handler = import "handler.login_handler"
-	local ok,err = xpcall(login_handler.enter,debug.traceback,cid,addr)
+	local ok,err = xpcall(login_server.enter,debug.traceback,login_server,cid,addr)
 	if not ok then
 		event.error(err)
 	end
 end
 
 local function client_close(cid)
-	local login_handler = import "handler.login_handler"
-	local ok,err = xpcall(login_handler.leave,debug.traceback,cid)
+	local ok,err = xpcall(login_server.leave,debug.traceback,login_server,cid)
 	if not ok then
 		event.error(err)
 	end

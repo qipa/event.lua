@@ -8,12 +8,13 @@ local common = import "common.common"
 _user_token = _user_token or {}
 _enter_user = _enter_user or {}
 
-local client_manager = model.get_client_manager()
+local client_manager
 
 function __init__(self)
 end
 
-function start(self)
+function start(self,client_mgr)
+	client_manager = client_mgr
 	self.db_timer = event.timer(30,function ()
 		local db_channel = model.get_db_channel()
 		local all = model.fetch_agent_user()
@@ -31,7 +32,7 @@ function stop(self)
 	end
 end
 
-function dispatch_client(self,message_id,data,size,cid)
+function dispatch_client(self,cid,message_id,data,size)
 	local user = model.fetch_agent_user_with_cid(cid)
 	if not user then
 		route.dispatch_client(message_id,data,size,cid)
