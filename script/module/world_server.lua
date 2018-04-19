@@ -25,6 +25,11 @@ end
 
 function stop(self)
 	database_common:flush()
+	local db_channel = model.get_db_channel()
+	local all = model.fetch_world_user()
+	for _,user in pairs(all) do
+		user:save(db_channel)
+	end
 end
 
 function enter(self,user_uid,user_agent)

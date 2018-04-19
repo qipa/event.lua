@@ -21,6 +21,13 @@ function __init__(self)
 	end)
 end
 
+function stop()
+	local db_channel = model.get_db_channel()
+	local all = model.fetch_fighter()
+	for _,fighter in pairs(all) do
+		fighter:save(db_channel)
+	end
+end
 
 function create_scene(self,scene_id)
 	local scene_uid = id_builder:alloc_scene_uid()
