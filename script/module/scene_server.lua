@@ -10,6 +10,7 @@ function __init__(self)
 	self.timer = event.timer(0.1,function ()
 		self:update()
 	end)
+	
 	self.db_timer = event.timer(30,function ()
 		local db_channel = model.get_db_channel()
 		local all = model.fetch_fighter()
