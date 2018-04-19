@@ -2,6 +2,7 @@ local event = require "event"
 local model = require "model"
 
 local scene = import "module.scene"
+local scene_user = import "module.scene_user"
 local id_builder = import "module.id_builder"
 
 _scene_ctx = _scene_ctx or {}

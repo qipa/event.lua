@@ -114,7 +114,7 @@ function req_enter(cid,args)
 	local scene_master = model.get_master_channel()
 	scene_master:send("handler.master_handler","enter_scene",{uid = user.uid,
 															  scene_id = fighter.scene_info.scene_id,
-															  scene_uid = fighter.scene_info.scene_uid
+															  scene_uid = fighter.scene_info.scene_uid,
 															  scene_pos = fighter.scene_info.scene_pos,
 															  agent = env.dist_id,
 															  fighter = fighter:pack()})

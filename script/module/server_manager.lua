@@ -51,7 +51,7 @@ function agent_server_down(self,agent_server_id)
 	_agent_server_manager[agent_server_id] = nil
 
 	local agent_listener = _listener["agent"]
-	if agent_listener do
+	if agent_listener then
 		for _,info in pairs(agent_listener) do
 			info.module[info.method](info.module,agent_server_id)
 		end
@@ -117,7 +117,7 @@ function scene_server_down(self,scene_server_id)
 	_scene_server_manager[scene_server_id] = nil
 
 	local scene_listener = _listener["scene"]
-	if scene_listener do
+	if scene_listener then
 		for _,info in pairs(scene_listener) do
 			info.module[info.method](info.module,scene_server_id)
 		end

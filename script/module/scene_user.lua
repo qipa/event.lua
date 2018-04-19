@@ -5,7 +5,6 @@ local util = require "util"
 local protocol = require "protocol"
 
 local fighter = import "module.fighter"
-local scene_server = import "module.scene_server"
 local server_manager = import "module.server_manager"
 
 cls_scene_user = fighter.cls_fighter:inherit("scene_user","uid")
@@ -43,17 +42,12 @@ function cls_scene_user:send_world(file,method,args,callback)
 end
 
 function cls_scene_user:do_enter(scene_uid)
-	local scene = scene_server:get_scene(scene_uid)
-	scene:enter(self)
-	self.scene_info.scene_uid = scene_uid
+	fighter.cls_fighter.do_enter(self,scene_uid)
 	self:dirty_field("scene_info")
 end
 
 function cls_scene_user:do_leave()
-	local scene_uid = self.scene_info.scene_uid
-	local scene = scene_server:get_scene(scene_uid)
-	scene:leave(self)
-	self.scene_info.scene_uid = 0
+	fighter.cls_fighter.do_leave(self)
 	self:dirty_field("scene_info")
 end
 
