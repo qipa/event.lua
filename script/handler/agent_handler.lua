@@ -45,12 +45,12 @@ function leave(cid)
 
 		local world_channel = model.get_world_channel()
 		if world_channel then
-			world_channel:call("handler.world_handler","leave_world",{uid = user.uid})
+			world_channel:send("handler.world_handler","leave_world",{uid = user.uid})
 		end
 
 		local master_channel = model.get_master_channel()
 		if master_channel then
-			master_channel:call("handler.master_handler","leave_scene",{uid = user.uid})
+			master_channel:send("handler.master_handler","leave_scene",{uid = user.uid})
 		end
 
 		local db_channel = model.get_db_channel()

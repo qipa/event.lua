@@ -4,6 +4,13 @@ local server_manager = import "module.server_manager"
 _scene_ctx = _scene_ctx or {}
 _user_ctx = _user_ctx or {}
 
+local PAHSE = {
+	CROSS = 1,
+	ENTER = 2,
+	LEAVING = 3,
+	LEAVE = 4
+}
+
 function __init__(self)
 	server_manager:listen("agent",self,"agent_down")
 	server_manager:listen("scene",self,"scene_down")
@@ -60,7 +67,11 @@ function add_scene(scene_id,scene_uid,server)
 end
 
 local function do_enter_scene(user_uid,user_agent,scene_server_id,scene_uid,scene_pos,fighter)
-	local user_enter_info = {scene_id = scene_id,scene_uid = scene_uid,server = scene_server_id,agent = user_agent}
+	local user_enter_info = {scene_id = scene_id,
+							 scene_uid = scene_uid,
+							 server = scene_server_id,
+							 agent = user_agent,
+							 phase = PHASE.ENTER}
 	_user_ctx[user_uid] = user_enter_info
 	server_manager:send_scene(scene_server_id,"handler.scene_channel","enter_scene",{scene_uid = scene_uid,pos = scene_pos,user_uid = user_uid,user_agent = user_agent,fighter = fighter})
 end
@@ -91,17 +102,24 @@ function enter_scene(channel,args)
 	if not user_info then
 		try_enter_scene(user_uid,user_agent,scene_id,scene_uid,scene_pos,fighter)
 	else
-		server_manager:send_scene(user_info.server,"handler.scene_handler","leave_scene",{scene_uid = scene_uid,user_uid = user_uid,switch = true},function (user_uid)
+		if user_info.phase == PHASE.ENTER then
+			user_info.phase = PHASE.LEAVING
+			server_manager:call_scene(user_info.server,"handler.scene_handler","leave_scene",{scene_uid = scene_uid,user_uid = user_uid,switch = true})
+			user_info.phase = PHASE.LEAVE
 			_user_ctx[user_uid] = nil
 			try_enter_scene(user_uid,user_agent,scene_id,scene_uid,scene_pos,fighter)
-		end)
+		else
+			assert(user_info.phase == PHASE.LEAVING)
+		end
 	end
 end
 
 function leave_scene(channel,args)
 	local user_uid = args.uid
 	local user_info = _user_ctx[user_uid]
+	user_info.phase = PHASE.LEAVING
 	server_manager:call_scene(user_info.scene_server_id,"handler.scene_handler","leave_scene",{scene_uid = user_info.scene_uid,user_uid = user_uid,switch = false})
+	user_info.phase = PHASE.LEAVE
 	_user_ctx[user_uid] = nil
 	return true
 end
