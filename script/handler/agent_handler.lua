@@ -2,6 +2,7 @@ local util = require "util"
 local protocol = require "protocol"
 
 local agent_user = import "module.agent_user"
+local scene_user = import "module.scene_user"
 local common = import "common.common"
 
 _user_token = _user_token or {}
@@ -104,6 +105,22 @@ function req_enter(cid,args)
 	end
 	
 	user:enter_game()
+
+	local world = model.get_world_channel()
+	world:send("handler.world_handler","enter_world",{uid = self.uid})
+
+	local fighter = scene_user.cls_scene_user:new(cid,info.uid)
+	fighter:load(db_channel)
+	local scene_master = model.get_master_channel()
+	scene_master:send("handler.master_handler","enter_scene",{uid = user.uid,
+															  scene_id = fighter.scene_info.scene_id,
+															  scene_uid = fighter.scene_info.scene_uid
+															  scene_pos = fighter.scene_info.scene_pos,
+															  agent = env.dist_id,
+															  fighter = fighter:pack()})
+	fighter:release()
+
+
 	user.phase = common.AGENT_PHASE.ENTER
 
 	_enter_user[cid] = info.uid

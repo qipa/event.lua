@@ -52,4 +52,6 @@ event.fork(function ()
 
 	local world_channel = model.get_world_channel()
 	world_channel:send("module.server_manager","register_scene_server",{id = env.dist_id,addr = addr_info})
+
+	import "handler.scene_handler"
 end)

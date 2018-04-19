@@ -59,24 +59,24 @@ function add_scene(scene_id,scene_uid,server)
 	scene_info[scene_uid] = {server = server,count = 0}
 end
 
-local function do_enter_scene(user_uid,user_agent,scene_server_id,scene_uid,scene_pos)
+local function do_enter_scene(user_uid,user_agent,scene_server_id,scene_uid,scene_pos,fighter)
 	local user_enter_info = {scene_id = scene_id,scene_uid = scene_uid,server = scene_server_id,agent = user_agent}
 	_user_ctx[user_uid] = user_enter_info
-	server_manager:send_scene(scene_server_id,"handler.scene_channel","enter_scene",{scene_uid = scene_uid,pos = scene_pos,user_uid = user_uid})
+	server_manager:send_scene(scene_server_id,"handler.scene_channel","enter_scene",{scene_uid = scene_uid,pos = scene_pos,user_uid = user_uid,fighter = fighter})
 end
 
-local function try_enter_scene(user_uid,user_agent,scene_id,scene_uid,scene_pos)
+local function try_enter_scene(user_uid,user_agent,scene_id,scene_uid,scene_pos,fighter)
 	local scene_server_id = find_scene(scene_id,scene_uid)
 	if not scene_server_id then
 		scene_server_id = server_manager:find_min_scene_server()
 		server_manager:send_scene(scene_server_id,"handler.scene_handler","create_scene",{scene_id = scene_id},function (scene_uid)
 			add_scene(scene_id,scene_uid,scene_server_id)
 
-			do_enter_scene(user_uid,user_agent,scene_server_id,scene_uid,scene_pos)
+			do_enter_scene(user_uid,user_agent,scene_server_id,scene_uid,scene_pos,fighter)
 		end)
 		return
 	end
-	do_enter_scene(user_uid,user_agent,scene_server_id,scene_uid,scene_pos)
+	do_enter_scene(user_uid,user_agent,scene_server_id,scene_uid,scene_pos,fighter)
 end
 
 function enter_scene(channel,args)
@@ -84,15 +84,16 @@ function enter_scene(channel,args)
 	local user_agent = args.agent
 	local scene_id = args.scene_id
 	local scene_uid = args.scene_uid
-	local scene_pos = args.pos
+	local scene_pos = args.scene_pos
+	local fighter = args.fighter
 
 	local user_info = _user_ctx[user_uid]
 	if not user_info then
-		try_enter_scene(user_uid,user_agent,scene_id,scene_uid,scene_pos)
+		try_enter_scene(user_uid,user_agent,scene_id,scene_uid,scene_pos,fighter)
 	else
 		server_manager:send_scene(user_info.server,"handler.scene_handler","leave_scene",{scene_uid = scene_uid,user_uid = user_uid},function (user_uid)
 			_user_ctx[user_uid] = nil
-			try_enter_scene(user_uid,user_agent,scene_id,scene_uid,scene_pos)
+			try_enter_scene(user_uid,user_agent,scene_id,scene_uid,scene_pos,fighter)
 		end)
 	end
 end
@@ -105,4 +106,3 @@ function leave_scene(channel,args)
 	return true
 end
 
-function 

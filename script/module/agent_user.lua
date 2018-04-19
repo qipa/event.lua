@@ -30,11 +30,6 @@ function cls_agent_user:db_index()
 end
 
 function cls_agent_user:enter_game()
-	local world = model.get_world_channel()
-	world:send("handler.world_handler","enter_world",{uid = self.uid})
-
-	local scene_master = model.get_master_channel()
-	scene_master:send("handler.master_handler","enter_scene",{scene_id = self.scene_info.id,pos = self.scene_info.pos})
 
 	local item_mgr = self.item_mgr
 	if not item_mgr then
