@@ -68,7 +68,7 @@ function leave_scene(self,user_uid,switch)
 	local updater = {}
 	updater["$inc"] = {version = 1}
 	updater["$set"] = {time = os.time()}
-	db_channel:findAndModify("save_version",{query = {uid = user.uid},update = updater})
+	db_channel:findAndModify("save_version",{query = {uid = fighter.uid},update = updater,upsert = true})
 
 	local fighter_data
 	if switch then

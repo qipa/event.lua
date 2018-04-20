@@ -101,9 +101,10 @@ function leave(self,cid)
 		local updater = {}
 		updater["$inc"] = {version = 1}
 		updater["$set"] = {time = os.time()}
-		db_channel:findAndModify("save_version",{query = {uid = user.uid},update = updater})
+		db_channel:findAndModify("save_version",{query = {uid = user.uid},update = updater,upsert = true})
 
 		local login_channel = model.get_login_channel()
+		print("user.account",user.account)
 		login_channel:send("handler.login_handler","rpc_leave_agent",{account = user.account})
 	end)
 end
@@ -152,7 +153,7 @@ function user_auth(self,cid,token)
 	end
 
 	local db_channel = model.get_db_channel()
-	local user = agent_user.cls_agent_user:new(cid,info.uid)
+	local user = agent_user.cls_agent_user:new(cid,info.uid,info.account)
 	
 	user.phase = common.AGENT_PHASE.LOAD
 	user:load(db_channel)

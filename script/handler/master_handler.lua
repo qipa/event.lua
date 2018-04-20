@@ -92,7 +92,6 @@ function execute_enter_scene(user_info,fighter_data,scene_id,scene_uid,scene_pos
 	if not scene_server then
 		scene_server = server_manager:find_min_scene_server()
 		scene_uid = server_manager:call_scene(scene_server,"handler.scene_handler","create_scene",{scene_id = scene_id})
-		print(scene_uid,"!!!!")
 		add_scene(scene_id,scene_uid,scene_server)
 	end
 

@@ -42,8 +42,8 @@ function cls_scene_user:send_world(file,method,args,callback)
 	world_channel:send(file,method,args,callback)
 end
 
-function cls_scene_user:do_enter(scene_id,scene_uid)
-	fighter.cls_fighter.do_enter(self,scene_id,scene_uid)
+function cls_scene_user:do_enter(scene_id,scene_uid,aoi_id)
+	fighter.cls_fighter.do_enter(self,scene_id,scene_uid,aoi_id)
 	self:dirty_field("scene_info")
 end
 

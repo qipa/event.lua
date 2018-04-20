@@ -18,9 +18,10 @@ function __init__(self)
 end
 
 
-function cls_agent_user:create(cid,uid)
+function cls_agent_user:create(cid,uid,account)
 	self.cid = cid
 	self.uid = uid
+	self.account = account
 	model.bind_agent_user_with_uid(uid,self)
 end
 

@@ -67,7 +67,7 @@ local function call_method(channel,session,file,method,args)
 		if not ok then
 			channel:ret(session,false,result)
 		else
-			channel:ret(session,result)
+			channel:ret(session,result or {})
 		end
 	end
 end

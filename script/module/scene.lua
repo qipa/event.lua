@@ -27,7 +27,7 @@ function cls_scene:create(scene_id,scene_uid)
 end
 
 function cls_scene:enter(fighter,pos)
-	fighter:do_enter(self.scene_id,self.scene_uid)
+	
 	self.fighter_ctx[fighter.uid] = fighter
 	local aoi_id,aoi_set = self.aoi:enter(fighter.uid,pos.x,pos.z,0)
 	fighter.scene_info.scene_pos = {x = pos.x,z = pos.z}
@@ -40,7 +40,7 @@ function cls_scene:enter(fighter,pos)
 
 	fighter:object_enter(enter_objs)
 
-	return aoi_id
+	fighter:do_enter(self.scene_id,self.scene_uid,aoi_id)
 end
 
 function cls_scene:leave(fighter)

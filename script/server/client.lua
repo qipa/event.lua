@@ -36,9 +36,6 @@ function agent_channel:data(data,size)
 	end
 end
 
-
-
-
 function response.s2c_login_enter(message)
 	local channel,err = event.connect(string.format("tcp://%s:%d",message.ip,message.port),2,true,agent_channel)
 	if not channel then
