@@ -44,9 +44,9 @@ function create_scene(self,scene_id)
 		local scene = scene.cls_scene:new(scene_id,scene_uid)
 		scene_info[scene_uid] = scene
 		_scene_uid2id[scene_uid] = scene_id
-		return {scene_uid,true}
+		return scene_uid
 	end
-	return {scene_uid,false}
+	return scene_uid
 end
 
 function delete_scene(self,scene_uid)

@@ -62,20 +62,32 @@ function find_scene(scene_id,scene_uid)
 	if not scene_uid then
 		local min_server
 		local min_count
+		local min_scene_uid
 		for scene_uid,info in pairs(scene_info) do
 			if not min_count or info.count < min_count then
 				min_count = info.count
 				min_server = info.server
+				min_scene_uid = scene_uid
 			end
 		end
-		return min_server
+
+		if min_server then
+			if min_count > 200 then
+				return
+			end
+			return min_server,min_scene_uid
+		end
 	end
 
 	local info = scene_info[scene_uid]
 	if not info then
 		return
 	end
-	return info.server
+
+	if info.count > 200 then
+		return
+	end
+	return info.server,scene_uid
 end
 
 function add_scene(scene_id,scene_uid,server)
@@ -112,15 +124,11 @@ function execute_enter_scene(user_info,fighter_data,scene_id,scene_uid,scene_pos
 		user_info.scene_server = nil
 	end
 
-	local scene_server = find_scene(scene_id,scene_uid)
+	local scene_server,scene_uid = find_scene(scene_id,scene_uid)
 	if not scene_server then
-		local create
 		scene_server = server_manager:find_min_scene_server()
-		local result = server_manager:call_scene(scene_server,"handler.scene_handler","create_scene",{scene_id = scene_id})
-		scene_uid = result[1]
-		if result[2] then
-			add_scene(scene_id,scene_uid,scene_server)
-		end
+		scene_uid = server_manager:call_scene(scene_server,"handler.scene_handler","create_scene",{scene_id = scene_id})
+		add_scene(scene_id,scene_uid,scene_server)
 	end
 
 	server_manager:send_scene(scene_server,"handler.scene_handler","enter_scene",{scene_uid = scene_uid,pos = scene_pos,user_uid = user_uid,user_agent = user_agent,fighter_data = fighter_data})
@@ -128,11 +136,15 @@ function execute_enter_scene(user_info,fighter_data,scene_id,scene_uid,scene_pos
 	user_info.scene_id = scene_id
 	user_info.scene_uid = scene_uid
 	user_info.scene_server = scene_server
+
+	add_scene_count(scene_id,scene_uid)
 end
 
 function execute_leave_scene(user_info)
 	server_manager:call_scene(user_info.scene_server,"handler.scene_handler","leave_scene",{user_uid = user_info.user_uid,
 																							switch = false})
+
+	sub_scene_count(user_info.scene_id,user_info.scene_uid)
 end
 
 function run_next_event(user_info)
