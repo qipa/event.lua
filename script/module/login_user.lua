@@ -107,8 +107,6 @@ end
 
 function cls_login_user:leave()
 	if self.phase < PHASE.AGENT_ENTER then
-		local client_manager = model.get_client_manager()
-		client_manager:close(self.cid)
 		self:release()
 		return true
 	end

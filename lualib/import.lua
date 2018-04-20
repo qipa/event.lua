@@ -31,10 +31,11 @@ function _M.import(file)
 
 	local ctx = {}
 	ctx.env = setmetatable({},{__index = _G})
-	ctx.change = loadfile(file,fullfile,ctx.env)
 	ctx.fullfile = fullfile
 	ctx.name = file
 	_script_ctx[file] = ctx
+
+	ctx.change = loadfile(file,fullfile,ctx.env)
 
 	if ctx.env["__init__"] then
 		ctx.env["__init__"](ctx.env)

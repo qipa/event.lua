@@ -11,6 +11,9 @@ end
 function log(_,args)
 	local log_lv = args[1]
 	local log_type = args[2]
+	if log_type == "monitor" then
+		return
+	end
 	local log = args[3]
 	local FILE = _log_ctx[log_type]
 	if not FILE then

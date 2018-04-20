@@ -14,7 +14,7 @@ function __init__(self)
 	
 	self.db_timer = event.timer(30,function ()
 		local db_channel = model.get_db_channel()
-		local all = model.fetch_fighter()
+		local all = model.fetch_scene_user()
 		for _,fighter in pairs(all) do
 			fighter:save(db_channel)
 		end
@@ -24,7 +24,7 @@ end
 
 function stop()
 	local db_channel = model.get_db_channel()
-	local all = model.fetch_fighter()
+	local all = model.fetch_scene_user()
 	for _,fighter in pairs(all) do
 		fighter:save(db_channel)
 	end
