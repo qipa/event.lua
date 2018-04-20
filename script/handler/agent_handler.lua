@@ -12,7 +12,7 @@ function req_auth(cid,args)
 end
 
 function user_register(_,args)
-	agent_server:user_register(args.uid,args.token,args.time)
+	agent_server:user_register(args.account,args.uid,args.token,args.time)
 end
 
 function user_kick(_,args)

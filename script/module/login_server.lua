@@ -2,9 +2,11 @@ local event = require "event"
 local model = require "model"
 local route = require "route"
 local login_user = import "module.login_user"
+local server_manager = import "module.server_manager"
 
 _login_ctx = _login_ctx or {}
 _account_queue = _account_queue or {}
+_enter_agent_user = _enter_agent_user or {}
 
 function start(self)
 	self.db_timer = event.timer(30,function ()
@@ -31,7 +33,7 @@ function leave(self,cid)
 	
 	if info.account then
 		local user = model.fetch_login_user_with_account(info.account)
-		if user then
+		if user and user.cid == cid then
 			user:leave()
 		end
 	end
@@ -43,38 +45,30 @@ function dispatch_client(self,cid,message_id,data,size)
 end
 
 function user_auth(self,cid,account)
-	local queue = _account_queue[account]
-	if not queue then
-		queue = {}
-		_account_queue[account] = queue
-	end
-	table.insert(queue,cid)
+	local info = _login_ctx[cid]
+	assert(info ~= nil,cid)
+	assert(info.account == nil,info.account)
 
-	local user = model.fetch_login_user_with_account(account)
+	local enter_info = _enter_agent_user[account]
+	if enter_info then
+		server_manager:send_agent(enter_info.agent_server,"handler.agent_handler","user_kick",{uid = enter_info.uid})
+		local queue = _account_queue[account]
+		if not queue then
+			queue = {}
+			_account_queue[account] = queue
+		end
+		table.insert(queue,cid)
+		return
+	end
+
+	info.account = account
+	local user = model.fetch_login_user_with_account(info.account)
 	if user then
-		if user:leave() then
-			assert(#queue == 1)
-			_account_queue[account] = nil
-			local info = _login_ctx[cid]
-			if info then
-				info.account = account
-				local user = login_user.cls_login_user:new(cid,account)
-				user:auth()
-			end
-		else
-			user:kick_agent()
-		end
-	else
-		assert(#queue == 1)
-		_account_queue[account] = nil
-
-		local info = _login_ctx[cid]
-		if info then
-			info.account = account
-			local user = login_user.cls_login_user:new(cid,account)
-			user:auth()
-		end
+		client_manager:close(user.cid)
+		user:leave()
 	end
+	local user = login_user.cls_login_user:new(cid,account)
+	user:auth()
 end
 
 function user_create_role(self,cid,career)
@@ -89,30 +83,37 @@ function user_enter_agent(self,cid,uid)
 	local info = _login_ctx[cid]
 	if info.account then
 		local user = model.fetch_login_user_with_account(info.account)
-		user:enter_agent(uid)
+		local agent_server = user:enter_agent(uid)
+		user:leave()
+		local client_manager = model.get_client_manager()
+		client_manager:close(user.cid,1)
+		_enter_agent_user[user.account] = {uid = uid,agent_server = agent_server}
 	end
 end
 
-function user_leave_agent(self,account)
-	local user = model.fetch_login_user_with_account(account)
-	if not user then
-		return
-	end
-	user:leave_agent()
+function user_enter_agent_timeout(self,uid)
 
-	local queue = _account_queue[user.account]
+
+end
+
+function user_leave_agent(self,account)
+	print("user_leave_agent")
+	_enter_agent_user[account] = nil
+
+	local queue = _account_queue[account]
 	if not queue then
 		return
 	end
-
-	local client_manager = model.get_client_manager()
-	for _,cid in pairs(queue) do
-		if last_cid ~= cid then
-			client_manager:close(cid)
-			_login_ctx[cid] = nil
-		end
-	end
 	_account_queue[account] = nil
+
+	local count = #queue
+	for i = 1,count-1 do
+		local cid = queue[i]
+		client_manager:close(cid)
+		_login_ctx[cid] = nil
+	end
+
+	local last_cid = queue[count]
 	local info = _login_ctx[last_cid]
 	if info then
 		info.account = account

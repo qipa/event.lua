@@ -46,15 +46,6 @@ event.fork(function ()
 	env.dist_id = startup.apply_id()
 	id_builder:init(env.dist_id)
 
-	local login_channel = model.get_login_channel()
-	login_channel:send("module.server_manager","register_agent_server",{ip = "0.0.0.0",port = port,id = env.dist_id})
-
-	local master_channel = model.get_master_channel()
-	master_channel:send("module.server_manager","register_agent_server",{ip = "0.0.0.0",port = port,id = env.dist_id})
-
-	local world_channel = model.get_world_channel()
-	world_channel:send("module.server_manager","register_agent_server",{ip = "0.0.0.0",port = port,id = env.dist_id})
-
 	import "handler.agent_handler"
 	
 	local scene_set
@@ -83,6 +74,16 @@ event.fork(function ()
 		os.exit(1)
 	end
 	model.set_client_manager(client_manager)
+
+	local login_channel = model.get_login_channel()
+	login_channel:send("module.server_manager","register_agent_server",{ip = "0.0.0.0",port = port,id = env.dist_id})
+
+	local master_channel = model.get_master_channel()
+	master_channel:send("module.server_manager","register_agent_server",{ip = "0.0.0.0",port = port,id = env.dist_id})
+
+	local world_channel = model.get_world_channel()
+	world_channel:send("module.server_manager","register_agent_server",{ip = "0.0.0.0",port = port,id = env.dist_id})
+
 
 	agent_server:start(client_manager)
 	event.error("start success")

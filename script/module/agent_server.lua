@@ -1,5 +1,6 @@
 local event = require "event"
 local model = require "model"
+local util = require "util"
 
 local agent_user = import "module.agent_user"
 local scene_user = import "module.scene_user"
@@ -20,6 +21,18 @@ function start(self,client_mgr)
 		local all = model.fetch_agent_user()
 		for _,user in pairs(all) do
 			user:save(db_channel)
+		end
+	end)
+
+	self.auth_timer = event.timer(1,function ()
+		local login_channel = model.get_login_channel()
+		local now = util.time()
+		for token,info in pairs(_user_token) do
+			if now - info.time >= 60 * 100 then
+				_user_token[token] = nil
+				login_channel:send("handler.login_handler","rpc_leave_agent",{account = info.account})
+				event.error(string.format("token:%s timeout",token))
+			end
 		end
 	end)
 end
@@ -93,12 +106,23 @@ function leave(self,cid)
 	end)
 end
 
-function user_register(self,uid,token,time)
-	_user_token[token] = {time = time,uid = uid}
+function user_register(self,account,uid,token,time)
+	print("user_register",account,uid)
+	_user_token[token] = {time = time,uid = uid,account = account}
 end
 
 function user_kick(self,uid)
 	local user = model.fetch_agent_user_with_uid(uid)
+	if not user then
+		for token,info in pairs(_user_token) do
+			if info.uid == uid then
+				local login_channel = model.get_login_channel()
+				login_channel:send("handler.login_handler","rpc_leave_agent",{account = info.account})
+				return
+			end
+		end
+		return
+	end
 	client_manager:close(user.cid)
 	leave(user.cid)
 end

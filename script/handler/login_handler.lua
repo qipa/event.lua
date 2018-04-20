@@ -29,5 +29,6 @@ function req_enter_game(cid,args)
 end
 
 function rpc_leave_agent(self,args)
-	login_server:user_leave_agent(cid,args.account)
+	table.print(args)
+	login_server:user_leave_agent(args.account)
 end
