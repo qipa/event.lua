@@ -15,21 +15,26 @@ end
 function cls_scene:enter(fighter,pos)
 	fighter:do_enter(self.scene_id,self.scene_uid)
 	self.fighter_ctx[fighter.uid] = fighter
-	local set = self.aoi:enter(fighter.uid,fighter.scene_info.pos.x,fighter.scene_info.pos.z,0)
+	local aoi_id,aoi_set = self.aoi:enter(fighter.uid,fighter.scene_info.pos.x,fighter.scene_info.pos.z,0)
 
-	for _,uid in pairs(set) do
+	local enter_objs = {}
+	for _,uid in pairs(aoi_set) do
 		local other = self.fighter_ctx[uid]
-		fighter:object_enter(other)
-		other:object_enter(fighter)
+		table.insert(enter_objs,other)
+		other:object_enter({fighter})
 	end
+
+	fighter:object_enter(enter_objs)
+
+	return aoi_id
 end
 
 function cls_scene:leave(fighter)
 	fighter:do_leave()
-	local set = self.aoi:leave(fighter.uid)
+	local set = self.aoi:leave(fighter.aoi_id)
 	for _,uid in pairs(set) do
 		local other = self.fighter_ctx[uid]
-		other:object_leave(fighter)
+		other:object_leave({fighter})
 	end
 
 	self.fighter_ctx[fighter.uid] = nil
@@ -52,18 +57,25 @@ function cls_scene:pos_around_movable(x,z,depth)
 end
 
 function cls_scene:fighter_move(fighter,x,z)
-	local enter,_,leave,_ = self.aoi:update(fighter.uid,x,z)
+	local enter_set,leave_set = self.aoi:update(fighter.aoi_id,x,z)
 	
-	for _,uid in pairs(enter) do
+	local enter_objs = {}
+	for _,uid in pairs(enter_set) do
 		local other = self.fighter_ctx[uid]
-		fighter:object_enter(other)
-		other:object_enter(fighter)
+		other:object_enter({fighter})
+		table.insert(enter_objs,other)
 	end
 
-	for _,uid in pairs(leave) do
+	fighter:object_enter(enter_objs)
+
+	local leave_objs = {}
+	for _,uid in pairs(leave_set) do
 		local other = self.fighter_ctx[uid]
-		other:object_leave(fighter)
+		other:object_leave({fighter})
+		table.insert(leave_objs,other)
 	end
+
+	fighter:object_leave(leave_objs)
 end
 
 function cls_scene:update(now)
