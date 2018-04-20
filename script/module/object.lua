@@ -117,7 +117,7 @@ end
 
 
 function cls_base:new(...)
-	local obj = {__event = {},__dirty = {}}
+	local obj = {__event = {},__dirty = {},__name = self.__name}
 	local self = class_ctx[self.__name]
 	new_object(self,obj)
 
@@ -173,7 +173,7 @@ end
 
 function cls_base:unpack(...)
 	local data = table.decode(...)
-	return self:instance_from(data)
+	return class.instance_from(self.__name,data)
 end
 
 function cls_base:save_field(field)
@@ -189,7 +189,15 @@ end
 
 function class.instance_from(name,data)
 	local cls = class.get(name)
-	return cls:instance_from(data)
+	local obj = cls:instance_from(data)
+	for key,value in pairs(obj) do
+		if type(value) == "table" then
+			if value.__name then
+				obj[key] = class.instance_from(value.__name,value)
+			end
+		end
+	end
+	return obj
 end
 
 function class.get(name)
