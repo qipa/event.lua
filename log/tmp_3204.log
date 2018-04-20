@@ -1,0 +1,84 @@
+[W:monitor][2018-04-20 17:39:33 logger] lua mem:222.073242kb,c mem:22806.281250kb
+handler.logger_handler:log time diff:average:0.000006,min:0.000001,max:0.000017,count:30
+handler.logger_handler:log input flow:average:279.466667,min:204,max:613,count:30
+[W:monitor][2018-04-20 17:39:43 logger] lua mem:228.312500kb,c mem:22836.796875kb
+handler.logger_handler:log time diff:average:0.000005,min:0.000001,max:0.000017,count:37
+handler.logger_handler:log input flow:average:310.648649,min:204,max:695,count:37
+[W:monitor][2018-04-20 17:39:53 logger] lua mem:235.138672kb,c mem:22874.171875kb
+handler.logger_handler:log time diff:average:0.000004,min:0.000001,max:0.000017,count:45
+handler.logger_handler:log input flow:average:340.000000,min:204,max:696,count:45
+[W:monitor][2018-04-20 17:40:03 logger] lua mem:241.388672kb,c mem:22901.828125kb
+handler.logger_handler:log time diff:average:0.000004,min:0.000001,max:0.000017,count:52
+handler.logger_handler:log input flow:average:360.019231,min:204,max:696,count:52
+[W:monitor][2018-04-20 17:40:13 logger] lua mem:249.667969kb,c mem:22940.390625kb
+handler.logger_handler:log time diff:average:0.000004,min:0.000001,max:0.000017,count:62
+handler.logger_handler:log input flow:average:380.774194,min:204,max:696,count:62
+[W:monitor][2018-04-20 17:40:23 logger] lua mem:256.313477kb,c mem:22985.187500kb
+handler.logger_handler:log time diff:average:0.000004,min:0.000001,max:0.000018,count:70
+handler.logger_handler:log input flow:average:388.957143,min:204,max:696,count:70
+[W:monitor][2018-04-20 17:40:33 logger] lua mem:264.291016kb,c mem:23021.140625kb
+handler.logger_handler:log time diff:average:0.000004,min:0.000001,max:0.000018,count:79
+handler.logger_handler:log input flow:average:405.227848,min:204,max:696,count:79
+[W:monitor][2018-04-20 17:40:43 logger] lua mem:270.515625kb,c mem:23054.875000kb
+handler.logger_handler:log time diff:average:0.000004,min:0.000001,max:0.000018,count:86
+handler.logger_handler:log input flow:average:411.720930,min:204,max:696,count:86
+[W:monitor][2018-04-20 17:40:53 logger] lua mem:277.619141kb,c mem:23089.703125kb
+handler.logger_handler:log time diff:average:0.000004,min:0.000001,max:0.000018,count:94
+handler.logger_handler:log input flow:average:420.223404,min:204,max:696,count:94
+[W:monitor][2018-04-20 17:41:03 logger] lua mem:285.600586kb,c mem:23125.687500kb
+handler.logger_handler:log time diff:average:0.000003,min:0.000001,max:0.000018,count:103
+handler.logger_handler:log input flow:average:430.009709,min:204,max:696,count:103
+[W:monitor][2018-04-20 17:41:13 logger] lua mem:291.837891kb,c mem:23159.421875kb
+handler.logger_handler:log time diff:average:0.000003,min:0.000001,max:0.000018,count:110
+handler.logger_handler:log input flow:average:433.536364,min:204,max:696,count:110
+[W:monitor][2018-04-20 17:41:23 logger] lua mem:300.928711kb,c mem:46704.578125kb
+handler.logger_handler:log time diff:average:0.000004,min:0.000001,max:0.000021,count:120
+handler.logger_handler:log input flow:average:445.050000,min:204,max:1065,count:120
+[W:monitor][2018-04-20 17:41:33 logger] lua mem:308.421875kb,c mem:46747.093750kb
+handler.logger_handler:log time diff:average:0.000004,min:0.000001,max:0.000021,count:127
+handler.logger_handler:log input flow:average:457.472441,min:204,max:1065,count:127
+[W:monitor][2018-04-20 17:41:43 logger] lua mem:319.585938kb,c mem:46805.859375kb
+handler.logger_handler:log time diff:average:0.000004,min:0.000001,max:0.000021,count:137
+handler.logger_handler:log input flow:average:481.437956,min:204,max:1066,count:137
+[W:monitor][2018-04-20 17:41:53 logger] lua mem:328.314453kb,c mem:46853.937500kb
+handler.logger_handler:log time diff:average:0.000003,min:0.000001,max:0.000021,count:145
+handler.logger_handler:log input flow:average:494.600000,min:204,max:1066,count:145
+[W:monitor][2018-04-20 17:42:03 logger] lua mem:337.042969kb,c mem:46902.437500kb
+handler.logger_handler:log time diff:average:0.000003,min:0.000001,max:0.000021,count:153
+handler.logger_handler:log input flow:average:506.385621,min:204,max:1066,count:153
+[W:monitor][2018-04-20 17:42:13 logger] lua mem:345.771484kb,c mem:46950.390625kb
+handler.logger_handler:log time diff:average:0.000003,min:0.000001,max:0.000021,count:161
+handler.logger_handler:log input flow:average:517.000000,min:204,max:1066,count:161
+[W:monitor][2018-04-20 17:42:23 logger] lua mem:353.265625kb,c mem:46989.953125kb
+handler.logger_handler:log time diff:average:0.000003,min:0.000001,max:0.000021,count:168
+handler.logger_handler:log input flow:average:523.398810,min:204,max:1066,count:168
+[W:monitor][2018-04-20 17:42:33 logger] lua mem:360.792969kb,c mem:47030.671875kb
+handler.logger_handler:log time diff:average:0.000003,min:0.000001,max:0.000021,count:175
+handler.logger_handler:log input flow:average:529.480000,min:204,max:1066,count:175
+[W:monitor][2018-04-20 17:42:43 logger] lua mem:373.000000kb,c mem:47118.562500kb
+handler.logger_handler:log time diff:average:0.000003,min:0.000001,max:0.000025,count:186
+handler.logger_handler:log input flow:average:545.080645,min:204,max:1343,count:186
+[W:monitor][2018-04-20 17:42:53 logger] lua mem:379.650391kb,c mem:47160.812500kb
+handler.logger_handler:log time diff:average:0.000003,min:0.000001,max:0.000025,count:192
+handler.logger_handler:log input flow:average:549.046875,min:204,max:1343,count:192
+[W:monitor][2018-04-20 17:43:03 logger] lua mem:390.555664kb,c mem:47225.421875kb
+handler.logger_handler:log time diff:average:0.000003,min:0.000001,max:0.000025,count:201
+handler.logger_handler:log input flow:average:563.278607,min:204,max:1343,count:201
+[W:monitor][2018-04-20 17:43:13 logger] lua mem:398.708984kb,c mem:47269.937500kb
+handler.logger_handler:log time diff:average:0.000003,min:0.000001,max:0.000025,count:208
+handler.logger_handler:log input flow:average:570.168269,min:204,max:1343,count:208
+[W:monitor][2018-04-20 17:43:23 logger] lua mem:410.563477kb,c mem:70844.609375kb
+handler.logger_handler:log time diff:average:0.000003,min:0.000001,max:0.000025,count:219
+handler.logger_handler:log input flow:average:579.707763,min:204,max:1343,count:219
+[W:monitor][2018-04-20 17:43:33 logger] lua mem:451.844727kb,c mem:71289.984375kb
+handler.logger_handler:log time diff:average:0.000004,min:0.000001,max:0.000025,count:300
+handler.logger_handler:log input flow:average:503.196667,min:204,max:1343,count:300
+[W:monitor][2018-04-20 17:43:43 logger] lua mem:318.383789kb,c mem:71653.812500kb
+handler.logger_handler:log time diff:average:0.000004,min:0.000001,max:0.000025,count:676
+handler.logger_handler:log input flow:average:352.431953,min:204,max:1343,count:676
+[W:monitor][2018-04-20 17:43:53 logger] lua mem:493.104492kb,c mem:73718.328125kb
+handler.logger_handler:log time diff:average:0.000005,min:0.000001,max:0.000025,count:1073
+handler.logger_handler:log input flow:average:310.790308,min:204,max:1343,count:1073
+[W:monitor][2018-04-20 17:44:03 logger] lua mem:221.015625kb,c mem:3947611.593750kb
+handler.logger_handler:log time diff:average:0.000005,min:0.000001,max:0.000025,count:1252
+handler.logger_handler:log input flow:average:303.272364,min:204,max:1354,count:1252

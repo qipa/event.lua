@@ -1,0 +1,9 @@
+[W:monitor][2018-04-20 17:44:42 logger] lua mem:271.521484kb,c mem:1933865.796875kb
+handler.logger_handler:log time diff:average:0.000005,min:0.000002,max:0.000023,count:134
+handler.logger_handler:log input flow:average:282.313433,min:204,max:987,count:134
+[W:monitor][2018-04-20 17:44:52 logger] lua mem:278.791992kb,c mem:1933908.562500kb
+handler.logger_handler:log time diff:average:0.000005,min:0.000001,max:0.000023,count:141
+handler.logger_handler:log input flow:average:297.780142,min:204,max:987,count:141
+[W:monitor][2018-04-20 17:45:02 logger] lua mem:287.953125kb,c mem:1933957.765625kb
+handler.logger_handler:log time diff:average:0.000005,min:0.000001,max:0.000023,count:150
+handler.logger_handler:log input flow:average:319.853333,min:204,max:1070,count:150
