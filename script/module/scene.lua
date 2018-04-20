@@ -11,6 +11,7 @@ function cls_scene:create(scene_id,scene_uid)
 
 	self.fighter_ctx = {}
 	self.aoi = aoi_core.new(1000,1000,2,5,1000)
+	self.aoi_ctx = {}
 
 	local FILE = io.open(string.format("./config/%d.mesh",scene_id),"r")
 	local mesh_info = FILE:read("*a")
@@ -30,9 +31,12 @@ function cls_scene:enter(fighter,pos)
 	
 	self.fighter_ctx[fighter.uid] = fighter
 	local aoi_id,aoi_set = self.aoi:enter(fighter.uid,pos.x,pos.z,0)
+	self.aoi_ctx[aoi_id] = fighter.uid
+
 	fighter.scene_info.scene_pos = {x = pos.x,z = pos.z}
 	local enter_objs = {}
-	for _,uid in pairs(aoi_set) do
+	for _,aoi_id in pairs(aoi_set) do
+		local uid = self.aoi_ctx[aoi_id]
 		local other = self.fighter_ctx[uid]
 		table.insert(enter_objs,other)
 		other:object_enter({fighter})
@@ -46,7 +50,8 @@ end
 function cls_scene:leave(fighter)
 	fighter:do_leave()
 	local set = self.aoi:leave(fighter.aoi_id)
-	for _,uid in pairs(set) do
+	for _,aoi_id in pairs(set) do
+		local uid = self.aoi_ctx[aoi_id]
 		local other = self.fighter_ctx[uid]
 		other:object_leave({fighter})
 	end
