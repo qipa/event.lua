@@ -6,6 +6,7 @@ local mongo = require "mongo"
 local route = require "route"
 local channel = require "channel"
 local http = require "http"
+local helper = require "helper"
 local startup = import "server.startup"
 local server_manager = import "module.server_manager"
 local id_builder = import "module.id_builder"
@@ -18,6 +19,8 @@ function agent_channel:disconnect()
 end
 
 event.fork(function ()
+	-- helper.heap.start("scene")
+
 	startup.run(env.mongodb)
 
 	startup.connect_server("world")
@@ -54,4 +57,8 @@ event.fork(function ()
 	world_channel:send("module.server_manager","register_scene_server",{id = env.dist_id,addr = addr_info})
 
 	import "handler.scene_handler"
+
+	-- event.timer(10,function ()
+	-- 	helper.heap.dump("scene")
+	-- end)
 end)

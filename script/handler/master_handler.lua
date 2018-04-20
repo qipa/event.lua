@@ -58,8 +58,10 @@ function find_scene(scene_id,scene_uid)
 	if not scene_info then
 		return
 	end
+
 	if not scene_uid then
-		return
+		local scene_uid = next(scene_info)
+		return scene_uid
 	end
 	local info = scene_info[scene_uid]
 	if not info then
