@@ -169,3 +169,18 @@ function leave_scene(channel,args)
 	return true
 end
 
+function transfer_scene(_,args)
+	local user_info = _user_ctx[args.uid]
+	if not user_info then
+		return
+	end
+
+	table.insert(user_info.event_queue,{ev = EVENT.ENTER
+										scene_id = args.scene_id,
+										scene_uid = args.scene_uid,
+										scene_pos = args.pos })
+
+	if user_info.phase == PHASE.INIT then
+		run_next_event(user_info)
+	end
+end

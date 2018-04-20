@@ -24,11 +24,11 @@ end
 
 function cls_fighter:do_enter(scene_uid)
 	local scene = scene_server:get_scene(scene_uid)
-	scene:enter(self)
+	self.scene = scene
 end
 
 function cls_fighter:do_leave()
-	self.scene:leave(self)
+	self.scene = nil
 end
 
 function cls_fighter:object_enter(objs)

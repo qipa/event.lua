@@ -6,6 +6,7 @@ local protocol = require "protocol"
 
 local fighter = import "module.fighter"
 local server_manager = import "module.server_manager"
+local scene_server = import "module.scene_server"
 
 cls_scene_user = fighter.cls_fighter:inherit("scene_user","uid")
 
@@ -51,3 +52,17 @@ function cls_scene_user:do_leave()
 	self:dirty_field("scene_info")
 end
 
+function cls_scene_user:transfer_scene(scene_id,scene_uid,x,z)
+	local scene = scene_server:get_scene(scene_uid)
+	if scene then
+		if self.scene == scene then
+			self:set_pos(x,z)
+			return
+		end
+		self.scene:leave(self)
+		scene:enter(self,{x = x,z = z})
+		return
+	end
+
+	scene_server:transfer_scene(self,scene_id,scene_uid,x,z)
+end
