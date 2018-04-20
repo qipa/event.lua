@@ -1,6 +1,8 @@
 local event = require "event"
 local model = require "model"
 local util = require "util"
+local route = require "route"
+local cjson = require "cjson"
 
 local agent_user = import "module.agent_user"
 local scene_user = import "module.scene_user"
@@ -142,13 +144,14 @@ function user_auth(self,cid,token)
 		return
 	end
 
-	local info = util.authcode(token,info.time,0)
-	if info.uid ~= info.uid then
+	local token_info = util.authcode(token,info.time,0)
+	token_info = cjson.decode(token_info)
+	if token_info.uid ~= info.uid then
 		client_manager:close(cid)
 		return
 	end
 
-	local db_channel = model.get_mongodb()
+	local db_channel = model.get_db_channel()
 	local user = agent_user.cls_agent_user:new(cid,info.uid)
 	
 	user.phase = common.AGENT_PHASE.LOAD
@@ -162,10 +165,13 @@ function user_auth(self,cid,token)
 	user:enter_game()
 
 	local world = model.get_world_channel()
-	world:send("handler.world_handler","enter_world",{user_uid = self.uid,user_agent = env.dist_id})
+	world:send("handler.world_handler","enter_world",{user_uid = user.uid,user_agent = env.dist_id})
 
 	local fighter = scene_user.cls_scene_user:new(cid,info.uid)
 	fighter:load(db_channel)
+	if not fighter.scene_info then
+		fighter.scene_info = {scene_id = 1001,scene_pos = {x = 100,z = 100}}
+	end
 	local scene_master = model.get_master_channel()
 	scene_master:send("handler.master_handler","enter_scene",{uid = user.uid,
 															  scene_id = fighter.scene_info.scene_id,

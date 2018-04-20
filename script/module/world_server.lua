@@ -3,6 +3,7 @@ local model = require "model"
 
 local database_manager = import "module.database_manager"
 local world_user = import "module.world_user"
+import "handler.world_handler"
 
 function __init__(self)
 	self.timer = event.timer(30,function ()

@@ -53,5 +53,5 @@ event.fork(function ()
         event.error(string.format("master server listen http:%s failed",env.master_http))
         os.exit(1)
     end
-
+    import "handler.master_handler"
 end)

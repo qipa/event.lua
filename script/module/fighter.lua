@@ -12,9 +12,9 @@ function __init__(self)
 end
 
 function cls_fighter:init(data)
-	self.uid = data.uid
-	self.scene_info = data.scene_info
-	self.fighter_info = data.fighter_info
+	-- self.uid = data.uid
+	-- self.scene_info = data.scene_info
+	-- self.fighter_info = data.fighter_info
 	self.view_list = {}
 end
 

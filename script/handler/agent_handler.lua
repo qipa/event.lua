@@ -1,5 +1,6 @@
 local util = require "util"
 local protocol = require "protocol"
+local event = require "event"
 
 local agent_server = import "module.agent_server"
 
@@ -8,7 +9,9 @@ function __init__(self)
 end
 
 function req_auth(cid,args)
-	agent_server:user_auth(cid,args.token)
+	event.fork(function ()
+		agent_server:user_auth(cid,args.token)
+	end)
 end
 
 function user_register(_,args)

@@ -4,7 +4,7 @@ local server_manager = import "module.server_manager"
 _scene_ctx = _scene_ctx or {}
 _user_ctx = _user_ctx or {}
 
-local PAHSE = {
+local PHASE = {
 	INIT = 1,
 	EXECUTE = 2
 }
@@ -90,11 +90,11 @@ function execute_enter_scene(user_info,fighter,scene_id,scene_uid,scene_pos)
 	local scene_server = find_scene(scene_id,scene_uid)
 	if not scene_server then
 		scene_server = server_manager:find_min_scene_server()
-		scene_uid = server_manager:send_scene(scene_server,"handler.scene_handler","create_scene",{scene_id = scene_id})
+		scene_uid = server_manager:call_scene(scene_server,"handler.scene_handler","create_scene",{scene_id = scene_id})
 		add_scene(scene_id,scene_uid,scene_server)
 	end
 
-	server_manager:send_scene(scene_server_id,"handler.scene_channel","enter_scene",{scene_uid = scene_uid,pos = scene_pos,user_uid = user_uid,user_agent = user_agent,fighter = fighter})
+	server_manager:send_scene(scene_server,"handler.scene_handler","enter_scene",{scene_uid = scene_uid,pos = scene_pos,user_uid = user_uid,user_agent = user_agent,fighter = fighter})
 
 	user_info.scene_id = scene_id
 	user_info.scene_uid = scene_uid
@@ -102,7 +102,7 @@ function execute_enter_scene(user_info,fighter,scene_id,scene_uid,scene_pos)
 end
 
 function execute_leave_scene(user_info)
-	server_manager:call_scene(user_info.scene_server_id,"handler.scene_handler","leave_scene",{scene_uid = user_info.scene_uid,
+	server_manager:call_scene(user_info.scene_server,"handler.scene_handler","leave_scene",{scene_uid = user_info.scene_uid,
 																							   user_uid = user_info.user_uid,
 																							   switch = false})
 end
@@ -146,7 +146,7 @@ function enter_scene(channel,args)
 		_user_ctx[user_uid] = user_info
 	end
 
-	table.insert(user_info.event_queue,{ev = EVENT.ENTER
+	table.insert(user_info.event_queue,{ev = EVENT.ENTER,
 										scene_id = scene_id,
 										scene_uid = scene_uid,
 										scene_pos = scene_pos,
@@ -175,7 +175,7 @@ function transfer_scene(_,args)
 		return
 	end
 
-	table.insert(user_info.event_queue,{ev = EVENT.ENTER
+	table.insert(user_info.event_queue,{ev = EVENT.ENTER,
 										scene_id = args.scene_id,
 										scene_uid = args.scene_uid,
 										scene_pos = args.pos })

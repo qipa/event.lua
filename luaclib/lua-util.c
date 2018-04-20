@@ -227,8 +227,8 @@ int
 ltime(lua_State* L) {
     struct timeval tv;
     gettimeofday(&tv, NULL);
-    double now = (tv.tv_sec + tv.tv_usec * 1e-6) * 100;
-    lua_pushnumber(L,now);
+    uint64_t now = (tv.tv_sec + tv.tv_usec * 1e-6) * 100;
+    lua_pushinteger(L,now);
     return 1;
 }
 
