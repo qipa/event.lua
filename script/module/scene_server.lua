@@ -55,14 +55,14 @@ function enter_scene(self,fighter_data,scene_uid,pos)
 	scene:enter(fighter,pos)
 end
 
-function leave_scene(self,user_uid)
+function leave_scene(self,user_uid,switch)
 	local fighter = model.fetch_fighter_with_uid(user_uid)
 	model.unbind_scene_user_with_uid(user_uid)
 
 	local scene = self:get_scene(fighter.scene_info.scene_uid)
 	scene:leave(fighter)
 
-	local fighter_data = fighter:pack()
+	
 
 	local db_channel = model.get_db_channel()
 	fighter:save(db_channel)
@@ -71,8 +71,14 @@ function leave_scene(self,user_uid)
 	updater["$inc"] = {version = 1}
 	updater["$set"] = {time = os.time()}
 	db_channel:findAndModify("save_version",{query = {uid = user.uid},update = updater})
+
+	local fighter_data
+	if switch then
+		fighter_data = fighter:pack()
+	end
 	
 	fighter:release()
+
 
 	return fighter_data
 end
