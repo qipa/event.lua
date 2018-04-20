@@ -62,8 +62,6 @@ function leave_scene(self,user_uid,switch)
 	local scene = self:get_scene(fighter.scene_info.scene_uid)
 	scene:leave(fighter)
 
-	
-
 	local db_channel = model.get_db_channel()
 	fighter:save(db_channel)
 
@@ -78,7 +76,6 @@ function leave_scene(self,user_uid,switch)
 	end
 	
 	fighter:release()
-
 
 	return fighter_data
 end
