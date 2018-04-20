@@ -104,9 +104,8 @@ function execute_enter_scene(user_info,fighter_data,scene_id,scene_uid,scene_pos
 end
 
 function execute_leave_scene(user_info)
-	server_manager:call_scene(user_info.scene_server,"handler.scene_handler","leave_scene",{scene_uid = user_info.scene_uid,
-																							   user_uid = user_info.user_uid,
-																							   switch = false})
+	server_manager:call_scene(user_info.scene_server,"handler.scene_handler","leave_scene",{user_uid = user_info.user_uid,
+																							switch = false})
 end
 
 function run_next_event(user_info)

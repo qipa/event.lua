@@ -13,7 +13,7 @@ function enter_scene(_,args)
 end
 
 function leave_scene(_,args)
-	return scene_server:leave_scene(args.uid,args.switch)
+	return scene_server:leave_scene(args.user_uid,args.switch)
 end
 
 function create_scene(_,args)

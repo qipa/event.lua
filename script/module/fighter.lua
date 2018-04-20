@@ -22,13 +22,15 @@ function cls_fighter:destroy()
 	
 end
 
-function cls_fighter:do_enter(scene_uid)
+function cls_fighter:do_enter(scene_id,scene_uid)
 	local scene = scene_server:get_scene(scene_uid)
 	self.scene = scene
+	self.scene_info.scene_uid = scene_uid
 end
 
 function cls_fighter:do_leave()
 	self.scene = nil
+	self.scene_info.scene_uid = nil
 end
 
 function cls_fighter:object_enter(objs)

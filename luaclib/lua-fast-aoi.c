@@ -372,6 +372,8 @@ laoi_leave(lua_State *L) {
 	int id = lua_tointeger(L, 2);
 
 	struct object* obj = container_get(aoi->container,id);
+	if (!obj)
+		luaL_error(L,"error aoi id:%d",id);
 
 	lua_newtable(L); //-1 leave other
 	aoi_leave(L,aoi,obj);

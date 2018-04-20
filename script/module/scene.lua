@@ -8,6 +8,7 @@ cls_scene = object.cls_base:inherit("scene")
 function cls_scene:create(scene_id,scene_uid)
 	self.scene_id = scene_id
 	self.scene_uid = scene_uid
+
 	self.fighter_ctx = {}
 	self.aoi = aoi_core.new(1000,1000,2,5,1000)
 
