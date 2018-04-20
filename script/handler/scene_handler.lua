@@ -8,6 +8,7 @@ end
 
 
 function enter_scene(_,args)
+	table.print(args,"enter_scene")
 	scene_server:enter_scene(args.fighter_data,args.scene_uid,args.pos)
 end
 

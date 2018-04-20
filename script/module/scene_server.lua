@@ -56,7 +56,7 @@ function enter_scene(self,fighter_data,scene_uid,pos)
 end
 
 function leave_scene(self,user_uid,switch)
-	local fighter = model.fetch_fighter_with_uid(user_uid)
+	local fighter = model.fetch_scene_user_with_uid(user_uid)
 	model.unbind_scene_user_with_uid(user_uid)
 
 	local scene = self:get_scene(fighter.scene_info.scene_uid)

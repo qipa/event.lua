@@ -89,7 +89,7 @@ function channel:dispatch(message,size)
 		if call_ctx.callback then
 			call_ctx.callback(message.args)
 		else
-			event.wakeup(message.session,message.args)
+			event.wakeup(message.session,table.unpack(message.args))
 		end
 		self.session_ctx[message.session] = nil
 	else

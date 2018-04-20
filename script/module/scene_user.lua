@@ -15,6 +15,10 @@ function __init__(self)
 	self.cls_scene_user:save_field("scene_info")
 end
 
+function cls_scene_user:create(uid)
+	self.uid = uid
+end
+
 function cls_scene_user:destroy()
 	
 end

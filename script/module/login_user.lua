@@ -24,14 +24,6 @@ function cls_login_user:create(cid,account)
 	self.cid = cid
 	self.phase = PHASE.LOGIN
 	self.account = account
-	self.timer = event.timer(1,function (timer)
-		local user = model.fetch_login_user_with_account(account)
-		if not user then
-			return
-		end
-		local db_channel = model.get_db_channel()
-		user:save(db_channel)
-	end)
 	model.bind_login_user_with_account(account,self)
 end
 
@@ -98,7 +90,6 @@ function cls_login_user:random_name()
 end
 
 function cls_login_user:destroy()
-	self.timer:cancel()
 	model.unbind_login_user_with_account(self.account)
 end
 

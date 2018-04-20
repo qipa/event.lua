@@ -4,7 +4,7 @@ local model = require "model"
 local util = require "util"
 
 local database_object = import "module.database_object"
-
+local scene_server = import "module.scene_server"
 cls_fighter = database_object.cls_database:inherit("fighter")
 
 function __init__(self)
@@ -69,3 +69,6 @@ function cls_fighter:set_pos(x,z)
 	self:move(x,z)
 end
 
+function cls_fighter:update()
+	print(self.uid,"update")
+end

@@ -25,7 +25,7 @@ function cls_agent_user:create(cid,uid)
 end
 
 function cls_agent_user:destroy()
-	model.unbind_agent_user_with_uid(uid,self)
+	model.unbind_agent_user_with_uid(self.uid,self)
 end
 
 function cls_agent_user:db_index()

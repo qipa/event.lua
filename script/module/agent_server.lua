@@ -167,18 +167,19 @@ function user_auth(self,cid,token)
 	local world = model.get_world_channel()
 	world:send("handler.world_handler","enter_world",{user_uid = user.uid,user_agent = env.dist_id})
 
-	local fighter = scene_user.cls_scene_user:new(cid,info.uid)
+	local fighter = scene_user.cls_scene_user:new(info.uid)
 	fighter:load(db_channel)
 	if not fighter.scene_info then
 		fighter.scene_info = {scene_id = 1001,scene_pos = {x = 100,z = 100}}
 	end
+
 	local scene_master = model.get_master_channel()
 	scene_master:send("handler.master_handler","enter_scene",{uid = user.uid,
 															  scene_id = fighter.scene_info.scene_id,
 															  scene_uid = fighter.scene_info.scene_uid,
 															  scene_pos = fighter.scene_info.scene_pos,
 															  agent = env.dist_id,
-															  fighter = fighter:pack()})
+															  fighter_data = fighter:pack()})
 	fighter:release()
 
 

@@ -77,7 +77,8 @@ function add_scene(scene_id,scene_uid,server)
 	scene_info[scene_uid] = {server = server,count = 0}
 end
 
-function execute_enter_scene(user_info,fighter,scene_id,scene_uid,scene_pos)
+function execute_enter_scene(user_info,fighter_data,scene_id,scene_uid,scene_pos)
+
 	if user_info.scene_uid then
 		server_manager:call_scene(user_info.scene_server,"handler.scene_handler","leave_scene",{scene_uid = user_info.scene_uid,
 																								user_uid = user_info.user_uid,
@@ -91,10 +92,11 @@ function execute_enter_scene(user_info,fighter,scene_id,scene_uid,scene_pos)
 	if not scene_server then
 		scene_server = server_manager:find_min_scene_server()
 		scene_uid = server_manager:call_scene(scene_server,"handler.scene_handler","create_scene",{scene_id = scene_id})
+		print(scene_uid,"!!!!")
 		add_scene(scene_id,scene_uid,scene_server)
 	end
 
-	server_manager:send_scene(scene_server,"handler.scene_handler","enter_scene",{scene_uid = scene_uid,pos = scene_pos,user_uid = user_uid,user_agent = user_agent,fighter = fighter})
+	server_manager:send_scene(scene_server,"handler.scene_handler","enter_scene",{scene_uid = scene_uid,pos = scene_pos,user_uid = user_uid,user_agent = user_agent,fighter_data = fighter_data})
 
 	user_info.scene_id = scene_id
 	user_info.scene_uid = scene_uid
@@ -116,7 +118,7 @@ function run_next_event(user_info)
 
 		if event.ev == EVENT.ENTER then
 			user_info.phase = PHASE.EXECUTE
-			execute_enter_scene(user_info,event.fighter,event.scene_id,event.scene_uid,event.scene_pos)
+			execute_enter_scene(user_info,event.fighter_data,event.scene_id,event.scene_uid,event.scene_pos)
 			user_info.phase = PHASE.INIT
 		else
 			user_info.phase = PHASE.EXECUTE
@@ -130,12 +132,13 @@ function run_next_event(user_info)
 end
 
 function enter_scene(channel,args)
+
 	local user_uid = args.uid
 	local user_agent = args.agent
 	local scene_id = args.scene_id
 	local scene_uid = args.scene_uid
 	local scene_pos = args.scene_pos
-	local fighter = args.fighter
+	local fighter_data = args.fighter_data
 
 	local user_info = _user_ctx[user_uid]
 	if not user_info then
@@ -150,7 +153,7 @@ function enter_scene(channel,args)
 										scene_id = scene_id,
 										scene_uid = scene_uid,
 										scene_pos = scene_pos,
-										fighter = fighter })
+										fighter_data = fighter_data })
 
 	if user_info.phase == PHASE.INIT then
 		run_next_event(user_info)

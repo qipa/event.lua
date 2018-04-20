@@ -1,5 +1,6 @@
 local aoi_core = require "fastaoi.core"
 local nav_core = require "nav.core"
+local cjson = require "cjson"
 local object = import "module.object"
 
 cls_scene = object.cls_base:inherit("scene")
@@ -9,14 +10,26 @@ function cls_scene:create(scene_id,scene_uid)
 	self.scene_uid = scene_uid
 	self.fighter_ctx = {}
 	self.aoi = aoi_core.new(1000,1000,2,5,1000)
-	self.nav = nav_core.create(scene_id)
+
+	local FILE = io.open(string.format("./config/%d.mesh",scene_id),"r")
+	local mesh_info = FILE:read("*a")
+	FILE:close()
+
+	local FILE = io.open(string.format("./config/%d.tile",scene_id),"r")
+	local tile_info = FILE:read("*a")
+	FILE:close()
+
+	local nav = nav_core.create(scene_id,cjson.decode(mesh_info))
+	nav:load_tile(cjson.decode(tile_info))
+
+	self.nav = nav
 end
 
 function cls_scene:enter(fighter,pos)
 	fighter:do_enter(self.scene_id,self.scene_uid)
 	self.fighter_ctx[fighter.uid] = fighter
-	local aoi_id,aoi_set = self.aoi:enter(fighter.uid,fighter.scene_info.pos.x,fighter.scene_info.pos.z,0)
-
+	local aoi_id,aoi_set = self.aoi:enter(fighter.uid,pos.x,pos.z,0)
+	fighter.scene_info.scene_pos = {x = pos.x,z = pos.z}
 	local enter_objs = {}
 	for _,uid in pairs(aoi_set) do
 		local other = self.fighter_ctx[uid]
