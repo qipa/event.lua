@@ -32,7 +32,7 @@ function start(self,client_mgr)
 		for token,info in pairs(_user_token) do
 			if now - info.time >= 10 * 100 then
 				_user_token[token] = nil
-				login_channel:send("handler.login_handler","rpc_leave_agent",{account = info.account})
+				login_channel:send("handler.login_handler","rpc_timeout_agent",{account = info.account})
 				event.error(string.format("%s:%d auth timeout",info.account,info.uid))
 			end
 		end
@@ -87,7 +87,7 @@ function user_kick(self,uid)
 		for token,info in pairs(_user_token) do
 			if info.uid == uid then
 				local login_channel = model.get_login_channel()
-				login_channel:send("handler.login_handler","rpc_leave_agent",{account = info.account})
+				login_channel:send("handler.login_handler","rpc_kick_agent",{account = info.account})
 				return
 			end
 		end
@@ -137,7 +137,6 @@ function user_auth(self,cid,token)
 end
 
 function user_enter(self,cid,uid,account)
-	print(cid,uid,account)
 	local db_channel = model.get_db_channel()
 	local user = agent_user.cls_agent_user:new(cid,uid,account)
 	

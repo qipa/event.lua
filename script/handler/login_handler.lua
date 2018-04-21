@@ -31,3 +31,11 @@ end
 function rpc_leave_agent(self,args)
 	login_server:user_leave_agent(args.account)
 end
+
+function rpc_kick_agent(self,args)
+	login_server:user_leave_agent(args.account)
+end
+
+function rpc_timeout_agent(self,args)
+	login_server:user_leave_agent(args.account)
+end
