@@ -21,6 +21,9 @@ local EVENT = {
 function __init__(self)
 	server_manager:listen("agent",self,"agent_down")
 	server_manager:listen("scene",self,"scene_down")
+	event.timer(1,function ()
+		table.print(_scene_ctx)
+	end)
 end
 
 function agent_down(self,server_id)
@@ -118,14 +121,13 @@ function sub_scene_count(scene_id,scene_uid)
 end
 
 function check_scene(scene_id,scene_uid)
-	-- table.print(_scene_ctx,"_scene_ctx")
 	local scene_server,scene_uid = find_scene(scene_id,scene_uid)
 	if not scene_server then
 		scene_server = server_manager:find_min_scene_server()
 		scene_uid = server_manager:call_scene(scene_server,"handler.scene_handler","create_scene",{scene_id = scene_id})
-		print("create scene",scene_id,scene_server,scene_uid)
 		add_scene(scene_id,scene_uid,scene_server)
 	end
+	add_scene_count(scene_id,scene_uid)
 	return scene_server,scene_uid
 end
 
@@ -158,7 +160,7 @@ function execute_enter_scene(user_info,fighter_data,scene_id,scene_uid,scene_pos
 	user_info.scene_uid = scene_uid
 	user_info.scene_server = scene_server
 
-	add_scene_count(scene_id,scene_uid)
+	
 end
 
 function execute_leave_scene(user_info)
