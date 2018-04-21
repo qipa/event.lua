@@ -123,7 +123,7 @@ local function sub_scene_count(scene_id,scene_uid)
 	server_manager:scene_server_sub_count(info.server)
 end
 
-local function check_scene(scene_id,scene_uid)
+local function do_enter_scene(scene_id,scene_uid)
 	local scene_server,scene_uid = find_scene(scene_id,scene_uid)
 	if not scene_server then
 		scene_server = server_manager:find_min_scene_server()
@@ -158,7 +158,7 @@ function execute_enter_scene(user_info,fighter_data,scene_id,scene_uid,scene_pos
 		_enter_mutex[scene_id] = mutex
 	end
 
-	local scene_server,scene_uid = mutex(check_scene,scene_id,scene_uid)
+	local scene_server,scene_uid = mutex(do_enter_scene,scene_id,scene_uid)
 
 	server_manager:send_scene(scene_server,"handler.scene_handler","enter_scene",{scene_uid = scene_uid,
 																				  pos = scene_pos,
