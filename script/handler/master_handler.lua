@@ -141,6 +141,7 @@ local function do_leave_scene(user_uid,scene_server,scene_id,scene_uid,switch)
 																				  switch = switch})
 	local scene_info = _scene_ctx[scene_id][scene_uid]
 	if info.count == 0 and info.clean then
+		_scene_ctx[scene_id][scene_uid] = nil
 		server_manager:send_scene(scene_server,"handler.scene_handler","delete_scene",{scene_uid = scene_uid})
 	end
 end
@@ -149,9 +150,6 @@ function execute_enter_scene(user_info,fighter_data,scene_id,scene_uid,scene_pos
 
 	if user_info.scene_uid then
 		do_leave_scene(user_info.user_uid,user_info.scene_server,user_info.scene_id,user_info.scene_uid,true)
-		user_info.scene_id = nil
-		user_info.scene_uid = nil
-		user_info.scene_server = nil
 	end
 
 	local mutex = _enter_mutex[scene_id]
