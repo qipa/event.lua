@@ -65,10 +65,12 @@ local function find_min_scene(scene_info)
 	local min_count
 	local min_scene_uid
 	for scene_uid,info in pairs(scene_info) do
-		if not min_count or info.count < min_count then
-			min_count = info.count
-			min_server = info.server
-			min_scene_uid = scene_uid
+		if info.clean == false then
+			if not min_count or info.count < min_count then
+				min_count = info.count
+				min_server = info.server
+				min_scene_uid = scene_uid
+			end
 		end
 	end
 
@@ -104,7 +106,7 @@ function add_scene(scene_id,scene_uid,server)
 		scene_info = {}
 		_scene_ctx[scene_id] = scene_info
 	end
-	scene_info[scene_uid] = {server = server,count = 0}
+	scene_info[scene_uid] = {server = server,count = 0,clean = false}
 end
 
 function add_scene_count(scene_id,scene_uid)
@@ -139,6 +141,10 @@ function execute_enter_scene(user_info,fighter_data,scene_id,scene_uid,scene_pos
 		server_manager:call_scene(user_info.scene_server,"handler.scene_handler","leave_scene",{scene_uid = user_info.scene_uid,
 																								user_uid = user_info.user_uid,
 																								switch = true})
+		local scene_info = _scene_ctx[scene_id][scene_uid]
+		if info.count == 0 and info.clean then
+			server_manager:send_scene(info.server,"handler.scene_handler","delete_scene",{scene_uid = scene_uid})
+		end
 		user_info.scene_id = nil
 		user_info.scene_uid = nil
 		user_info.scene_server = nil
@@ -168,7 +174,10 @@ function execute_leave_scene(user_info)
 	server_manager:call_scene(user_info.scene_server,"handler.scene_handler","leave_scene",{user_uid = user_info.user_uid,
 																							switch = false})
 
-	
+	local scene_info = _scene_ctx[scene_id][scene_uid]
+	if info.count == 0 and info.clean then
+		server_manager:send_scene(info.server,"handler.scene_handler","delete_scene",{scene_uid = scene_uid})
+	end
 end
 
 function run_next_event(user_info)
@@ -248,4 +257,10 @@ function transfer_scene(_,args)
 	if user_info.phase == PHASE.INIT then
 		run_next_event(user_info)
 	end
+end
+
+function delete_scene(_,args)
+	local scene_info = _scene_ctx[args.scene_id]
+	local info = scene_info[args.scene_uid]
+	info.clean = true
 end
