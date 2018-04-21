@@ -88,17 +88,15 @@ function user_enter_agent(self,cid,uid)
 		local client_manager = model.get_client_manager()
 		client_manager:close(user.cid,1)
 		_enter_agent_user[user.account] = {uid = uid,agent_server = agent_server}
+		server_manager:agent_count_add(agent_server)
 	end
 end
 
-function user_enter_agent_timeout(self,uid)
-
-
-end
-
 function user_leave_agent(self,account)
+	local enter_info = _enter_agent_user[account]
 	_enter_agent_user[account] = nil
-
+	server_manager:agent_count_add(enter_info.agent_server)
+	
 	local queue = _account_queue[account]
 	if not queue then
 		return

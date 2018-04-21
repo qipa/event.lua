@@ -72,15 +72,16 @@ end
 function bench(count)
 
 	for i = 1,count do
-		local ip,port = table.unpack(env.login_addr)
-		print(string.format("tcp://%s:%d",ip,port))
-		local channel,err = event.connect(string.format("tcp://%s:%d",ip,port),2,true,client_channel)
-		if not channel then
-			event.error(err)
-			return
-		end
-		channel.packet = util.packet_new()
 		event.fork(function ()
+			local ip,port = table.unpack(env.login_addr)
+			print(string.format("tcp://%s:%d",ip,port))
+			local channel,err = event.connect(string.format("tcp://%s:%d",ip,port),2,false,client_channel)
+			if not channel then
+				event.error(err)
+				return
+			end
+			channel.packet = util.packet_new()
+
 			_M.login(channel,"mrq"..i)
 		end)
 		
@@ -91,6 +92,6 @@ event.fork(function ()
 	protocol.parse("login")
 	protocol.load()
 	
-	bench(2000)
+	bench(3000)
 end)
 

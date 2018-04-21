@@ -33,7 +33,7 @@ function start(self,client_mgr)
 			if now - info.time >= 60 * 100 then
 				_user_token[token] = nil
 				login_channel:send("handler.login_handler","rpc_leave_agent",{account = info.account})
-				event.error(string.format("token:%s timeout",token))
+				event.error(string.format("%s:%d auth timeout",info.account,info.uid))
 			end
 		end
 	end)
@@ -104,7 +104,7 @@ function leave(self,cid)
 		db_channel:findAndModify("save_version",{query = {uid = user.uid},update = updater,upsert = true})
 
 		local login_channel = model.get_login_channel()
-		print("user.account",user.account)
+
 		login_channel:send("handler.login_handler","rpc_leave_agent",{account = user.account})
 	end)
 end

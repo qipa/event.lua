@@ -48,10 +48,11 @@ function cls_agent_user:enter_game()
 	if not item_mgr then
 		item_mgr = module_item_mgr.cls_item_mgr:new(self.uid)
 	end
+	event.error(string.format("user:%d enter agent:%d",self.uid,env.dist_id))
 end
 
 function cls_agent_user:leave_game()
-	
+	event.error(string.format("user:%d leave agent:%d",self.uid,env.dist_id))
 end
 
 function cls_agent_user:enter_scene(scene_id,pos)

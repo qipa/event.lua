@@ -97,7 +97,7 @@ function cls_login_user:leave()
 	end
 
 	local db_channel = model.get_db_channel()
-	user:save(db_channel)
+	self:save(db_channel)
 	self:release()
 end
 
@@ -108,7 +108,7 @@ function cls_login_user:enter_agent(uid)
 	local token = util.authcode(json,tostring(time),1)
 
 	server_manager:send_agent(agent_server,"handler.agent_handler","user_register",{token = token,time = time,uid = uid,account = self.account})
-
+	
 	self:send_client("s2c_login_enter",{token = token,ip = agent_addr.ip,port = agent_addr.port})
 
 	return agent_server

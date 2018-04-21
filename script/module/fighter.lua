@@ -23,7 +23,7 @@ function cls_fighter:destroy()
 end
 
 function cls_fighter:do_enter(scene_id,scene_uid,aoi_id)
-	print("enter",self.uid,scene_id,scene_uid,aoi_id,env.dist_id)
+	event.error(string.format("user:%d enter scene:%d %d %d %d",self.uid,env.dist_id,scene_id,scene_uid,aoi_id))
 	local scene = scene_server:get_scene(scene_uid)
 	self.scene = scene
 	self.scene_info.scene_uid = scene_uid
@@ -31,6 +31,7 @@ function cls_fighter:do_enter(scene_id,scene_uid,aoi_id)
 end
 
 function cls_fighter:do_leave()
+	event.error(string.format("user:%d leave scene:%d %d %d",self.uid,env.dist_id,self.scene_info.scene_id,self.scene_info.scene_uid))
 	self.scene = nil
 	self.scene_info.scene_uid = nil
 end
