@@ -21,9 +21,9 @@ local EVENT = {
 function __init__(self)
 	server_manager:listen("agent",self,"agent_down")
 	server_manager:listen("scene",self,"scene_down")
-	event.timer(2,function ()
-		table.print(_scene_ctx)
-	end)
+	-- event.timer(2,function ()
+	-- 	table.print(_scene_ctx)
+	-- end)
 end
 
 function agent_down(self,server_id)
@@ -60,39 +60,40 @@ function scene_down(self,server_id)
 	end
 end
 
-function find_scene(scene_id,scene_uid)
+local function find_min_scene(scene_info)
+	local min_server
+	local min_count
+	local min_scene_uid
+	for scene_uid,info in pairs(scene_info) do
+		if not min_count or info.count < min_count then
+			min_count = info.count
+			min_server = info.server
+			min_scene_uid = scene_uid
+		end
+	end
+
+	if not min_server then
+		return
+	end
+
+	if min_count > 100 then
+		return
+	end
+	return min_server,min_scene_uid
+end
+
+local function find_scene(scene_id,scene_uid)
 	local scene_info = _scene_ctx[scene_id]
 	if not scene_info then
 		return
 	end
-
-	if not scene_uid then
-		local min_server
-		local min_count
-		local min_scene_uid
-		for scene_uid,info in pairs(scene_info) do
-			if not min_count or info.count < min_count then
-				min_count = info.count
-				min_server = info.server
-				min_scene_uid = scene_uid
-			end
-		end
-
-		if min_server then
-			if min_count > 100 then
-				return
-			end
-			return min_server,min_scene_uid
-		end
+	if not scene_uid or not scene_info[scene_uid] then
+		return find_min_scene(scene_info)
 	end
 
 	local info = scene_info[scene_uid]
-	if not info then
-		return
-	end
-
 	if info.count > 100 then
-		return
+		return find_min_scene(scene_info)
 	end
 	return info.server,scene_uid
 end
@@ -134,6 +135,7 @@ end
 function execute_enter_scene(user_info,fighter_data,scene_id,scene_uid,scene_pos)
 
 	if user_info.scene_uid then
+		sub_scene_count(user_info.scene_id,user_info.scene_uid)
 		server_manager:call_scene(user_info.scene_server,"handler.scene_handler","leave_scene",{scene_uid = user_info.scene_uid,
 																								user_uid = user_info.user_uid,
 																								switch = true})
@@ -158,16 +160,15 @@ function execute_enter_scene(user_info,fighter_data,scene_id,scene_uid,scene_pos
 
 	user_info.scene_id = scene_id
 	user_info.scene_uid = scene_uid
-	user_info.scene_server = scene_server
-
-	
+	user_info.scene_server = scene_server	
 end
 
 function execute_leave_scene(user_info)
+	sub_scene_count(user_info.scene_id,user_info.scene_uid)
 	server_manager:call_scene(user_info.scene_server,"handler.scene_handler","leave_scene",{user_uid = user_info.user_uid,
 																							switch = false})
 
-	sub_scene_count(user_info.scene_id,user_info.scene_uid)
+	
 end
 
 function run_next_event(user_info)

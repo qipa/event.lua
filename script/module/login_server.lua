@@ -21,11 +21,11 @@ end
 function enter(self,cid,addr)
 	local info = {cid = cid,addr = addr}
 	_login_ctx[cid] = info
-	-- event.error(string.format("cid:%d addr:%s enter",cid,addr))
+	event.error(string.format("cid:%d addr:%s enter",cid,addr))
 end
 
 function leave(self,cid)
-	-- event.error(string.format("cid:%d leave",cid))
+	event.error(string.format("cid:%d leave",cid))
 	local info = _login_ctx[cid]
 	if not info then
 		return
