@@ -164,24 +164,24 @@ function mongo_channel:findAndModify(name,doc)
 end
 
 function mongo_channel:ensureIndex(name,indexes)
-	local function make_index(index)
+	local function make_index(index,unique)
 		local list = {}
 		local name = "_index_"
-		for _,kv in pairs(index) do
-			local k,v = next(kv)
-			table.insert(list,k)
-			table.insert(list,v)
-			name = name..k.."_"
+		for field,value in pairs(index) do
+			table.insert(list,field)
+			table.insert(list,value)
+			name = name..field.."_"
 		end
 		local doc = {}
 		doc.name = name
+		doc.unique = unique
 		doc.key = bson.encode_order(table.unpack(list))
 		return doc
 	end
 
 	local idx = {}
 	for i,index in pairs(indexes) do
-		idx[i] = make_index(index.index)
+		idx[i] = make_index(index.index,index.unique or true)
 	end
 
 	return self:runCommand("createIndexes",name,"indexes",idx)

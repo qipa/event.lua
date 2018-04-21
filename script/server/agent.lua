@@ -9,6 +9,7 @@ local startup = import "server.startup"
 local id_builder = import "module.id_builder"
 local agent_server = import "module.agent_server"
 
+local mongo_indexes = import "common.mongo_indexes"
 
 model.register_binder("scene_channel","id")
 model.register_value("client_manager")
@@ -84,6 +85,12 @@ event.fork(function ()
 	local world_channel = model.get_world_channel()
 	world_channel:send("module.server_manager","register_agent_server",{ip = "0.0.0.0",port = port,id = env.dist_id})
 
+
+	local db_channel = model.get_db_channel()
+	db_channel:set_db("agent_user")
+	for name,indexes in pairs(mongo_indexes.agent_user) do
+		table.print(db_channel:ensureIndex(name,indexes))
+	end
 
 	agent_server:start(client_manager)
 	event.error("start success")

@@ -10,6 +10,7 @@ local startup = import "server.startup"
 local id_builder = import "module.id_builder"
 local server_manager = import "module.server_manager"
 local login_server = import "module.login_server"
+local mongo_indexes = import "common.mongo_indexes"
 model.register_value("client_manager")
 model.register_binder("agent_channel","id")
 
@@ -103,6 +104,13 @@ event.fork(function ()
 	end
 	event.error(string.format("login listen client success",reason))
 	model.set_client_manager(client_manager)
+
+	local db_channel = model.get_db_channel()
+	db_channel:set_db("login_user")
+	for name,indexes in pairs(mongo_indexes.login_user) do
+		db_channel:ensureIndex(name,indexes)
+	end
+
 
 	import "handler.login_handler"
 end)

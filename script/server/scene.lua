@@ -10,6 +10,7 @@ local helper = require "helper"
 local startup = import "server.startup"
 local server_manager = import "module.server_manager"
 local id_builder = import "module.id_builder"
+local mongo_indexes = import "common.mongo_indexes"
 
 local agent_channel = channel:inherit()
 function agent_channel:disconnect()
@@ -55,6 +56,12 @@ event.fork(function ()
 
 	local world_channel = model.get_world_channel()
 	world_channel:send("module.server_manager","register_scene_server",{id = env.dist_id,addr = addr_info})
+
+	local db_channel = model.get_db_channel()
+	db_channel:set_db("scene_user")
+	for name,indexes in pairs(mongo_indexes.scene_user) do
+		db_channel:ensureIndex(name,indexes)
+	end
 
 	import "handler.scene_handler"
 

@@ -93,7 +93,7 @@ function find_min_agent(self)
 	local best
 	local host
 	for agent_server_id,agent in pairs(_agent_server_manager) do
-		if not min or min < agent.count then
+		if not min or min > agent.count then
 			min = agent.count
 			best = agent_server_id
 			host = {ip = agent.ip,port = agent.port}
