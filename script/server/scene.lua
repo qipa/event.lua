@@ -20,7 +20,7 @@ function agent_channel:disconnect()
 end
 
 event.fork(function ()
-	-- helper.heap.start("scene")
+	helper.heap.start("scene")
 
 	startup.run(env.mongodb)
 
@@ -65,7 +65,11 @@ event.fork(function ()
 
 	import "handler.scene_handler"
 
-	-- event.timer(10,function ()
-	-- 	helper.heap.dump("scene")
-	-- end)
+	local count = 1
+	while true do
+		helper.heap.dump("timeout")
+		print(event.run_process(string.format("pprof --text ./event scene.%04d.heap",count)))
+		count = count + 1
+		event.sleep(10)
+	end
 end)

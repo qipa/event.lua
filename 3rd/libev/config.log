@@ -599,7 +599,7 @@ configure:11502: $? = 0
 configure:11502: result: yes
 configure:11502: checking for kqueue
 configure:11502: gcc -o conftest -g -O3   conftest.c  >&5
-/tmp/ccEuAKAN.o: In function `main':
+/tmp/cc1eEMBk.o: In function `main':
 /data/caiguanqiu/event.lua/3rd/libev/conftest.c:65: undefined reference to `kqueue'
 collect2: ld returned 1 exit status
 configure:11502: $? = 1
@@ -675,7 +675,7 @@ configure: failed program was:
 configure:11502: result: no
 configure:11502: checking for port_create
 configure:11502: gcc -o conftest -g -O3   conftest.c  >&5
-/tmp/ccFqMlLR.o: In function `main':
+/tmp/ccyGgbNa.o: In function `main':
 /data/caiguanqiu/event.lua/3rd/libev/conftest.c:65: undefined reference to `port_create'
 collect2: ld returned 1 exit status
 configure:11502: $? = 1
@@ -767,7 +767,7 @@ configure:11502: $? = 0
 configure:11502: result: yes
 configure:11514: checking for clock_gettime
 configure:11514: gcc -o conftest -g -O3   conftest.c  >&5
-/tmp/ccVSDbd2.o: In function `main':
+/tmp/ccNrw38k.o: In function `main':
 /data/caiguanqiu/event.lua/3rd/libev/conftest.c:69: undefined reference to `clock_gettime'
 collect2: ld returned 1 exit status
 configure:11514: $? = 1
@@ -856,7 +856,7 @@ configure:11618: result: yes
 configure:11693: checking for library containing floor
 configure:11724: gcc -o conftest -g -O3   conftest.c  >&5
 conftest.c:44: warning: conflicting types for built-in function 'floor'
-/tmp/ccryhyN9.o: In function `main':
+/tmp/ccGP0Sar.o: In function `main':
 /data/caiguanqiu/event.lua/3rd/libev/conftest.c:48: undefined reference to `floor'
 collect2: ld returned 1 exit status
 configure:11724: $? = 1

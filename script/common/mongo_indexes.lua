@@ -15,3 +15,7 @@ world_user = {
 login_user = {
 	save_version = {{unique = true,index = {uid = 1}}}
 }
+
+common = {
+	
+}
