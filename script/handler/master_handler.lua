@@ -140,7 +140,7 @@ local function do_leave_scene(user_uid,scene_server,scene_id,scene_uid,switch)
 																				  user_uid = user_uid,
 																				  switch = switch})
 	local scene_info = _scene_ctx[scene_id][scene_uid]
-	if info.count == 0 and info.clean then
+	if scene_info.count == 0 and scene_info.clean then
 		_scene_ctx[scene_id][scene_uid] = nil
 		server_manager:send_scene(scene_server,"handler.scene_handler","delete_scene",{scene_uid = scene_uid})
 	end

@@ -22,7 +22,7 @@ local function client_data(cid,message_id,data,size)
 	end
 end
 
-local function client_accept(id,addr)
+local function client_accept(cid,addr)
 	local ok,err = xpcall(agent_server.enter,debug.traceback,agent_server,cid,addr)
 	if not ok then
 		event.error(err)

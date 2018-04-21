@@ -95,6 +95,7 @@ end
 function user_leave_agent(self,account)
 	local enter_info = _enter_agent_user[account]
 	_enter_agent_user[account] = nil
+	assert(enter_info ~= nil,account)
 	server_manager:agent_count_add(enter_info.agent_server)
 	
 	local queue = _account_queue[account]
@@ -103,11 +104,15 @@ function user_leave_agent(self,account)
 	end
 	_account_queue[account] = nil
 
+	local client_manager = model.get_client_manager()
+
 	local count = #queue
 	for i = 1,count-1 do
 		local cid = queue[i]
-		client_manager:close(cid)
-		_login_ctx[cid] = nil
+		if _login_ctx[cid] then
+			client_manager:close(cid)
+			_login_ctx[cid] = nil
+		end
 	end
 
 	local last_cid = queue[count]
