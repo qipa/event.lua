@@ -70,7 +70,6 @@ function leave(self,cid)
 	if not user then
 		return
 	end
-	user.cid = nil
 
 	event.fork(function ()
 		enter_info.mutex(user_leave,self,user)
@@ -86,6 +85,7 @@ function user_kick(self,uid)
 	if not user then
 		for token,info in pairs(_user_token) do
 			if info.uid == uid then
+				_user_token[token] = nil
 				local login_channel = model.get_login_channel()
 				login_channel:send("handler.login_handler","rpc_kick_agent",{account = info.account})
 				return
@@ -94,17 +94,12 @@ function user_kick(self,uid)
 		return
 	end
 
-	if not user.cid then
-		return
-	end
-
-	client_manager:close(user.cid)
-
 	local enter_info = _enter_user[user.cid]
 	_enter_user[user.cid] = nil
 	if not enter_info then
 		return
 	end
+	client_manager:close(user.cid)
 	_enter_user.mutex(user_leave,user)
 end
 

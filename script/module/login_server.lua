@@ -21,11 +21,11 @@ end
 function enter(self,cid,addr)
 	local info = {cid = cid,addr = addr}
 	_login_ctx[cid] = info
-	event.error(string.format("cid:%d addr:%s enter",cid,addr))
+	-- event.error(string.format("cid:%d addr:%s enter",cid,addr))
 end
 
 function leave(self,cid)
-	event.error(string.format("cid:%d leave",cid))
+	-- event.error(string.format("cid:%d leave",cid))
 	local info = _login_ctx[cid]
 	if not info then
 		return
@@ -89,6 +89,7 @@ function user_enter_agent(self,cid,uid)
 		client_manager:close(user.cid,1)
 		_enter_agent_user[user.account] = {uid = uid,agent_server = agent_server}
 		server_manager:agent_count_add(agent_server)
+		print("enter",info.account)
 	end
 end
 
