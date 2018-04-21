@@ -5,7 +5,8 @@ agent_user = {
 }
 
 scene_user = {
-	save_version = {{unique = true,index = {uid = 1}}}
+	save_version = {{unique = true,index = {uid = 1}}},
+	scene_info = {{unique = true,index = {uid = 1}}}
 }
 
 world_user = {
