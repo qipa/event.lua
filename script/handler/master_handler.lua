@@ -21,7 +21,7 @@ local EVENT = {
 function __init__(self)
 	server_manager:listen("agent",self,"agent_down")
 	server_manager:listen("scene",self,"scene_down")
-	event.timer(1,function ()
+	event.timer(2,function ()
 		table.print(_scene_ctx)
 	end)
 end
