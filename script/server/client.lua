@@ -51,13 +51,21 @@ function response.s2c_create_role(channel,message)
 	channel:write(channel.packet:pack(protocol.encode.c2s_login_enter({account = channel.account,uid = uid})))
 end
 
+function response.s2c_login_auth(channel,message)
+	channel.list = message.list
+	if #channel.list > 0 then
+		local uid = channel.list[1].uid
+		channel:write(channel.packet:pack(protocol.encode.c2s_login_enter({account = channel.account,uid = uid})))
+	else
+		channel:write(channel.packet:pack(protocol.encode.c2s_create_role({career = 1})))
+	end
+end
+
 local _M = {}
 
 function _M.login(channel,account)
 	channel.account = account
-	channel:write(channel.packet:pack(protocol.encode.c2s_login_auth({account = account})))
-	event.sleep(1)
-	channel:write(channel.packet:pack(protocol.encode.c2s_create_role({career = 1})))
+	channel:write(channel.packet:pack(protocol.encode.c2s_login_auth({account = account})))	
 end
 
 
@@ -83,6 +91,6 @@ event.fork(function ()
 	protocol.parse("login")
 	protocol.load()
 	
-	bench(500)
+	bench(2000)
 end)
 

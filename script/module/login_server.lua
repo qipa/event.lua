@@ -97,7 +97,6 @@ function user_enter_agent_timeout(self,uid)
 end
 
 function user_leave_agent(self,account)
-	print("user_leave_agent")
 	_enter_agent_user[account] = nil
 
 	local queue = _account_queue[account]

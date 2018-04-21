@@ -20,7 +20,6 @@ local PHASE = {
 }
 
 function cls_login_user:create(cid,account)
-	print("cls_login_user:create",cid)
 	self.cid = cid
 	self.phase = PHASE.LOGIN
 	self.account = account
@@ -38,7 +37,6 @@ function cls_login_user:send_client(proto,args)
 end
 
 function cls_login_user:auth()
-	print("cls_login_user:auth")
 	local db_channel = model.get_db_channel()
 	
 	self.phase = PHASE.LOADING
@@ -59,12 +57,11 @@ function cls_login_user:auth()
 	for _,role in pairs(self.role_list.list) do
 		table.insert(result,{uid = role.uid,name = role.name})
 	end
-	table.print(result,"auth")
+
 	self:send_client("s2c_login_auth",{list = result})
 end
 
 function cls_login_user:create_role(career)
-	print("cls_login_user:create_role")
 	local role = {career = career,name = "mrq",uid = id_builder:alloc_user_uid()}
 	table.insert(self.role_list.list,role)
 	self:dirty_field("role_list")
@@ -73,7 +70,7 @@ function cls_login_user:create_role(career)
 	for _,role in pairs(self.role_list.list) do
 		table.insert(result,{uid = role.uid,name = role.name})
 	end
-	table.print(result,"create role")
+
 	self:send_client("s2c_create_role",{list = result})
 end
 
@@ -105,10 +102,7 @@ function cls_login_user:leave()
 end
 
 function cls_login_user:enter_agent(uid)
-	print("enter agent")
-
 	local agent_server,agent_addr = server_manager:find_min_agent()
-	table.print(agent_addr,"agent_addr")
 	local time = util.time()
 	local json = cjson.encode({account = self.account,uid = uid})
 	local token = util.authcode(json,tostring(time),1)

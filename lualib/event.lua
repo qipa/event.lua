@@ -244,6 +244,44 @@ function _M.wait(session)
 	return co_yield(CO_STATE.WAIT,session)
 end
 
+function _M.mutex()
+	local current_thread
+	local ref = 0
+	local thread_queue = {}
+	local thread_session = {}
+
+	local function xpcall_ret(ok, ...)
+		ref = ref - 1
+		if ref == 0 then
+			current_thread = table.remove(thread_queue,1)
+			if current_thread then
+				local session = thread_session[current_thread]
+				_M.timer(0,function (timer)
+					timer:cancel()
+					_M.wakeup(session)
+				end)
+			end
+		end
+		assert(ok, (...))
+		return ...
+	end
+
+	return function(f, ...)
+		local thread = coroutine.running()
+		if current_thread and current_thread ~= thread then
+			table.insert(thread_queue, thread)
+			local session = _M.gen_session()
+			thread_session[thread] = session
+			_M.wait(session)
+			assert(ref == 0)	-- current_thread == thread
+		end
+		current_thread = thread
+
+		ref = ref + 1
+		return xpcall_ret(xpcall(f, debug.traceback, ...))
+	end
+end
+
 function _M.gen_session()
 	if _session >= math.maxinteger then
 		_session = 1

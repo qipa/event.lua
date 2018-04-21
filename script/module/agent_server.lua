@@ -110,7 +110,6 @@ function leave(self,cid)
 end
 
 function user_register(self,account,uid,token,time)
-	print("user_register",account,uid)
 	_user_token[token] = {time = time,uid = uid,account = account}
 end
 

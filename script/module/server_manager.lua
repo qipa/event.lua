@@ -146,8 +146,10 @@ function find_min_scene_server(self)
 	local min
 	local best
 	local addr
+
 	for scene_server_id,scene_server in pairs(_scene_server_manager) do
-		if not min or min < scene_server.count then
+
+		if not min or min > scene_server.count then
 			min = scene_server.count
 			best = scene_server_id
 			addr = scene_server.addr

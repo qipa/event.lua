@@ -1,8 +1,12 @@
+local event = require "event"
 local model = require "model"
+
 local server_manager = import "module.server_manager"
 
 _scene_ctx = _scene_ctx or {}
 _user_ctx = _user_ctx or {}
+
+_enter_mutex = _enter_mutex or {}
 
 local PHASE = {
 	INIT = 1,
@@ -72,7 +76,7 @@ function find_scene(scene_id,scene_uid)
 		end
 
 		if min_server then
-			if min_count > 200 then
+			if min_count > 100 then
 				return
 			end
 			return min_server,min_scene_uid
@@ -84,7 +88,7 @@ function find_scene(scene_id,scene_uid)
 		return
 	end
 
-	if info.count > 200 then
+	if info.count > 100 then
 		return
 	end
 	return info.server,scene_uid
@@ -113,6 +117,18 @@ function sub_scene_count(scene_id,scene_uid)
 	server_manager:scene_server_sub_count(info.server)
 end
 
+function check_scene(scene_id,scene_uid)
+	-- table.print(_scene_ctx,"_scene_ctx")
+	local scene_server,scene_uid = find_scene(scene_id,scene_uid)
+	if not scene_server then
+		scene_server = server_manager:find_min_scene_server()
+		scene_uid = server_manager:call_scene(scene_server,"handler.scene_handler","create_scene",{scene_id = scene_id})
+		print("create scene",scene_id,scene_server,scene_uid)
+		add_scene(scene_id,scene_uid,scene_server)
+	end
+	return scene_server,scene_uid
+end
+
 function execute_enter_scene(user_info,fighter_data,scene_id,scene_uid,scene_pos)
 
 	if user_info.scene_uid then
@@ -124,14 +140,19 @@ function execute_enter_scene(user_info,fighter_data,scene_id,scene_uid,scene_pos
 		user_info.scene_server = nil
 	end
 
-	local scene_server,scene_uid = find_scene(scene_id,scene_uid)
-	if not scene_server then
-		scene_server = server_manager:find_min_scene_server()
-		scene_uid = server_manager:call_scene(scene_server,"handler.scene_handler","create_scene",{scene_id = scene_id})
-		add_scene(scene_id,scene_uid,scene_server)
+	local mutex = _enter_mutex[scene_id]
+	if not mutex then
+		mutex = event.mutex()
+		_enter_mutex[scene_id] = mutex
 	end
 
-	server_manager:send_scene(scene_server,"handler.scene_handler","enter_scene",{scene_uid = scene_uid,pos = scene_pos,user_uid = user_uid,user_agent = user_agent,fighter_data = fighter_data})
+	local scene_server,scene_uid = mutex(check_scene,scene_id,scene_uid)
+
+	server_manager:send_scene(scene_server,"handler.scene_handler","enter_scene",{scene_uid = scene_uid,
+																				  pos = scene_pos,
+																				  user_uid = user_uid,
+																				  user_agent = user_agent,
+																				  fighter_data = fighter_data})
 
 	user_info.scene_id = scene_id
 	user_info.scene_uid = scene_uid

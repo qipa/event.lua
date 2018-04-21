@@ -38,14 +38,10 @@ function create_scene(self,scene_id)
 		_scene_ctx[scene_id] = scene_info
 	end
 
-	local scene_uid = next(scene_info)
-	if scene_uid == nil then
-		local scene_uid = id_builder:alloc_scene_uid()
-		local scene = scene.cls_scene:new(scene_id,scene_uid)
-		scene_info[scene_uid] = scene
-		_scene_uid2id[scene_uid] = scene_id
-		return scene_uid
-	end
+	local scene_uid = id_builder:alloc_scene_uid()
+	local scene = scene.cls_scene:new(scene_id,scene_uid)
+	scene_info[scene_uid] = scene
+	_scene_uid2id[scene_uid] = scene_id
 	return scene_uid
 end
 

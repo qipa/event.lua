@@ -23,6 +23,7 @@ function cls_fighter:destroy()
 end
 
 function cls_fighter:do_enter(scene_id,scene_uid,aoi_id)
+	print("enter",self.uid,scene_id,scene_uid,aoi_id,env.dist_id)
 	local scene = scene_server:get_scene(scene_uid)
 	self.scene = scene
 	self.scene_info.scene_uid = scene_uid
@@ -73,5 +74,5 @@ function cls_fighter:set_pos(x,z)
 end
 
 function cls_fighter:update()
-	print(self.uid,"update")
+	-- print(self.uid,"update")
 end
