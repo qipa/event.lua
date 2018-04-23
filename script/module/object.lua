@@ -206,7 +206,7 @@ function cls_base:save_field(field)
 	self.__save_fields[field] = true
 end
 
-function cls_base:save_field(field)
+function cls_base:pack_field(field)
 	self.__pack_fields[field] = true
 end
 
