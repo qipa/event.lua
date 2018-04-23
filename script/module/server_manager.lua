@@ -109,7 +109,8 @@ function send_agent(self,agent_server_id,file,method,args,callback)
 end
 
 function call_agent(self,agent_server_id,file,method,args)
-	return agent.channel:call(file,method,args,callback)
+	local agent = _agent_server_manager[agent_server_id]
+	return agent.channel:call(file,method,args)
 end
 
 function register_scene_server(channel,args)

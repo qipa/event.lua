@@ -3,7 +3,7 @@ local model = require "model"
 local util = require "util"
 local route = require "route"
 local cjson = require "cjson"
-
+	
 local agent_user = import "module.agent_user"
 local scene_user = import "module.scene_user"
 local common = import "common.common"
@@ -14,6 +14,7 @@ _enter_user = _enter_user or {}
 local client_manager
 
 function __init__(self)
+
 end
 
 function start(self,client_mgr)
@@ -37,6 +38,8 @@ function start(self,client_mgr)
 			end
 		end
 	end)
+
+	import "handler.agent_handler"
 end
 
 function stop(self)

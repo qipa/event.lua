@@ -46,8 +46,6 @@ event.fork(function ()
 
 	env.dist_id = startup.apply_id()
 	id_builder:init(env.dist_id)
-
-	import "handler.agent_handler"
 	
 	local scene_set
 	while true do
@@ -65,7 +63,13 @@ event.fork(function ()
 		end
 	end
 
-	event.error(string.format("scene already:%s",table.concat(scene_set,",")))
+	event.error(string.format("scene ready:%s",table.concat(scene_set,",")))
+
+	local db_channel = model.get_db_channel()
+	db_channel:set_db("agent_user")
+	for name,indexes in pairs(mongo_indexes.agent_user) do
+		db_channel:ensureIndex(name,indexes)
+	end
 
 	local client_manager = event.client_manager(1024)
 	client_manager:set_callback(client_accept,client_close,client_data)
@@ -85,12 +89,6 @@ event.fork(function ()
 	local world_channel = model.get_world_channel()
 	world_channel:send("module.server_manager","register_agent_server",{ip = "0.0.0.0",port = port,id = env.dist_id})
 
-
-	local db_channel = model.get_db_channel()
-	db_channel:set_db("agent_user")
-	for name,indexes in pairs(mongo_indexes.agent_user) do
-		table.print(db_channel:ensureIndex(name,indexes))
-	end
 
 	agent_server:start(client_manager)
 	event.error("start success")

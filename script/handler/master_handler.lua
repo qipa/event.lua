@@ -125,18 +125,20 @@ local function do_enter_scene(scene_id,scene_uid)
 		add_scene(scene_id,scene_uid,scene_server)
 	end
 	add_scene_count(scene_id,scene_uid)
-	return scene_server,scene_uid
+
+	local scene_addr = server_manager:get_scene_addr(scene_server)
+	return scene_server,scene_addr,scene_uid
 end
 
-local function do_leave_scene(user_uid,scene_server,scene_id,scene_uid,switch)
-	sub_scene_count(scene_id,scene_uid)
-	local fighter_data = server_manager:call_scene(scene_server,"handler.scene_handler","leave_scene",{scene_uid = scene_uid,
-																				  user_uid = user_uid,
+local function do_leave_scene(user_info,switch)
+	sub_scene_count(user_info.scene_id,user_info.scene_uid)
+	local fighter_data = server_manager:call_scene(user_info.scene_server,"handler.scene_handler","leave_scene",{scene_uid = user_info.scene_uid,
+																				  user_uid = user_info.user_uid,
 																				  switch = switch})
-	local scene_info = _scene_ctx[scene_id][scene_uid]
+	local scene_info = _scene_ctx[user_info.scene_id][user_info.scene_uid]
 	if scene_info.count == 0 and scene_info.clean then
-		_scene_ctx[scene_id][scene_uid] = nil
-		server_manager:send_scene(scene_server,"handler.scene_handler","delete_scene",{scene_uid = scene_uid})
+		_scene_ctx[user_info.scene_id][user_info.scene_uid] = nil
+		server_manager:send_scene(scene_server,"handler.scene_handler","delete_scene",{scene_uid = user_info.scene_uid})
 	end
 
 	user_info.scene_id = nil
@@ -147,18 +149,26 @@ local function do_leave_scene(user_uid,scene_server,scene_id,scene_uid,switch)
 end
 
 function execute_enter_scene(user_info,fighter_data,scene_id,scene_uid,scene_pos)
-	local fighter_data = fighter_data
-	if user_info.scene_uid then
-		fighter_data = do_leave_scene(user_info.user_uid,user_info.scene_server,user_info.scene_id,user_info.scene_uid,true)
-	end
-
 	local mutex = _enter_mutex[scene_id]
 	if not mutex then
 		mutex = event.mutex()
 		_enter_mutex[scene_id] = mutex
 	end
 
-	local scene_server,scene_uid = mutex(do_enter_scene,scene_id,scene_uid)
+	local scene_server,scene_addr,scene_uid = mutex(do_enter_scene,scene_id,scene_uid)
+	local result = server_manager:call_agent(user_info.user_agent,"handler.agent_handler","prepare_enter_scene",{user_uid = user_info.user_uid,
+																					 scene_id = scene_id,
+																					 scene_uid = scene_uid,
+																					 scene_server = scene_server,
+																					 scene_addr = scene_addr})
+	if not result then
+		return
+	end
+
+	local fighter_data = fighter_data
+	if user_info.scene_uid then
+		fighter_data = do_leave_scene(user_info,true)
+	end
 
 	server_manager:send_scene(scene_server,"handler.scene_handler","enter_scene",{scene_uid = scene_uid,
 																				  pos = scene_pos,
@@ -166,12 +176,7 @@ function execute_enter_scene(user_info,fighter_data,scene_id,scene_uid,scene_pos
 																				  user_agent = user_agent,
 																				  fighter_data = fighter_data})
 
-	local addr = server_manager:get_scene_addr(scene_server)
-	server_manager:send_agent(user_agent,"handler.agent_handler","user_enter_scene",{user_uid = user_uid,
-																					 scene_id = scene_id,
-																					 scene_uid = scene_uid,
-																					 scene_server = scene_server,
-																					 scene_addr = addr})
+	
 
 	user_info.scene_id = scene_id
 	user_info.scene_uid = scene_uid
@@ -179,7 +184,7 @@ function execute_enter_scene(user_info,fighter_data,scene_id,scene_uid,scene_pos
 end
 
 function execute_leave_scene(user_info)
-	do_leave_scene(user_info.user_uid,user_info.scene_server,user_info.scene_id,user_info.scene_uid,false)
+	do_leave_scene(user_info,false)
 end
 
 function enter_scene(_,args)

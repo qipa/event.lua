@@ -103,6 +103,7 @@ end
 
 function cls_login_user:enter_agent(uid)
 	local agent_server,agent_addr = server_manager:find_min_agent()
+	table.print(agent_addr)
 	local time = util.time()
 	local json = cjson.encode({account = self.account,uid = uid})
 	local token = util.authcode(json,tostring(time),1)

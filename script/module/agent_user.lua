@@ -67,11 +67,28 @@ function cls_agent_user:enter_scene(scene_id,pos)
 	scene_master:send("handler.master_handler","enter_scene",{scene_id = scene_id,pos = pos})
 end
 
-function cls_agent_user:on_enter_scene(scene_id,scene_uid,scene_server,scene_addr)
+function cls_agent_user:prepare_enter_scene(scene_id,scene_uid,scene_server,scene_addr)
+	local scene_channel = _scene_channel_ctx[scene_server]
+	if not scene_channel then
+		local addr
+		if scene_addr.file then
+			addr = string.format("ipc://%s",scene_addr.file)
+		else
+			addr = string.format("tcp://%s:%d",scene_addr.ip,scene_addr.port)
+		end
+
+		local channel,reason = event.connect(addr,4,false,scene_channel)
+		if not channel then
+			print(string.format("connect scene server:%d faield:%s",addr,reason))
+			return false
+		end
+		_scene_channel_ctx[scene_server] = channel
+	end
+
 	self.scene_id = scene_id
 	self.scene_uid = scene_uid
 	self.scene_server = scene_server
-	self.scene_addr = scene_addr
+	return true
 end
 
 function cls_agent_user:forward_scene(message_id,message)
@@ -81,14 +98,8 @@ end
 function cls_agent_user:send_scene(file,method,args)
 	local scene_channel = _scene_channel_ctx[self.scene_server]
 	if not scene_channel then
-		local channel,reason = event.connect(self.scene_addr,4,true,scene_channel)
-		if not channel then
-			print(string.format("connect scene server:%d faield:%s",self.scene_server,reason))
-			return
-		end
-		channel.id = self.scene_server
-		_scene_channel_ctx[self.scene_server] = channel
-		scene_channel = channel
+		print(string.format("scene server:%d not connected",self.scene_server))
+		return
 	end
 	scene_channel:send(file,method,args)
 end

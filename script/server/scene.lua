@@ -14,9 +14,12 @@ local mongo_indexes = import "common.mongo_indexes"
 
 local agent_channel = channel:inherit()
 function agent_channel:disconnect()
-	if self.id ~= nil then
-		server_manager:agent_server_down(self.id)
-	end
+
+end
+
+local function agent_accept(_,channel)
+
+
 end
 
 event.fork(function ()
@@ -36,7 +39,7 @@ event.fork(function ()
 	else
 		addr = "tcp://127.0.0.1:0"
 	end
-	local listener,reason = event.listen(addr,4,channel_accept,agent_channel)
+	local listener,reason = event.listen(addr,4,agent_accept,agent_channel)
 	if not listener then
 		event.breakout(reason)
 		return
