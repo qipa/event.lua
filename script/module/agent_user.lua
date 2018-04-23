@@ -67,9 +67,11 @@ function cls_agent_user:enter_scene(scene_id,pos)
 	scene_master:send("handler.master_handler","enter_scene",{scene_id = scene_id,pos = pos})
 end
 
-function cls_agent_user:user_enter_scene(scene_id,scene_uid,server_id,server_addr)
-	self.scene_server = server_id
-	self.scene_server_addr = server_addr
+function cls_agent_user:on_enter_scene(scene_id,scene_uid,scene_server,scene_addr)
+	self.scene_id = scene_id
+	self.scene_uid = scene_uid
+	self.scene_server = scene_server
+	self.scene_addr = scene_addr
 end
 
 function cls_agent_user:forward_scene(message_id,message)
@@ -79,7 +81,7 @@ end
 function cls_agent_user:send_scene(file,method,args)
 	local scene_channel = _scene_channel_ctx[self.scene_server]
 	if not scene_channel then
-		local channel,reason = event.connect(self.scene_server_addr,4,true,scene_channel)
+		local channel,reason = event.connect(self.scene_addr,4,true,scene_channel)
 		if not channel then
 			print(string.format("connect scene server:%d faield:%s",self.scene_server,reason))
 			return

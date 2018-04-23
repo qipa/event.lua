@@ -1,6 +1,7 @@
 local util = require "util"
 local protocol = require "protocol"
 local event = require "event"
+local model = require "model"
 
 local agent_server = import "module.agent_server"
 
@@ -20,6 +21,14 @@ end
 
 function user_kick(_,args)
 	agent_server:user_kick(args.uid)
+end
+
+function user_enter_scene(_,args)
+	local user = model.fetch_agent_user_with_uid(args.user_uid)
+	if not user then
+		return
+	end
+	user:on_enter_scene(args.scene_id,args.scene_uid,args.scene_server,args.scene_addr)
 end
 
 function forward_client(_,args)

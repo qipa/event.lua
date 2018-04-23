@@ -138,6 +138,11 @@ local function do_leave_scene(user_uid,scene_server,scene_id,scene_uid,switch)
 		_scene_ctx[scene_id][scene_uid] = nil
 		server_manager:send_scene(scene_server,"handler.scene_handler","delete_scene",{scene_uid = scene_uid})
 	end
+
+	user_info.scene_id = nil
+	user_info.scene_uid = nil
+	user_info.scene_server = nil
+		
 	return fighter_data
 end
 
@@ -160,6 +165,13 @@ function execute_enter_scene(user_info,fighter_data,scene_id,scene_uid,scene_pos
 																				  user_uid = user_uid,
 																				  user_agent = user_agent,
 																				  fighter_data = fighter_data})
+
+	local addr = server_manager:get_scene_addr(scene_server)
+	server_manager:send_agent(user_agent,"handler.agent_handler","user_enter_scene",{user_uid = user_uid,
+																					 scene_id = scene_id,
+																					 scene_uid = scene_uid,
+																					 scene_server = scene_server,
+																					 scene_addr = addr})
 
 	user_info.scene_id = scene_id
 	user_info.scene_uid = scene_uid

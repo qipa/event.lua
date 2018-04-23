@@ -159,6 +159,14 @@ function find_min_scene_server(self)
 	return best,addr
 end
 
+function get_scene_addr(self,scene_server_id)
+	local scene_info = _scene_server_manager[scene_server_id]
+	if not scene_info then
+		return
+	end
+	return scene_info.addr
+end
+
 function send_scene(self,scene_server_id,file,method,args,callback)
 	local scene_info = _scene_server_manager[scene_server_id]
 	if not scene_info then
