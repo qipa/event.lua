@@ -1,15 +1,22 @@
 local event = require "event"
 local cjson = require "cjson"
 local model = require "model"
+local channel = require "channel"
 local util = require "util"
 local protocol = require "protocol"
 
 local database_object = import "module.database_object"
 local module_item_mgr = import "module.item_manager"
 
+_scene_channel_ctx = _scene_channel_ctx or {}
+
+local scene_channel = channel:inherit()
+
+function scene_channel:disconnect()
+	_scene_channel_ctx[self.id] = nil
+end
 
 cls_agent_user = database_object.cls_database:inherit("agent_user","uid","cid")
-
 
 
 function __init__(self)
@@ -70,14 +77,15 @@ function cls_agent_user:forward_scene(message_id,message)
 end
 
 function cls_agent_user:send_scene(file,method,args)
-	local scene_channel = model.fetch_scene_channel_with_id(self.scene_server)
+	local scene_channel = _scene_channel_ctx[self.scene_server]
 	if not scene_channel then
-		local channel,reason = event.connect(self.scene_server_addr,4,true)
+		local channel,reason = event.connect(self.scene_server_addr,4,true,scene_channel)
 		if not channel then
 			print(string.format("connect scene server:%d faield:%s",self.scene_server,reason))
 			return
 		end
-		model.bind_scene_channel_with_id(self.scene_server,channel)
+		channel.id = self.scene_server
+		_scene_channel_ctx[self.scene_server] = channel
 		scene_channel = channel
 	end
 	scene_channel:send(file,method,args)
