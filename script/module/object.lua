@@ -47,9 +47,15 @@ function cls_base:inherit(name,...)
 	cls.__parent = parent.__name
 	cls.__childs = {}
 	cls.__save_fields = {}
+	cls.__pack_fields = {}
 	if parent.__save_fields then
 		for f in pairs(parent.__save_fields) do
 			cls.__save_fields[f] = true
+		end
+	end
+	if parent.__pack_fields then
+		for f in pairs(parent.__pack_fields) do
+			cls.__pack_fields[f] = true
 		end
 	end
 	cls.__method = {}
@@ -117,7 +123,7 @@ end
 
 
 function cls_base:new(...)
-	local obj = {__event = {},__dirty = {},__name = self.__name}
+	local obj = {__dirty = {},__name = self.__name}
 	local self = class_ctx[self.__name]
 	new_object(self,obj)
 
@@ -130,7 +136,7 @@ end
 function cls_base:instance_from(data)
 	local object_type = self:get_type()
 	local class = class_ctx[object_type]
-	local object = {__event = {}}
+	local object = {__dirty = {},__name = self.__name}
 	new_object(class,object)
 	for k,v in pairs(data) do
 		object[k] = v
@@ -167,8 +173,28 @@ function cls_base:tostring()
 	return table.concat(str,",")
 end
 
-function cls_base:pack()
-	return table.tostring(self)
+function cls_base:pack(clone)
+	local cls = class.get(self:get_type())
+	local result = {}
+	for k,v in pairs(self) do
+		if cls.__pack_fields[k] or cls.__save_fields[k] then
+			if type(v) == "table" then
+				if v.__name then
+					result[k] = v:pack(true)
+				else
+					result[k] = v
+				end
+			else
+				result[k] = v
+			end
+		end
+	end
+
+	if clone then
+		return result
+	else
+		return table.tostring(result)
+	end
 end
 
 function cls_base:unpack(...)
@@ -178,6 +204,10 @@ end
 
 function cls_base:save_field(field)
 	self.__save_fields[field] = true
+end
+
+function cls_base:save_field(field)
+	self.__pack_fields[field] = true
 end
 
 class = {}
