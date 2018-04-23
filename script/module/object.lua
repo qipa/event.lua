@@ -29,9 +29,7 @@ local function reset_object_meta(name)
 		return
 	end
 	for obj in pairs(object_set) do
-		setmetatable(obj,{__index = cls, __tostring = function ()
-			return obj:toString()
-		end})
+		setmetatable(obj,{__index = cls})
 	end
 end
 
@@ -101,9 +99,7 @@ function cls_base:get_type()
 end
 
 local function new_object(self,obj)
-	setmetatable(obj,{__index = self, __tostring = function ()
-		return obj:tostring()
-	end})
+	setmetatable(obj,{__index = self})
 
 	local object_type = self:get_type()
 	local object_set = object_ctx[object_type]
@@ -156,14 +152,6 @@ end
 --子类重写
 function cls_base:destroy()
 
-end
-
---子类重写
-function cls_base:tostring()
-	local time = object_ctx[self:get_type()][self].time
-	local str = {}
-	table.insert(str,string.format("time:%s",os.date("%m-%d %H:%M:%S",math.floor(time/100))))
-	return table.concat(str,",")
 end
 
 function cls_base:pack(clone)
