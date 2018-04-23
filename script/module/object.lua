@@ -55,6 +55,7 @@ function cls_base:inherit(name,...)
 		end
 	end
 	cls.__method = {}
+	cls.__pack_fields["__name"] = true
 
 	assert(name ~= parent.__name)
 
@@ -200,6 +201,7 @@ end
 
 function class.instance_from(name,data)
 	local cls = class.get(name)
+	assert(cls ~= nil,name)
 	local obj = cls:instance_from(data)
 	for key,value in pairs(obj) do
 		if type(value) == "table" then

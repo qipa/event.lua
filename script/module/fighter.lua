@@ -8,7 +8,10 @@ local scene_server = import "module.scene_server"
 cls_fighter = database_object.cls_database:inherit("fighter")
 
 function __init__(self)
-	
+	self.cls_fighter:pack_field("uid")
+	self.cls_fighter:pack_field("scene_info")
+	self.cls_fighter:pack_field("attr")
+	self.cls_fighter:pack_field("agent_user")
 end
 
 function cls_fighter:init(data)

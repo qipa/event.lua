@@ -144,6 +144,9 @@ function user_enter(self,cid,uid,account)
 
 	local fighter = scene_user.cls_scene_user:new(uid)
 	fighter:load(db_channel)
+	if not fighter.attr then
+		fighter.attr = {atk = 100,def = 100}
+	end
 	if not fighter.scene_info then
 		fighter.scene_info = {scene_id = 1001,scene_pos = {x = 100,z = 100}}
 	end
