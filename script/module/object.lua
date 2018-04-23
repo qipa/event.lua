@@ -6,9 +6,7 @@ class_ctx = class_ctx or {}
 
 object_ctx = object_ctx or {}
 
-counter = 0
-
-cls_base = { __name = "root", __parent = nil, __childs = {}}
+cls_base = cls_base or { __name = "root", __childs = {}}
 
 class_ctx[cls_base.__name] = cls_base
 
@@ -103,10 +101,6 @@ function cls_base:get_type()
 end
 
 local function new_object(self,obj)
-	counter = counter + 1
-
-	obj.__uid = counter
-
 	setmetatable(obj,{__index = self, __tostring = function ()
 		return obj:tostring()
 	end})
@@ -168,7 +162,6 @@ end
 function cls_base:tostring()
 	local time = object_ctx[self:get_type()][self].time
 	local str = {}
-	table.insert(str,string.format("obj.__uid:%d",self.__uid))
 	table.insert(str,string.format("time:%s",os.date("%m-%d %H:%M:%S",math.floor(time/100))))
 	return table.concat(str,",")
 end
@@ -264,7 +257,7 @@ function class.detect_leak()
 	
 	local log = {}
 	for obj,info in pairs(leak_obj) do
-		table.insert(log,string.format("object __uid:%d,type:%s,create time:%s,debug info:%s",obj.__uid,obj:get_type(),os.date("%m-%d %H:%M:%S",math.floor(info.time/100)),obj.__debugInfo or "unknown"))
+		table.insert(log,string.format("object type:%s,create time:%s,debug info:%s",obj:get_type(),os.date("%m-%d %H:%M:%S",math.floor(info.time/100)),obj.__debugInfo or "unknown"))
 	end
 	print("-----------------detect leak object-----------------")
 	print(table.concat(log,"\n"))
