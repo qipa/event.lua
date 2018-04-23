@@ -21,31 +21,25 @@ local EVENT = {
 function __init__(self)
 	server_manager:listen("agent",self,"agent_down")
 	server_manager:listen("scene",self,"scene_down")
-	-- event.timer(2,function ()
-	-- 	table.print(_scene_ctx)
-	-- end)
 end
 
 function agent_down(self,server_id)
 	local set = {}
 	for uid,user_info in pairs(_user_ctx) do
-		if user_info.agent == server_id then
-			table.insert(user_info.event_queue,{ev = EVENT.LEAVE})
+		if user_info.user_agent == server_id then
 			table.insert(set,user_info)
 		end
 	end
 
 	for _,user_info in pairs(set) do
-		if user_info.phase == PHASE.INIT then
-			event.fork(function ()
-				run_next_event(user_info)
-			end)
-		end
+		event.fork(function ()
+			leave_scene(nil,user_info.uid)
+		end)
 	end
 end
 
 function scene_down(self,server_id)
-	for uid,user_info in pairs(_user_ctx) do
+	for user_uid,user_info in pairs(_user_ctx) do
 		if user_info.server == server_id then
 			_user_ctx[user_uid] = nil
 		end
@@ -136,7 +130,7 @@ end
 
 local function do_leave_scene(user_uid,scene_server,scene_id,scene_uid,switch)
 	sub_scene_count(scene_id,scene_uid)
-	server_manager:call_scene(scene_server,"handler.scene_handler","leave_scene",{scene_uid = scene_uid,
+	local fighter_data = server_manager:call_scene(scene_server,"handler.scene_handler","leave_scene",{scene_uid = scene_uid,
 																				  user_uid = user_uid,
 																				  switch = switch})
 	local scene_info = _scene_ctx[scene_id][scene_uid]
@@ -144,12 +138,13 @@ local function do_leave_scene(user_uid,scene_server,scene_id,scene_uid,switch)
 		_scene_ctx[scene_id][scene_uid] = nil
 		server_manager:send_scene(scene_server,"handler.scene_handler","delete_scene",{scene_uid = scene_uid})
 	end
+	return fighter_data
 end
 
 function execute_enter_scene(user_info,fighter_data,scene_id,scene_uid,scene_pos)
-
+	local fighter_data = fighter_data
 	if user_info.scene_uid then
-		do_leave_scene(user_info.user_uid,user_info.scene_server,user_info.scene_id,user_info.scene_uid,true)
+		fighter_data = do_leave_scene(user_info.user_uid,user_info.scene_server,user_info.scene_id,user_info.scene_uid,true)
 	end
 
 	local mutex = _enter_mutex[scene_id]
@@ -175,29 +170,7 @@ function execute_leave_scene(user_info)
 	do_leave_scene(user_info.user_uid,user_info.scene_server,user_info.scene_id,user_info.scene_uid,false)
 end
 
-function run_next_event(user_info)
-	while true do
-		local event = table.remove(user_info.event_queue,1)
-		if not event then
-			return
-		end
-
-		if event.ev == EVENT.ENTER then
-			user_info.phase = PHASE.EXECUTE
-			execute_enter_scene(user_info,event.fighter_data,event.scene_id,event.scene_uid,event.scene_pos)
-			user_info.phase = PHASE.INIT
-		else
-			user_info.phase = PHASE.EXECUTE
-			execute_leave_scene(user_info)
-			user_info.phase = PHASE.INIT
-			if #user_info.event_queue == 0 then
-				_user_ctx[user_info.user_uid] = nil
-			end
-		end
-	end
-end
-
-function enter_scene(channel,args)
+function enter_scene(_,args)
 
 	local user_uid = args.uid
 	local user_agent = args.agent
@@ -210,31 +183,20 @@ function enter_scene(channel,args)
 	if not user_info then
 		user_info = {user_uid = user_uid,
 					 user_agent = user_agent,
-					 phase = PHASE.INIT,
-					 event_queue = {}}
+					 mutex = event.mutex()}
 		_user_ctx[user_uid] = user_info
 	end
 
-	table.insert(user_info.event_queue,{ev = EVENT.ENTER,
-										scene_id = scene_id,
-										scene_uid = scene_uid,
-										scene_pos = scene_pos,
-										fighter_data = fighter_data })
-
-	if user_info.phase == PHASE.INIT then
-		run_next_event(user_info)
-	end
+	user_info.mutex(execute_enter_scene,user_info,fighter_data,scene_id,scene_uid,scene_pos)
 end
 
-function leave_scene(channel,args)
+function leave_scene(_,args)
 	local user_info = _user_ctx[args.uid]
 	if not user_info then
 		return true
 	end
-	table.insert(user_info.event_queue,{ev = EVENT.LEAVE})
-	if user_info.phase == PHASE.INIT then
-		run_next_event(user_info)
-	end
+	user_info.mutex(execute_leave_scene,user_info)
+	_user_ctx[args.uid] = nil
 	return true
 end
 
@@ -244,14 +206,11 @@ function transfer_scene(_,args)
 		return
 	end
 
-	table.insert(user_info.event_queue,{ev = EVENT.ENTER,
-										scene_id = args.scene_id,
-										scene_uid = args.scene_uid,
-										scene_pos = args.pos })
+	local scene_id = args.scene_id
+	local scene_uid = args.scene_uid
+	local scene_pos = args.scene_pos
 
-	if user_info.phase == PHASE.INIT then
-		run_next_event(user_info)
-	end
+	user_info.mutex(execute_enter_scene,user_info,nil,scene_id,scene_uid,scene_pos)
 end
 
 function delete_scene(_,args)

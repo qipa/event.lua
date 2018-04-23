@@ -1,4 +1,5 @@
 local model = require "model"
+local event = require "event"
 local persistence = require "persistence"
 local util = require "util"
 
@@ -160,11 +161,19 @@ end
 
 function send_scene(self,scene_server_id,file,method,args,callback)
 	local scene_info = _scene_server_manager[scene_server_id]
+	if not scene_info then
+		event.error(string.format("no such scene server:%d",scene_server_id))
+		return
+	end
 	scene_info.channel:send(file,method,args,callback)
 end
 
 function call_scene(self,scene_server_id,file,method,args)
 	local scene_info = _scene_server_manager[scene_server_id]
+	if not scene_info then
+		event.error(string.format("no such scene server:%d",scene_server_id))
+		return
+	end
 	return scene_info.channel:call(file,method,args,callback)
 end
 
