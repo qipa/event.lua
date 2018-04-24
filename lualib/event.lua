@@ -36,6 +36,10 @@ local tremove = table.remove
 local tunpack = table.unpack
 
 local ipairs = ipairs
+local xpcall = xpcall
+local traceback = debug.traceback
+local assert = assert
+local tostring = tostring
 
 local _M = {}
 
@@ -70,7 +74,7 @@ local function co_monitor(co,ok,state,session)
 			assert(state == CO_STATE.EXIT)
 		end
 	else
-		_M.error(debug.traceback(co,tostring(state)))
+		_M.error(traceback(co,tostring(state)))
 	end
 end
 
@@ -253,7 +257,7 @@ function _M.mutex()
 	local function xpcall_ret(ok, ...)
 		ref = ref - 1
 		if ref == 0 then
-			current_thread = table.remove(thread_queue,1)
+			current_thread = tremove(thread_queue,1)
 			if current_thread then
 				local session = thread_session[current_thread]
 				_M.timer(0,function (timer)
@@ -269,7 +273,7 @@ function _M.mutex()
 	return function(f, ...)
 		local thread = coroutine.running()
 		if current_thread and current_thread ~= thread then
-			table.insert(thread_queue, thread)
+			tinsert(thread_queue, thread)
 			local session = _M.gen_session()
 			thread_session[thread] = session
 			_M.wait(session)
@@ -278,7 +282,7 @@ function _M.mutex()
 		current_thread = thread
 
 		ref = ref + 1
-		return xpcall_ret(xpcall(f, debug.traceback, ...))
+		return xpcall_ret(xpcall(f, traceback, ...))
 	end
 end
 
@@ -385,7 +389,7 @@ local function event_dispatch(ev,...)
 		_M.error(string.format("no such ev:%d",ev))
 		return
 	end
-	local ok,err = xpcall(ev_func,debug.traceback,...)
+	local ok,err = xpcall(ev_func,traceback,...)
 	if not ok then
 		_M.error(err)
 	end

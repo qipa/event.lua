@@ -16,12 +16,12 @@ local profiler = require "profiler.core"
 local worker = require "worker"
 
 table.print = util.dump
--- table.encode = serialize.pack
--- table.decode = serialize.unpack
--- table.tostring = serialize.tostring
-table.encode = dump.pack
-table.decode = dump.unpack
-table.tostring = dump.tostring
+table.encode = serialize.pack
+table.decode = serialize.unpack
+table.tostring = serialize.tostring
+-- table.encode = dump.pack
+-- table.decode = dump.unpack
+-- table.tostring = dump.tostring
 
 string.split = util.split
 string.copy = util.clone_string

@@ -11,26 +11,29 @@ local agent_server = import "module.agent_server"
 
 local mongo_indexes = import "common.mongo_indexes"
 
+local xpcall = xpcall
+local traceback = debug.traceback
+
 model.register_binder("scene_channel","id")
 model.register_value("client_manager")
 
 
 local function client_data(cid,message_id,data,size)
-	local ok,err = xpcall(agent_server.dispatch_client,debug.traceback,agent_server,cid,message_id,data,size)
+	local ok,err = xpcall(agent_server.dispatch_client,traceback,agent_server,cid,message_id,data,size)
 	if not ok then
 		event.error(err)
 	end
 end
 
 local function client_accept(cid,addr)
-	local ok,err = xpcall(agent_server.enter,debug.traceback,agent_server,cid,addr)
+	local ok,err = xpcall(agent_server.enter,traceback,agent_server,cid,addr)
 	if not ok then
 		event.error(err)
 	end
 end
 
 local function client_close(cid)
-	local ok,err = xpcall(agent_server.leave,debug.traceback,agent_server,cid)
+	local ok,err = xpcall(agent_server.leave,traceback,agent_server,cid)
 	if not ok then
 		event.error(err)
 	end

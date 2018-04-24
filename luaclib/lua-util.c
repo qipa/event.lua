@@ -271,7 +271,7 @@ ltostring(lua_State* L) {
                 }  else {
                     LUAI_UACNUMBER number = (LUAI_UACNUMBER)lua_tonumber(L, 1);
                     double d = (double)number;
-                    if ((LUAI_UACNUMBER)d == number) {
+                    if (!isnan(d) && !isinf(d) && (LUAI_UACNUMBER)d == number) {
                         char buff[64] = {0};
                         dtoa_fast(d, buff);
                         lua_pushstring(L,buff);
