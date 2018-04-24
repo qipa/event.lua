@@ -61,6 +61,25 @@ function response.s2c_login_auth(channel,message)
 	end
 end
 
+function response.s2c_agent_enter(channel,message)
+	table.print(message,"s2c_agent_enter")
+end
+
+function response.s2c_world_enter(channel,message)
+	table.print(message,"s2c_world_enter")
+end
+
+function response.s2c_scene_enter(channel,message)
+	table.print(message,"s2c_scene_enter")
+	event.fork(function ()
+		while true do
+			event.sleep(0.2)
+			channel:write(channel.packet:pack(protocol.encode.c2s_move({x = 100,z = 100})))
+		end
+	end)
+	
+end
+
 local _M = {}
 
 function _M.login(channel,account)
@@ -92,6 +111,6 @@ event.fork(function ()
 	protocol.parse("login")
 	protocol.load()
 	
-	bench(1)
+	bench(2000)
 end)
 

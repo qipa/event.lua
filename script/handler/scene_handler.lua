@@ -8,7 +8,7 @@ end
 
 
 function enter_scene(_,args)
-	scene_server:enter_scene(args.fighter_data,args.scene_uid,args.pos)
+	scene_server:enter_scene(args.fighter_data,args.user_agent,args.scene_uid,args.pos)
 end
 
 function leave_scene(_,args)

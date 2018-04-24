@@ -67,8 +67,10 @@ function get_scene(self,scene_uid)
 	return scene_info[scene_uid]
 end
 
-function enter_scene(self,fighter_data,scene_uid,pos)
+function enter_scene(self,fighter_data,user_agent,scene_uid,pos)
 	local fighter = scene_user.cls_scene_user:unpack(fighter_data)
+	fighter.user_agent = user_agent
+	print("user_agent",user_agent)
 	model.bind_scene_user_with_uid(fighter.uid,fighter)
 
 	local scene = self:get_scene(scene_uid)

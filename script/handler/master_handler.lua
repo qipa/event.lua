@@ -5,18 +5,7 @@ local server_manager = import "module.server_manager"
 
 _scene_ctx = _scene_ctx or {}
 _user_ctx = _user_ctx or {}
-
-_enter_mutex = _enter_mutex or {}
-
-local PHASE = {
-	INIT = 1,
-	EXECUTE = 2
-}
-
-local EVENT = {
-	ENTER = 1,
-	LEAVE = 2
-}
+_scene_mutex = _scene_mutex or {}
 
 function __init__(self)
 	server_manager:listen("agent",self,"agent_down")
@@ -149,10 +138,10 @@ local function do_leave_scene(user_info,switch)
 end
 
 function execute_enter_scene(user_info,fighter_data,scene_id,scene_uid,scene_pos)
-	local mutex = _enter_mutex[scene_id]
+	local mutex = _scene_mutex[scene_id]
 	if not mutex then
 		mutex = event.mutex()
-		_enter_mutex[scene_id] = mutex
+		_scene_mutex[scene_id] = mutex
 	end
 
 	local scene_server,scene_addr,scene_uid = mutex(do_enter_scene,scene_id,scene_uid)
@@ -173,7 +162,7 @@ function execute_enter_scene(user_info,fighter_data,scene_id,scene_uid,scene_pos
 	server_manager:send_scene(scene_server,"handler.scene_handler","enter_scene",{scene_uid = scene_uid,
 																				  pos = scene_pos,
 																				  user_uid = user_uid,
-																				  user_agent = user_agent,
+																				  user_agent = user_info.user_agent,
 																				  fighter_data = fighter_data})
 
 	
@@ -213,7 +202,7 @@ function leave_scene(_,args)
 		return true
 	end
 	user_info.mutex(execute_leave_scene,user_info)
-	_user_ctx[args.uid] = nil
+	-- _user_ctx[args.uid] = nil
 	return true
 end
 

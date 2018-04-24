@@ -55,11 +55,12 @@ function cls_agent_user:enter_game()
 	if not item_mgr then
 		item_mgr = module_item_mgr.cls_item_mgr:new(self.uid)
 	end
-	-- event.error(string.format("user:%d enter agent:%d",self.uid,env.dist_id))
+	self:send_client("s2c_agent_enter",{user_uid = self.uid})
+	event.error(string.format("user:%d enter agent:%d",self.uid,env.dist_id))
 end
 
 function cls_agent_user:leave_game()
-	-- event.error(string.format("user:%d leave agent:%d",self.uid,env.dist_id))
+	event.error(string.format("user:%d leave agent:%d",self.uid,env.dist_id))
 end
 
 function cls_agent_user:enter_scene(scene_id,pos)
@@ -83,6 +84,8 @@ function cls_agent_user:prepare_enter_scene(scene_id,scene_uid,scene_server,scen
 			return false
 		end
 		_scene_channel_ctx[scene_server] = channel
+
+		channel:send("module.server_manager","register_agent_server",{ip = "0.0.0.0",port = port,id = env.dist_id})
 	end
 
 	self.scene_id = scene_id

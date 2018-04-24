@@ -42,3 +42,25 @@ protocol c2s_agent_auth
 {
 	string token
 }
+
+protocol s2c_agent_enter
+{
+	int user_uid
+}
+
+protocol s2c_world_enter
+{
+	int user_uid
+}
+
+protocol s2c_scene_enter
+{
+	int scene_id
+	int scene_uid
+}
+
+protocol c2s_move
+{
+	float x
+	float z
+}
