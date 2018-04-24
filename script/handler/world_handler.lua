@@ -9,3 +9,12 @@ end
 function leave_world(channel,args)
 	return world_server:leave(args.user_uid)
 end
+
+function forward(_,args)
+	local user = model.fetch_world_user_with_uid(args.uid)
+	if not user then
+		return
+	else
+		route.dispatch_client(args.message_id,args.message,nil,user)
+	end
+end

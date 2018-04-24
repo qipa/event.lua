@@ -46,12 +46,10 @@ function enter(self,user_uid,user_agent)
 	user.loading = true
 	user:load(db_channel)
 	user.loading = false
-	print("!!!!!!1",user_uid)
 	local user = model.fetch_world_user_with_uid(user_uid)
 	if not user then
 		return
 	end
-	print("!!!!!!2")
 	user:enter()
 end
 

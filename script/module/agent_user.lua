@@ -30,10 +30,12 @@ function cls_agent_user:create(cid,uid,account)
 	self.uid = uid
 	self.account = account
 	model.bind_agent_user_with_uid(uid,self)
+	model.bind_agent_user_with_cid(cid,self)
 end
 
 function cls_agent_user:destroy()
 	model.unbind_agent_user_with_uid(self.uid,self)
+	model.unbind_agent_user_with_cid(self.cid,self)
 end
 
 function cls_agent_user:db_index()
@@ -94,8 +96,13 @@ function cls_agent_user:prepare_enter_scene(scene_id,scene_uid,scene_server,scen
 	return true
 end
 
+function cls_agent_user:forward_world(message_id,message)
+	local world_channel = model.get_world_channel()
+	world_channel:send("handler.world_handler","forward",{uid = self.uid, message_id = message_id, message = message})
+end
+
 function cls_agent_user:forward_scene(message_id,message)
-	self:send_scene("handler.scene_handler","forward",{uid = self.uid,message_id = mesasge_id,mesasge = message})
+	self:send_scene("handler.scene_handler","forward",{uid = self.uid,message_id = message_id,message = message})
 end
 
 function cls_agent_user:send_scene(file,method,args)

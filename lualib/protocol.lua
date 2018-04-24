@@ -91,6 +91,7 @@ function _M.load()
 	local decode = {}
 
 	local name_id = {}
+	local id_name = {}
 
 	_ctx = protocolcore.new()
 	for i,info in ipairs(meta) do
@@ -107,6 +108,7 @@ function _M.load()
 		end
 
 		name_id[info.name] = i
+		id_name[i] = info.name
 	end
 
 	_M.encode = encode
@@ -119,6 +121,7 @@ function _M.load()
 		rawset(self,proto,func)
 	end})
 	_M.name_id = name_id
+	_M.id_name = id_name
 end
 
 function _M.dump(id)

@@ -7,3 +7,13 @@ AGENT_PHASE = {
 	ENTER = 2,
 	LEAVE = 3
 }
+
+SERVER_TYPE = {
+	AGENT = 0,
+	WORLD = 1,
+	SCENE = 2
+}
+
+PROTOCOL_FORWARD = {
+	c2s_move = SERVER_TYPE.SCENE
+}

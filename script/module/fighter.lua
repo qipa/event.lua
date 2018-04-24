@@ -68,7 +68,7 @@ function cls_fighter:pos_around_movable(x,z,depth)
 end
 
 function cls_fighter:move(x,z)
-	self.scene:move(fighter,x,z)
+	self.scene:fighter_move(self,x,z)
 	self.scene_info.x = x
 	self.scene_info.z = z
 end

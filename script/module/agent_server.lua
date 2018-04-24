@@ -3,7 +3,8 @@ local model = require "model"
 local util = require "util"
 local route = require "route"
 local cjson = require "cjson"
-	
+local protocol = require "protocol"
+
 local agent_user = import "module.agent_user"
 local scene_user = import "module.scene_user"
 local common = import "common.common"
@@ -55,7 +56,15 @@ function dispatch_client(self,cid,message_id,data,size)
 	if not user then
 		route.dispatch_client(message_id,data,size,cid)
 	else
-		route.dispatch_client(message_id,data,size,user)
+		local proto = protocol.id_name[message_id]
+		local forward = common.PROTOCOL_FORWARD[proto]
+		if forward == common.SERVER_TYPE.WORLD then
+			user:forward_world(message_id,string.copy(data,size))
+		elseif forward == common.SERVER_TYPE.SCENE then
+			user:forward_scene(message_id,string.copy(data,size))
+		else
+			route.dispatch_client(message_id,data,size,user)
+		end
 	end
 end
 
