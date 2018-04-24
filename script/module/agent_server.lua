@@ -163,8 +163,8 @@ function user_enter(self,cid,uid,account)
 		fighter.scene_info = {scene_id = 1001,scene_pos = {x = 100,z = 100}}
 	end
 
-	local scene_master = model.get_master_channel()
-	scene_master:send("handler.master_handler","enter_scene",{uid = user.uid,
+	local world_channel = model.get_world_channel()
+	world_channel:send("module.scene_manager","enter_scene",{uid = user.uid,
 															  scene_id = fighter.scene_info.scene_id,
 															  scene_uid = fighter.scene_info.scene_uid,
 															  scene_pos = fighter.scene_info.scene_pos,
@@ -182,15 +182,10 @@ function user_leave(self,user)
 	local world_channel = model.get_world_channel()
 	if world_channel then
 		world_channel:send("handler.world_handler","leave_world",{user_uid = user.uid})
-	end
-
-	local master_channel = model.get_master_channel()
-	if master_channel then
-		master_channel:send("handler.master_handler","leave_scene",{uid = user.uid})
+		world_channel:send("module.scene_manager","leave_scene",{uid = user.uid})
 	end
 
 	local db_channel = model.get_db_channel()
-	
 	user:save(db_channel)
 	
 	local updater = {}

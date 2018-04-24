@@ -42,23 +42,16 @@ event.fork(function ()
 
 	startup.connect_server("login")
 	startup.connect_server("world")
-	startup.connect_server("master")
 
 	env.dist_id = startup.apply_id()
 	id_builder:init(env.dist_id)
 	
-	local scene_set
-	while true do
-		local result,reason  = http.post_master("/howmany_scene")
-		if not result then
-			event.error(string.format("howmany_scene error:%s",reason))
-			event.breakout(reason)
-			return
-		end
-		if #result == 0 then
+	local scene_set = {}
+	while #scene_set == 0 do
+		scene_set = startup.how_many_scene()
+		if #scene_set == 0 then
 			event.sleep(1)
 		else
-			scene_set = result
 			break
 		end
 	end
@@ -83,12 +76,8 @@ event.fork(function ()
 	local login_channel = model.get_login_channel()
 	login_channel:send("module.server_manager","register_agent_server",{ip = "0.0.0.0",port = port,id = env.dist_id})
 
-	local master_channel = model.get_master_channel()
-	master_channel:send("module.server_manager","register_agent_server",{ip = "0.0.0.0",port = port,id = env.dist_id})
-
 	local world_channel = model.get_world_channel()
 	world_channel:send("module.server_manager","register_agent_server",{ip = "0.0.0.0",port = port,id = env.dist_id})
-
 
 	agent_server:start(client_manager)
 	event.error("start success")

@@ -28,7 +28,6 @@ event.fork(function ()
 	startup.run(env.mongodb)
 
 	startup.connect_server("world")
-	startup.connect_server("master")
 
 	env.dist_id = startup.apply_id()
 	id_builder:init(env.dist_id)
@@ -53,9 +52,6 @@ event.fork(function ()
 		addr_info.ip = ip
 		addr_info.port = port
 	end
-
-	local master_channel = model.get_master_channel()
-	master_channel:send("module.server_manager","register_scene_server",{id = env.dist_id,addr = addr_info})
 
 	local world_channel = model.get_world_channel()
 	world_channel:send("module.server_manager","register_scene_server",{id = env.dist_id,addr = addr_info})

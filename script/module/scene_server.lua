@@ -105,8 +105,8 @@ end
 
 
 function transfer_scene(self,fighter,scene_id,scene_uid,x,z)
-	local master_channel = model.get_master_channel()
-	master_channel:send("handler.master_handler","transfer_scene",{scene_id = scene_id,scene_uid = scene_uid,pos = {x = x,z = z},fighter = fighter:pack()})
+	local world_channel = model.get_world_channel()
+	world_channel:send("module.scene_manager","transfer_scene",{scene_id = scene_id,scene_uid = scene_uid,pos = {x = x,z = z},fighter = fighter:pack()})
 end
 
 function update()

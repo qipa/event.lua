@@ -65,11 +65,6 @@ function cls_agent_user:leave_game()
 	event.error(string.format("user:%d leave agent:%d",self.uid,env.dist_id))
 end
 
-function cls_agent_user:enter_scene(scene_id,pos)
-	local scene_master = model.get_master_channel()
-	scene_master:send("handler.master_handler","enter_scene",{scene_id = scene_id,pos = pos})
-end
-
 function cls_agent_user:prepare_enter_scene(scene_id,scene_uid,scene_server,scene_addr)
 	local scene_channel = _scene_channel_ctx[scene_server]
 	if not scene_channel then

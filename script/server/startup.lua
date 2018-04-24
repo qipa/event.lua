@@ -46,20 +46,19 @@ function run(db_addr)
 end
 
 function apply_id()
-	local count = 0
-	local result,reason
-	while not result do
-		result,reason = http.post_master("/apply_id")
-		if not result then
-			event.error(string.format("apply id error:%s",reason))
-			count = count + 1
-			event.sleep(1)
-		end
-	end
-	if not result then
-		os.exit(1)
-	end
-	return result.id
+	local world_channel = model.get_world_channel()
+	local id = world_channel:call("module.server_manager","apply_id")
+	return id
+end
+
+function how_many_agent()
+	local world_channel = model.get_world_channel()
+	return world_channel:call("module.server_manager","how_many_agent")
+end
+
+function how_many_scene()
+	local world_channel = model.get_world_channel()
+	return world_channel:call("module.server_manager","how_many_scene")
 end
 
 function connect_server(name)

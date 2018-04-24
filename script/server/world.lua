@@ -19,6 +19,8 @@ function common_channel:disconnect()
 			server_manager:agent_server_down(self.id)
 		elseif self.name == "scene" then
 			server_manager:scene_server_down(self.id)
+		elseif self.name == "login" then
+			server_manager:login_server_down(self.id)
 		end
 	end
 end
@@ -30,7 +32,7 @@ end
 event.fork(function ()
 	startup.run(env.mongodb)
 
-	env.dist_id = startup.apply_id()
+	env.dist_id = server_manager:apply_id()
 	id_builder:init(env.dist_id)
 	
 	local db_channel = model.get_db_channel()
@@ -38,7 +40,6 @@ event.fork(function ()
 	for name,indexes in pairs(mongo_indexes.world_user) do
 		db_channel:ensureIndex(name,indexes)
 	end
-
 
 	local ok,reason = event.listen(env.world,4,channel_accept,agent_channel)
 	if not ok then

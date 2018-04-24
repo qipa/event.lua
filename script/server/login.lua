@@ -53,6 +53,8 @@ end
 event.fork(function ()
 	startup.run(env.mongodb)
 
+	startup.connect_server("world")
+
 	env.dist_id = startup.apply_id()
 	id_builder:init(env.dist_id)
 	
@@ -62,18 +64,12 @@ event.fork(function ()
 		return
 	end
 
-	local agent_set
-	while true do
-		local result,reason  = http.post_master("/howmany_agent")
-		if not result then
-			event.error(string.format("howmany_agent error:%s",reason))
-			event.breakout(reason)
-			return
-		end
-		if #result == 0 then
+	local agent_set = {}
+	while #agent_set == 0 do
+		agent_set = startup.how_many_agent()
+		if #agent_set == 0 then
 			event.sleep(1)
 		else
-			agent_set = result
 			break
 		end
 	end

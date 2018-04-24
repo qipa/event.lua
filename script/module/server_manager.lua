@@ -7,6 +7,8 @@ _agent_server_manager = _agent_server_manager or {}
 
 _scene_server_manager = _scene_server_manager or {}
 
+_login_server = _login_server or nil
+
 _server_counter = 1
 
 _listener = _listener or {}
@@ -23,14 +25,14 @@ function __init__(self)
 	end
 end
 
-function apply_id(channel)
+function apply_id(self)
 	local id = _server_counter
 	_server_counter = _server_counter + 1
 	fs:save("dist_id",{id = _server_counter})
-	return {id = id}
+	return id
 end
 
-function howmany_agent()
+function how_many_agent()
 	local result = {}
 	for id,info in pairs(_agent_server_manager) do
 		table.insert(result,id)
@@ -38,7 +40,7 @@ function howmany_agent()
 	return result
 end
 
-function howmany_scene()
+function how_many_scene()
 	local result = {}
 	for id,info in pairs(_scene_server_manager) do
 		table.insert(result,id)
@@ -184,6 +186,18 @@ function call_scene(self,scene_server_id,file,method,args)
 		return
 	end
 	return scene_info.channel:call(file,method,args,callback)
+end
+
+function register_login_server(channel,args)
+	local login = {channel = channel,count = 0,id = args.id}
+	_login_server = login
+	channel.name = "agent"
+	channel.id = args.id
+	return true
+end
+
+function login_server_down(self)
+	_login_server = nil
 end
 
 function listen(self,event,module,method)
