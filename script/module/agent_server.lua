@@ -195,3 +195,15 @@ function user_leave(self,user)
 
 	login_channel:send("handler.login_handler","rpc_leave_agent",{account = user.account})
 end
+
+function get_all_enter_user(self)
+	local result = {}
+	for cid,info in pairs(_enter_user) do
+		local user = model.fetch_agent_user_with_uid(info.uid)
+		result[user.account] = {uid = user.uid,agent_server = env.dist_id}
+	end
+	for _,info in pairs(_user_token) do
+		result[info.account] = {uid = info.uid,agent_server = env.dist_id}
+	end
+	return result
+end

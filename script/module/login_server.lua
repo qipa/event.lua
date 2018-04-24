@@ -16,6 +16,19 @@ function start(self)
 			user:save(db_channel)
 		end
 	end)
+	server_manager:listen("agent",self,"agent_server_down")
+end
+
+function set_enter_user(self,enter_user)
+	_enter_agent_user = enter_user
+end
+
+function agent_server_down(self,agent_id)
+	for account,info in pairs(_enter_agent_user) do
+		if info.agent_server == agent_id then
+			_enter_agent_user[account] = nil
+		end
+	end
 end
 
 function enter(self,cid,addr)
@@ -89,7 +102,6 @@ function user_enter_agent(self,cid,uid)
 		client_manager:close(user.cid,1)
 		_enter_agent_user[user.account] = {uid = uid,agent_server = agent_server}
 		server_manager:agent_count_add(agent_server)
-		print("enter",info.account)
 	end
 end
 

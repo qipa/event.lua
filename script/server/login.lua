@@ -81,9 +81,13 @@ event.fork(function ()
 	local agent_ready = true
 	while true do
 		for _,agent_id in pairs(agent_set) do
-			if not server_manager:find_agent(agent_id) then
+			local agent_channel = server_manager:find_agent(agent_id)
+			if not agent_channel then
 				agent_ready = false
 				break
+			else
+				local result = server_manager:call_agent(agent_id,"handler.agent_handler","get_enter_user")
+				login_server:set_enter_user(result)
 			end
 		end
 		if agent_ready then

@@ -38,3 +38,7 @@ function forward_client(_,args)
 	end
 	user:forward_client(args.message_id,args.data)
 end
+
+function get_enter_user(_,_)
+	return agent_server:get_all_enter_user()
+end
