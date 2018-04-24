@@ -25,7 +25,7 @@ typedef void (*accept_callback)(void* ud,int id,const char* addr);
 typedef void (*close_callback)(void* ud,int id);
 typedef void (*data_callback)(void* ud,int client_id,int message_id,void* data,size_t size);
 
-__thread char CACHED_BUFFER[CACHED_SIZE];
+__thread uint8_t CACHED_BUFFER[CACHED_SIZE];
 
 struct client_manager {
 	struct ev_loop_ctx* loop_ctx;
@@ -86,11 +86,11 @@ read_complete(struct ev_session* ev_session, void* ud) {
 		total = ev_session_input_size(ev_session);
 		if (client->need > 0) {
 			if (total >= client->need) {
-				char* data = CACHED_BUFFER;
+				uint8_t* data = CACHED_BUFFER;
 				if (client->need > CACHED_SIZE) {
 					data = malloc(client->need);
 				}
-				ev_session_read(ev_session,data,client->need);
+				ev_session_read(ev_session,(char*)data,client->need);
 				
 				int i;
 			    for (i = 0; i < client->need; ++i) {

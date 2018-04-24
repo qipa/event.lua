@@ -73,8 +73,10 @@ function response.s2c_scene_enter(channel,message)
 	table.print(message,"s2c_scene_enter")
 	event.fork(function ()
 		while true do
-			event.sleep(0.2)
-			channel:write(channel.packet:pack(protocol.encode.c2s_move({x = 100,z = 100})))
+			event.sleep(0.1)
+			for i = 1,5 do
+				channel:write(channel.packet:pack(protocol.encode.c2s_move({x = 100,z = 100})))
+			end
 		end
 	end)
 	
@@ -111,6 +113,6 @@ event.fork(function ()
 	protocol.parse("login")
 	protocol.load()
 	
-	bench(1)
+	bench(3000)
 end)
 

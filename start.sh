@@ -13,7 +13,7 @@ fi
 
 rm ./*.ipc
 
-gdb --args ./event server/logger  server/world  server/login server/scene server/scene server/agent server/agent
+gdb --args ./event server/logger  server/world  server/login server/scene server/scene server/agent server/agent server/scene server/scene
 
 
 # ./event server/logger &

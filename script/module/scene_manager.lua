@@ -165,8 +165,6 @@ function execute_enter_scene(user_info,fighter_data,scene_id,scene_uid,scene_pos
 																				  user_agent = user_info.user_agent,
 																				  fighter_data = fighter_data})
 
-	
-
 	user_info.scene_id = scene_id
 	user_info.scene_uid = scene_uid
 	user_info.scene_server = scene_server	
