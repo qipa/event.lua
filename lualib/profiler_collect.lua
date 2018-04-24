@@ -30,7 +30,7 @@ function collect(...)
 		end
 	end
 	local now = os.time()
-	if now - time >= 1 then
+	if now - time >= 2 then
 		time = now
 		local info = {}
 		for frame,count in pairs(stdin) do
@@ -39,8 +39,11 @@ function collect(...)
 		table.sort(info,function (l,r)
 			return l.percent > r.percent
 		end)
-		for _,detail in ipairs(info) do
-			print(detail.frame,string.format("%f%%",detail.percent * 100))
+		for i,detail in ipairs(info) do
+			print(string.format("%060s  %s",detail.frame,string.format("%f%%",detail.percent * 100)))
+			if i >= 30 then
+				break
+			end
 		end
 	end
 end

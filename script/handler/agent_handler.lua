@@ -32,7 +32,6 @@ function prepare_enter_scene(_,args)
 end
 
 function forward_client(_,args)
-	print("forward_client")
 	local user = model.fetch_agent_user_with_uid(args.uid)
 	if not user then
 		return
