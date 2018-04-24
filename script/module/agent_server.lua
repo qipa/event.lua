@@ -32,7 +32,7 @@ function start(self,client_mgr)
 		local login_channel = model.get_login_channel()
 		local now = util.time()
 		for token,info in pairs(_user_token) do
-			if now - info.time >= 10 * 100 then
+			if now - info.time >= 60 * 100 then
 				_user_token[token] = nil
 				login_channel:send("handler.login_handler","rpc_timeout_agent",{account = info.account})
 				event.error(string.format("%s:%d auth timeout",info.account,info.uid))

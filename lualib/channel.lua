@@ -2,9 +2,16 @@ local co_core = require "co.core"
 local route = require "route"
 local event = require "event"
 local monitor = require "monitor"
+local util = require "util"
 
 local WARN_FLOW = 1024 * 1024
 local channel = {}
+
+local xpcall = xpcall
+local tinsert = table.insert
+local tunpack = table.unpack
+local setmetatable = setmetatable
+local pairs = pairs
 
 function channel:inherit()
 	local children = setmetatable({},{__index = self})
@@ -32,7 +39,7 @@ function channel:disconnect()
 	local list = {}
 	for session,ctx in pairs(self.session_ctx) do
 		if not ctx.callback then
-			table.insert(list,session)
+			tinsert(list,session)
 		end
 	end
 
@@ -89,7 +96,7 @@ function channel:dispatch(message,size)
 		if call_ctx.callback then
 			call_ctx.callback(message.args)
 		else
-			event.wakeup(message.session,table.unpack(message.args))
+			event.wakeup(message.session,tunpack(message.args))
 		end
 		self.session_ctx[message.session] = nil
 	else
@@ -104,9 +111,11 @@ function channel:data(data,size)
 end
 
 local function pack_table(tbl)
-	local str = table.tostring(tbl)
-	local pat = string.format("I4c%d",str:len())
-	return string.pack(pat,str:len()+4,str)
+	-- local str = table.tostring(tbl)
+	-- local pat = string.format("I4c%d",str:len())
+	-- return string.pack(pat,str:len()+4,str)
+	local ptr,size = table.encode(tbl)
+	return util.rpc_pack(ptr,size)
 end
 
 function channel:write(...)
@@ -132,10 +141,10 @@ function channel:send(file,method,args,callback)
 	if callback then
 		session = event.gen_session()
 	end
-	local str = pack_table({file = file,method = method,session = 0,args = args})
-	self:write(str)
+	local ptr,size = pack_table({file = file,method = method,session = 0,args = args})
+	self:write(ptr,size)
 	
-	monitor.report_output(file,method,#str)
+	monitor.report_output(file,method,size)
 
 	if session ~= 0 then
 		self.session_ctx[session] = {callback = callback}
@@ -145,10 +154,10 @@ end
 function channel:call(file,method,args)
 	local session = event.gen_session()
 	self.session_ctx[session] = {}
-	local str = pack_table({file = file,method = method,session = session,args = args})
-	self:write(str)
+	local ptr,size = pack_table({file = file,method = method,session = session,args = args})
+	self:write(ptr,size)
 
-	monitor.report_output(file,method,#str)
+	monitor.report_output(file,method,size)
 
 	local ok,err = event.wait(session)
 	if not ok then
@@ -158,8 +167,8 @@ function channel:call(file,method,args)
 end
 
 function channel:ret(session,...)
-	local str = pack_table({ret = true,session = session,args = {...}})
-	self:write(str)
+	local ptr,size = pack_table({ret = true,session = session,args = {...}})
+	self:write(ptr,size)
 end
 
 function channel:close()
