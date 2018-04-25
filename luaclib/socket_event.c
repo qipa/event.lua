@@ -123,7 +123,6 @@ _ev_read_cb(struct ev_loop* loop,struct ev_io* io,int revents) {
 	struct data_buffer* rdb = buffer_next(ev_session->loop_ctx);
 	rdb->data = malloc(ev_session->threshold);
 	rdb->size = ev_session->threshold;
-	int total = 0;
 	int fail = 0;
 	//一次性接完数据，再回调(为了预防恶意流，理论上应该接一次回调一次，在上层判断数据合法性)
 	for(;;) {
@@ -145,42 +144,32 @@ _ev_read_cb(struct ev_loop* loop,struct ev_io* io,int revents) {
 			fail = 1;
 			break;
 		} else {
-			total += n;
 			rdb->wpos += n;
 	
 			if (rdb->wpos == rdb->size) {
 				ev_session->threshold *= 2;
 				if (ev_session->threshold > MAX_BUFFER_SIZE)
 					ev_session->threshold = MAX_BUFFER_SIZE;
-
-				buffer_append(&ev_session->input,rdb);
-
-				struct data_buffer* next_rdb = buffer_next(ev_session->loop_ctx);
-				next_rdb->data = malloc(ev_session->threshold);
-				next_rdb->size = ev_session->threshold;
-
-				rdb = next_rdb;
 			} else {
 				ev_session->threshold /= 2;
 				if (ev_session->threshold < MIN_BUFFER_SIZE)
 					ev_session->threshold = MIN_BUFFER_SIZE;
-				break;
 			}
+			break;
 		}
 	}
 
 	buffer_append(&ev_session->input,rdb);
 
-	if (total != 0) {
-		if (ev_session->read_cb) {
-			ev_session->read_cb(ev_session,ev_session->userdata);
-		}
-	}
 	if (fail) {
 		ev_session_disable(ev_session,EV_READ | EV_WRITE);
 		ev_session->alive = 0;
 		if (ev_session->event_cb) {
 			ev_session->event_cb(ev_session,ev_session->userdata);
+		}
+	} else {
+		if (ev_session->read_cb) {
+			ev_session->read_cb(ev_session,ev_session->userdata);
 		}
 	}
 }
