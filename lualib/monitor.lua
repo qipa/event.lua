@@ -2,6 +2,11 @@ local event = require "event"
 local helper = require "helper"
 local logger = require "logger"
 
+local pairs = pairs
+local tinsert = table.insert
+local tconcat = table.concat
+local str_format = string.format
+
 local logger_obj = nil
 
 local timer = nil
@@ -17,30 +22,30 @@ local function update()
 	local logs = {}
 
 	local lua_mem = collectgarbage("count")
-	table.insert(logs,string.format("lua mem:%fkb,c mem:%fkb",lua_mem,helper.allocated()/1024))
+	tinsert(logs,str_format("lua mem:%fkb,c mem:%fkb",lua_mem,helper.allocated()/1024))
 
 	for name,info in pairs(diff_monitor) do
 		local average = info.total / info.count
-		table.insert(logs,string.format("%s time diff:average:%f,min:%f,max:%f,count:%d",name,average,info.min,info.max,info.count))
+		tinsert(logs,str_format("%s time diff:average:%f,min:%f,max:%f,count:%d",name,average,info.min,info.max,info.count))
 	end
 
 	for name,info in pairs(input_monitor) do
 		local average = info.total / info.count
-		table.insert(logs,string.format("%s input flow:average:%f,min:%d,max:%d,count:%d",name,average,info.min,info.max,info.count))
+		tinsert(logs,str_format("%s input flow:average:%f,min:%d,max:%d,count:%d",name,average,info.min,info.max,info.count))
 	end
 
 	for name,info in pairs(output_monitor) do
 		local average = info.total / info.count
-		table.insert(logs,string.format("%s output flow:average:%f,min:%d,max:%d,count:%d",name,average,info.min,info.max,info.count))
+		tinsert(logs,str_format("%s output flow:average:%f,min:%d,max:%d,count:%d",name,average,info.min,info.max,info.count))
 	end
-	logger_obj:WARN(table.concat(logs,"\n"))
+	logger_obj:WARN(tconcat(logs,"\n"))
 end
 
 function _M.report_diff(file,method,diff)
 	if not start then
 		return
 	end
-	local name = string.format("%s:%s",file,method)
+	local name = str_format("%s:%s",file,method)
 	local info = diff_monitor[name]
 	if not info then
 		info = {count = 0,min = nil,max = nil,total = 0}
@@ -60,7 +65,7 @@ function _M.report_input(file,method,size)
 	if not start then
 		return
 	end
-	local name = string.format("%s:%s",file,method)
+	local name = str_format("%s:%s",file,method)
 	local info = input_monitor[name]
 	if not info then
 		info = {count = 0,min = nil,max = nil,total = 0}
@@ -80,7 +85,7 @@ function _M.report_output(file,method,size)
 	if not start then
 		return
 	end
-	local name = string.format("%s:%s",file,method)
+	local name = str_format("%s:%s",file,method)
 	local info = output_monitor[name]
 	if not info then
 		info = {count = 0,min = nil,max = nil,total = 0}
