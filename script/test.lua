@@ -20,3 +20,12 @@ util.time_diff("time",function ()
 		local a = type({}) == 1
 	end
 end)
+
+print(os.tmpname())
+-- print(os.execute("ps -elf|grep event"))
+
+local FILE = io.tmpfile()
+FILE:write("!@")
+FILE:close()
+
+print(util.week_start())

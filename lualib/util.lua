@@ -2,6 +2,10 @@ require("lfs")
 local event = require "event"
 local util_core = require "util.core"
 
+local type = type
+local assert = assert
+local os_date = os.date
+
 local _M = {}
 
 for method,func in pairs(lfs) do
@@ -176,12 +180,12 @@ function _M.week_start(unix_time)
     local result = os.date("*t",day_start)
 
     local wday = result.wday
-    if wday == 1 then
+    if wday == 2 then
         return day_start
     end
 
-    if wday == 0 then
-        wday = 7
+    if wday == 1 then
+        wday = 8
     end
     return day_start - (wday-2) * 24 * 3600
 end
@@ -191,11 +195,30 @@ function _M.week_over(unix_time)
 end
 
 function _M.same_day(ti0,ti1,sep)
-
+    assert(ti0 ~= nil and ti1 ~= nil)
+    local sep = sep or 0
+    local date0 = os_date("*t",ti0 - sep)
+    local date1 = os_date("*t",ti1 - sep)
+    return date0.yday == date1.yday
 end
 
-function _M.same_week(ti0,ti1,sep)
+function _M.same_week(ti1,ti2,sep)
+    local ti1 = ti1 - (sep or 0)
+    local ti2 = ti2 - (sep or 0)
 
+    local wstart
+    if ti1 < ti2 then
+        wstart = _M.week_start(ti2)
+        if ti1 < wstart then
+            return false
+        end
+    else
+        wstart = _M.week_start(ti1)
+        if ti2 < wstart then
+            return false
+        end
+    end
+    return true
 end
 
 function _M.time_diff(desc,func)
