@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <assert.h>
+#include <math.h>
 
 #include "lua.h"
 #include "lualib.h"
@@ -31,6 +32,9 @@ struct client_manager {
 	struct ev_loop_ctx* loop_ctx;
 	struct ev_listener* listener;
 	struct object_container* container;
+	size_t max_client;
+	size_t max_offset;
+	uint32_t index;
 	accept_callback accept_func;
 	close_callback close_func;
 	data_callback data_func;
@@ -41,7 +45,7 @@ struct ev_client {
 	struct client_manager* manager;
 	struct ev_session* session;
 	struct ev_timer timer;
-	int id;
+	uint64_t id;
 	int need;
 	int freq;
 	int execute;
@@ -51,12 +55,26 @@ struct ev_client {
 	double tick;
 };
 
+static inline struct ev_client*
+get_client(struct client_manager* manager,uint64_t id) {
+	uint64_t slot = id - (id / manager->max_offset) * manager->max_offset;
+	struct ev_client* client = container_get(manager->container,slot);
+	if (!client) {
+		return NULL;
+	}
+	if (client->id != id) {
+		return NULL;
+	}
+	return client;
+}
+
 static void 
 close_client(int id,void* data) {
 	struct ev_client* client = data;
 	ev_session_free(client->session);
 	ev_timer_stop(loop_ctx_get(client->manager->loop_ctx),(struct ev_timer*)&client->timer);
-	container_remove(client->manager->container,client->id);
+	uint64_t slot = client->id - (client->id / client->manager->max_offset) * client->manager->max_offset;
+	container_remove(client->manager->container,slot);
 	free(client);
 }
 
@@ -155,14 +173,21 @@ accept_client(struct ev_listener *listener, int fd, const char* addr, void *ud) 
 
 	struct ev_client* client = malloc(sizeof(*client));
 	memset(client,0,sizeof(*client));
-	client->manager = manager;
-	client->session = ev_session_bind(manager->loop_ctx,fd);
-	client->id = container_add(manager->container,client);
-	if (client->id == -1) {
-		ev_session_free(client->session);
+
+	struct ev_session* session = ev_session_bind(manager->loop_ctx,fd);
+	int slot = container_add(manager->container,client);
+	if (slot == -1) {
+		ev_session_free(session);
 		free(client);
 		return;
 	}
+	
+	uint32_t index = manager->index++;
+
+	client->manager = manager;
+	client->session = session;
+	client->id = index * manager->max_offset + slot;
+
 	ev_session_setcb(client->session,read_complete,NULL,error_happen,client);
 	ev_session_enable(client->session,EV_READ);
 
@@ -186,6 +211,15 @@ client_manager_create(struct ev_loop_ctx* loop_ctx,size_t max,void* ud) {
 	manager->container = container_create(max);
 	manager->loop_ctx = loop_ctx;
 	manager->ud = ud;
+	manager->max_client = max;
+	manager->max_offset = 0;
+	manager->index = 1;
+
+	int offset = 0;
+	for (; max > 0; offset++)
+        max /= 10;
+    manager->max_offset = pow(10,offset);
+	
 	return manager;
 }
 
@@ -229,7 +263,7 @@ client_manager_stop(struct client_manager* manager) {
 
 int
 client_manager_close(struct client_manager* manager,int client_id,int grace) {
-	struct ev_client* client = container_get(manager->container,client_id);
+	struct ev_client* client = get_client(manager,client_id);
 	if (!client) {
 		return -1;
 	}
@@ -250,7 +284,7 @@ client_manager_close(struct client_manager* manager,int client_id,int grace) {
 
 void
 client_manager_send(struct client_manager* manager,int client_id,int message_id,void* data,size_t size) {
-	struct ev_client* client = container_get(manager->container,client_id);
+	struct ev_client* client = get_client(manager,client_id);
 
 	size_t total = size + sizeof(short) * 2;
 
@@ -351,7 +385,7 @@ lclient_manager_close(lua_State* L) {
 	struct lclient_manager* client_manager = lua_touserdata(L, 1);
 	int client_id = luaL_checkinteger(L, 2);
 	int grace = luaL_optinteger(L, 3, 0);
-	struct ev_client* client = container_get(client_manager->manager->container,client_id);
+	struct ev_client* client = get_client(client_manager->manager,client_id);
 	if (!client)
 		luaL_error(L,"client manager send failed,no such client:%d",client_id);
 	client_manager_close(client_manager->manager,client_id,grace);
@@ -364,7 +398,7 @@ lclient_manager_send(lua_State* L) {
 	int client_id = luaL_checkinteger(L, 2);
 	int message_id = luaL_checkinteger(L, 3);
 
-	struct ev_client* client = container_get(client_manager->manager->container,client_id);
+	struct ev_client* client = get_client(client_manager->manager,client_id);
 	if (!client)
 		luaL_error(L,"client manager send failed,no such client:%d",client_id);
 
@@ -428,7 +462,7 @@ int
 lcreate_client_manager(lua_State* L,struct ev_loop_ctx* loop_ctx,size_t max) {
 	struct lclient_manager* client_manager = lua_newuserdata(L, sizeof(*client_manager));
 	client_manager->manager = client_manager_create(loop_ctx,max,client_manager);
-	client_manager->alive = 1;
+	client_manager->alive = 1;    
 	client_manager->L = G(L)->mainthread;//callback must be run in main thread
 
 	if (luaL_newmetatable(L, "meta_client_manager")) {
