@@ -17,10 +17,11 @@
 #include "object_container.h"
 #include "common.h"
 
-#define CACHED_SIZE 1024 * 1024
-#define MAX_FREQ 100
-#define ALIVE_TIME 60 * 5
-#define WARN_OUTPUT_FLOW 10 * 1024
+#define CACHED_SIZE 		1024 * 1024
+#define MAX_FREQ 			100
+#define ALIVE_TIME 			60
+#define WARN_OUTPUT_FLOW 	10 * 1024
+#define MAX_SEQMENT 		64 * 1024
 
 typedef void (*accept_callback)(void* ud,int id,const char* addr);
 typedef void (*close_callback)(void* ud,int id);
@@ -100,6 +101,10 @@ read_complete(struct ev_session* ev_session, void* ud) {
 				client->need = header[0] | header[1] << 8;
 				client->need -= 2;
 				assert(client->need > 0);
+				if (client->need > MAX_SEQMENT) {
+					error_happen(ev_session, client);
+					return;
+				}
 			} else {
 				break;
 			}
