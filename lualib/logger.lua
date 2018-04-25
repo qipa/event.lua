@@ -23,8 +23,6 @@ local os_date = os.date
 
 local logger_container = {}
 
-local tmp_FILE
-
 local source_name
 
 local _M = {}
@@ -54,32 +52,34 @@ local function get_debug_info(logger)
 end
 
 local function append_log(logger,log_lv,...)
-	local log = tconcat({...},"\t")
-	local content
+	if not model.get_logger_channel or not model.get_logger_channel() then
+		return
+	end
 
 	if not source_name then
 		local list = env.name:split("/")
 		source_name = list[#list]
 	end
+
+	local log = tconcat({...},"\t")
+
+	local mb = {
+		log_lv = log_lv,
+		log_tag = LOG_TAG[log_lv],
+		log_type = logger.log_type,
+		time = os_time(),
+		source_name = source_name,
+		log = log,
+	}
 	
 	if log_lv == LOG_LV_ERROR then
 		local source,line = get_debug_info(logger)
-		content = strformat("[%s:%s][%s %s %s:%s] %s",LOG_TAG[log_lv],logger.log_type,os_date("%Y-%m-%d %H:%M:%S",os_time()),source_name,source,tostring(line),log)
-	else
-		content = strformat("[%s:%s][%s %s] %s",LOG_TAG[log_lv],logger.log_type,os_date("%Y-%m-%d %H:%M:%S",os_time()),source_name,log)
+		mb.source_file = source
+		mb.source_line = line
 	end
-
-	if not model.get_logger_channel or not model.get_logger_channel() then
-		if not tmp_FILE then
-			local name = strformat("./log/%s_%d.log",source_name,util.thread_id())
-			tmp_FILE = assert(io.open(name,"a+"))
-		end
-		tmp_FILE:write(content.."\r\n")
-		tmp_FILE:flush()
-		return
-	end
+	
 	local logger_channel = model.get_logger_channel()
-	logger_channel:send("handler.logger_handler","log",{log_lv,logger.log_type,content})
+	logger_channel:send("handler.logger_handler","log",mb)
 end
 
 function _M:DEBUG(...)
