@@ -131,7 +131,6 @@ _ev_read_cb(struct ev_loop* loop,struct ev_io* io,int revents) {
 		if (n < 0) {
 			if (errno) {
 				if (errno == EINTR) {
-
 					continue;
 				} else if (errno == EAGAIN) {
 					break;
@@ -165,6 +164,7 @@ _ev_read_cb(struct ev_loop* loop,struct ev_io* io,int revents) {
 				ev_session->threshold /= 2;
 				if (ev_session->threshold < MIN_BUFFER_SIZE)
 					ev_session->threshold = MIN_BUFFER_SIZE;
+				break;
 			}
 		}
 	}

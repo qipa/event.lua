@@ -1,5 +1,6 @@
 local util = require "util"
 require "lfs" 
+local dump_core = require "dump.core"
 
 local tohex = util.hex_encode
 local fromhex = util.hex_decode
@@ -30,7 +31,7 @@ function _M:save(k,v)
 	local name = self.db..k
 	local FILE = assert(io.open(name..".bak","w"))
 
-	local content = table.tostring(v)
+	local content = dump_core.tostring(v)
 	local md5 = MD5(content)
 	local hex = tohex(md5)
 
@@ -56,9 +57,9 @@ function _M:load(k)
 		local bak_cmd5 = tohex(MD5(bak_content))
 		FILE:close()
 		assert(bak_omd5 == bak_cmd5,string.format("load %s bak error,md5 error",k))
-		return table.decode(bak_content)
+		return dump_core.unpack(bak_content)
 	end
-	return table.decode(content)
+	return dump_core.unpack(content)
 end
 
 return _M

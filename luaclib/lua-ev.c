@@ -53,6 +53,9 @@ struct lua_ev_session {
 	int closed;
 	int wait;
 
+	int execute;
+	int mark;
+
 	int header;
 	int state;
 	int need;
@@ -113,6 +116,8 @@ session_create(lua_State* L, struct lua_ev* lev,int fd,int header) {
 	lev_session->closed = 0;
 	lev_session->header = header;
 	lev_session->state = STATE_HEAD;
+	lev_session->execute = 0;
+	lev_session->mark = 0;
 	
 	if (fd > 0)
 		lev_session->session = ev_session_bind(lev->loop_ctx, fd);
@@ -151,14 +156,17 @@ error_occur(struct ev_session* ev_session,void* ud) {
 	lua_rawgeti(lev->main, LUA_REGISTRYINDEX, lev->callback);
 	lua_pushinteger(lev->main, LUA_EV_ERROR);
 	lua_rawgeti(lev->main, LUA_REGISTRYINDEX, lev_session->ref);
-	lua_pcall(lev->main, 2, 0, 0);
 	lev_session->closed = 1;
 	session_destroy(lev_session);
+
+	lua_pcall(lev->main, 2, 0, 0);
 }
 
 static void
 read_complete(struct ev_session* ev_session, void* ud) {
 	struct lua_ev_session* lev_session = ud;
+	lev_session->execute = 1;
+
 	struct lua_ev* lev = lev_session->lev;
 
 	if (lev_session->header == 0) {
@@ -167,64 +175,62 @@ read_complete(struct ev_session* ev_session, void* ud) {
 		lua_rawgeti(lev->main, LUA_REGISTRYINDEX, lev_session->ref);
 		lua_pcall(lev->main, 2, 0, 0);
 	} else {
-		for(;;) {
+		while(lev_session->mark == 0) {
 			size_t len = ev_session_input_size(lev_session->session);
-			switch(lev_session->state) {
-				case STATE_HEAD: {
-					if (len < lev_session->header)
-						return;
-
-					if (lev_session->header == HEADER_TYPE_WORD) {
-						uint8_t header[HEADER_TYPE_WORD];
-						ev_session_read(lev_session->session,(char*)header,HEADER_TYPE_WORD);
-						lev_session->need = header[0] | header[1] << 8;
-					} else {
-						assert(lev_session->header == HEADER_TYPE_DWORD);
-						uint8_t header[HEADER_TYPE_DWORD];
-						ev_session_read(lev_session->session,(char*)header,HEADER_TYPE_DWORD);
-						lev_session->need = header[0] | header[1] << 8 | header[2] << 16 | header[3] << 24;
-					}
-					lev_session->need -= lev_session->header;
-					lev_session->state = STATE_BODY;
+			if (lev_session->state == STATE_HEAD) {
+				if (len < lev_session->header)
 					break;
+
+				if (lev_session->header == HEADER_TYPE_WORD) {
+					uint8_t header[HEADER_TYPE_WORD];
+					ev_session_read(lev_session->session,(char*)header,HEADER_TYPE_WORD);
+					lev_session->need = header[0] | header[1] << 8;
+				} else {
+					assert(lev_session->header == HEADER_TYPE_DWORD);
+					uint8_t header[HEADER_TYPE_DWORD];
+					ev_session_read(lev_session->session,(char*)header,HEADER_TYPE_DWORD);
+					lev_session->need = header[0] | header[1] << 8 | header[2] << 16 | header[3] << 24;
 				}
-				case STATE_BODY: {
-					if (len < lev_session->need)
-						return;
+				lev_session->need -= lev_session->header;
+				lev_session->state = STATE_BODY;
+			} else if (lev_session->state == STATE_BODY) {
+				if (len < lev_session->need)
+					break;
 
-					if (lev_session->need > MAX_PACKET_SIZE) {
-						lua_rawgeti(lev->main, LUA_REGISTRYINDEX, lev->callback);
-						lua_pushinteger(lev->main, LUA_EV_ERROR);
-						lua_rawgeti(lev->main, LUA_REGISTRYINDEX, lev_session->ref);
-						lua_pcall(lev->main, 2, 0, 0);
-						lev_session->closed = 1;
-						session_destroy(lev_session);
-						return;
-					}
-					
-					char* data = THREAD_CACHED_BUFFER;
-					if (lev_session->need > THREAD_CACHED_SIZE)
-						data = malloc(lev_session->need);
-
-					ev_session_read(lev_session->session,data,lev_session->need);
-
+				if (lev_session->need > MAX_PACKET_SIZE) {
 					lua_rawgeti(lev->main, LUA_REGISTRYINDEX, lev->callback);
-					lua_pushinteger(lev->main, LUA_EV_DATA);
+					lua_pushinteger(lev->main, LUA_EV_ERROR);
 					lua_rawgeti(lev->main, LUA_REGISTRYINDEX, lev_session->ref);
-					lua_pushlightuserdata(lev->main,data);
-					lua_pushinteger(lev->main,lev_session->need);
-					lua_pcall(lev->main, 4, 0, 0);
-					lev_session->state = STATE_HEAD;
+					lev_session->closed = 1;
+					session_destroy(lev_session);
+					lua_pcall(lev->main, 2, 0, 0);
+					return;
+				}
+				
+				char* data = THREAD_CACHED_BUFFER;
+				if (lev_session->need > THREAD_CACHED_SIZE)
+					data = malloc(lev_session->need);
 
-					if (data != THREAD_CACHED_BUFFER)
-						free(data);
-					break;
-				}
-				default: {
-					assert(0);
-				}
+				ev_session_read(lev_session->session,data,lev_session->need);
+
+				lua_rawgeti(lev->main, LUA_REGISTRYINDEX, lev->callback);
+				lua_pushinteger(lev->main, LUA_EV_DATA);
+				lua_rawgeti(lev->main, LUA_REGISTRYINDEX, lev_session->ref);
+				lua_pushlightuserdata(lev->main,data);
+				lua_pushinteger(lev->main,lev_session->need);
+				lua_pcall(lev->main, 4, 0, 0);
+				lev_session->state = STATE_HEAD;
+
+				if (data != THREAD_CACHED_BUFFER)
+					free(data);
 			}
 		}
+	}
+
+	lev_session->execute = 0;
+
+	if (lev_session->mark) {
+		session_destroy(lev_session);
 	}
 }	
 
@@ -237,9 +243,10 @@ close_complete(struct ev_session* ev_session, void* ud) {
 	lua_rawgeti(lev->main, LUA_REGISTRYINDEX, lev->callback);
 	lua_pushinteger(lev->main, LUA_EV_ERROR);
 	lua_rawgeti(lev->main, LUA_REGISTRYINDEX, lev_session->ref);
-	lua_pcall(lev->main, 2, 0, 0);
 
 	session_destroy(lev_session);
+
+	lua_pcall(lev->main, 2, 0, 0);
 }
 
 static void
@@ -264,7 +271,6 @@ connect_complete(struct ev_session* session,void *userdata) {
 		}
 		lua_pushboolean(lev->main,0);
 		lua_pushstring(lev->main,strerr);
-
 		session_destroy(lev_session);
 	} else {
 		socket_nonblock(fd);
@@ -494,7 +500,11 @@ _session_close(lua_State* L) {
 		ev_session_disable(lev_session->session,EV_READ);
 		ev_session_enable(lev_session->session, EV_WRITE);
 	} else {
-		session_destroy(lev_session);
+		if (lev_session->execute) {
+			lev_session->mark = 1;
+		} else {
+			session_destroy(lev_session);
+		}
 	}
 
 	return 0;

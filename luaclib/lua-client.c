@@ -44,6 +44,8 @@ struct ev_client {
 	int id;
 	int need;
 	int freq;
+	int invoked;
+	int need_close;
 	uint8_t seed;
 	uint16_t order;
 	double tick;
@@ -61,15 +63,17 @@ close_client(int id,void* data) {
 static void
 error_happen(struct ev_session* session,void* ud) {
 	struct ev_client* client = ud;
-	client->manager->close_func(client->manager->ud,client->id);
+	int id = client->id;
+	struct client_manager* manager = client->manager;
 	close_client(0,client);
+	manager->close_func(manager->ud,id);
 }
 
 static void
 read_complete(struct ev_session* ev_session, void* ud) {
 	struct ev_client* client = ud;
-
-	while (true) {
+	client->invoked = 1;
+	while (client->need_close == 0) {
 		size_t total = ev_session_input_size(ev_session);
 		if (client->need == 0) {
 			if (total >= 2) {
@@ -79,7 +83,7 @@ read_complete(struct ev_session* ev_session, void* ud) {
 				client->need -= 2;
 				assert(client->need > 0);
 			} else {
-				return;
+				break;
 			}
 		}
 
@@ -106,7 +110,7 @@ read_complete(struct ev_session* ev_session, void* ud) {
 			    	error_happen(ev_session, client);
 				    if (data != CACHED_BUFFER)
 				    	free(data);
-					return;
+					break;
 			    } else {
 			    	client->order++;
 			    }
@@ -119,10 +123,14 @@ read_complete(struct ev_session* ev_session, void* ud) {
 
 			    client->need = 0;
 			} else {
-				return;
+				break;
 			}
 		}
 	}
+	if (client->need_close) {
+		close_client(0,client);
+	}
+	client->invoked = 0;
 }	
 
 static void
@@ -225,8 +233,13 @@ client_manager_close(struct client_manager* manager,int client_id,int grace) {
 	if (!client) {
 		return -1;
 	}
-	if (!grace)
-		close_client(0,client);
+	if (!grace) {
+		if (client->invoked) {
+			client->need_close = 1;
+		} else {
+			close_client(0,client);
+		}
+	}
 	else {
 		ev_session_setcb(client->session, NULL, close_complete, error_happen, client);
 		ev_session_disable(client->session,EV_READ);
