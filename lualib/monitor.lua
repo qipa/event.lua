@@ -2,9 +2,10 @@ local event = require "event"
 local helper = require "helper"
 local logger = require "logger"
 
-local logger = logger:create("monitor")
+local logger_obj = nil
 
 local timer = nil
+local start = false
 
 local diff_monitor = {}
 local input_monitor = {}
@@ -32,10 +33,13 @@ local function update()
 		local average = info.total / info.count
 		table.insert(logs,string.format("%s output flow:average:%f,min:%d,max:%d,count:%d",name,average,info.min,info.max,info.count))
 	end
-	logger:WARN(table.concat(logs,"\n"))
+	logger_obj:WARN(table.concat(logs,"\n"))
 end
 
 function _M.report_diff(file,method,diff)
+	if not start then
+		return
+	end
 	local name = string.format("%s:%s",file,method)
 	local info = diff_monitor[name]
 	if not info then
@@ -53,6 +57,9 @@ function _M.report_diff(file,method,diff)
 end
 
 function _M.report_input(file,method,size)
+	if not start then
+		return
+	end
 	local name = string.format("%s:%s",file,method)
 	local info = input_monitor[name]
 	if not info then
@@ -70,6 +77,9 @@ function _M.report_input(file,method,size)
 end
 
 function _M.report_output(file,method,size)
+	if not start then
+		return
+	end
 	local name = string.format("%s:%s",file,method)
 	local info = output_monitor[name]
 	if not info then
@@ -86,6 +96,15 @@ function _M.report_output(file,method,size)
 	info.total = info.total + size
 end
 
-timer = event.timer(10,update)
+
+function _M.start()
+	if start then
+		return
+	end
+
+	timer = event.timer(10,update)
+	start = true
+	logger_obj = logger:create("monitor")
+end
 
 return _M
