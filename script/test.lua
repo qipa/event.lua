@@ -28,4 +28,19 @@ local FILE = io.tmpfile()
 FILE:write("!@")
 FILE:close()
 
-print(util.week_start())
+print(util.week_start(os.time()))
+
+util.time_diff("day start 2",function ()
+	for i = 1,1 do
+		print(util.same_day(os.time(),1524672000))
+	end
+end)
+
+print(os.time())
+print(util.daytime(os.time()),util.daytime(1524671999))
+-- util.time_diff("day start 1",function ()
+-- 	for i = 1,1024  * 1024 do
+-- 		util.same_day1(os.time(),1524412800)
+-- 	end
+-- end)
+

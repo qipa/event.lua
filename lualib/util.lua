@@ -5,6 +5,8 @@ local util_core = require "util.core"
 local type = type
 local assert = assert
 local os_date = os.date
+local os_time = os.time
+local math_modf = math.modf
 
 local _M = {}
 
@@ -151,11 +153,19 @@ function _M.format_to_unix(str)
 end
 
 function _M.daytime(unix_time,hour,min,sec)
-    local result = os.date("*t",unix_time)
-    result.hour = hour or 0
-    result.min = min or 0
-    result.sec = sec or 0
-    return os.time(result)
+    local unix_time = unix_time + 8 * 3600
+    local tmp = math_modf(unix_time / 86400)
+    local result = tmp * 86400 - 8 * 3600
+    if hour then
+        result = result + hour * 3600
+    end
+    if min then
+        result = result + min * 60
+    end
+    if sec then
+        result = result + sec
+    end
+    return result
 end
 
 function _M.format_to_daytime(unix_time,str)
@@ -197,9 +207,7 @@ end
 function _M.same_day(ti0,ti1,sep)
     assert(ti0 ~= nil and ti1 ~= nil)
     local sep = sep or 0
-    local date0 = os_date("*t",ti0 - sep)
-    local date1 = os_date("*t",ti1 - sep)
-    return date0.yday == date1.yday
+    return _M.daytime(ti0 - sep) == _M.daytime(ti1 - sep)
 end
 
 function _M.same_week(ti1,ti2,sep)
