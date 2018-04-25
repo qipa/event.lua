@@ -159,6 +159,11 @@ read_complete(struct ev_session* ev_session, void* ud) {
 static void
 timeout(struct ev_loop* loop,struct ev_timer* io,int revents) {
 	struct ev_client* client = io->data;
+
+	if (ev_session_output_size(client->session) > WARN_OUTPUT_FLOW) {
+		fprintf(stderr,"client:%d more then %dkb flow need to send out",client->id,WARN_OUTPUT_FLOW/1024);
+	}
+
 	if (client->freq > MAX_FREQ) {
 		error_happen(NULL, client);
 	}
@@ -300,9 +305,6 @@ client_manager_send(struct client_manager* manager,int client_id,int message_id,
     memcpy(mb+4,data,size);
 
 	ev_session_write(client->session,(char*)mb,total);
-	if (ev_session_output_size(client->session) > WARN_OUTPUT_FLOW) {
-		fprintf(stderr,"client:%d more then %dkb flow need to send out",client_id,WARN_OUTPUT_FLOW/1024);
-	}
 }
 
 void
