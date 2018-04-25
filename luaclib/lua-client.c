@@ -95,59 +95,56 @@ read_complete(struct ev_session* ev_session, void* ud) {
 	while (client->mark == 0) {
 		size_t total = ev_session_input_size(ev_session);
 		if (client->need == 0) {
-			if (total >= 2) {
-				uint8_t header[2];
-				ev_session_read(ev_session,(char*)header,2);
-				client->need = header[0] | header[1] << 8;
-				client->need -= 2;
-				assert(client->need > 0);
-				if (client->need > MAX_SEQMENT) {
-					error_happen(ev_session, client);
-					return;
-				}
-			} else {
+			if (total < 2) {
 				break;
 			}
-		}
+	
+			uint8_t header[2];
+			ev_session_read(ev_session,(char*)header,2);
+			client->need = header[0] | header[1] << 8;
+			client->need -= 2;
+			assert(client->need > 0);
+			if (client->need > MAX_SEQMENT) {
+				error_happen(ev_session, client);
+				return;
+			}
+		} else {
+			if (total < client->need) {
+				break;
+			}
 
-		total = ev_session_input_size(ev_session);
-		if (client->need > 0) {
-			if (total >= client->need) {
-				uint8_t* data = CACHED_BUFFER;
-				if (client->need > CACHED_SIZE) {
-					data = malloc(client->need);
-				}
-				ev_session_read(ev_session,(char*)data,client->need);
-				
-				int i;
-			    for (i = 0; i < client->need; ++i) {
-			        data[i] = data[i] ^ client->seed;
-			        client->seed += data[i];
-			    }
+			uint8_t* data = CACHED_BUFFER;
+			if (client->need > CACHED_SIZE) {
+				data = malloc(client->need);
+			}
+			ev_session_read(ev_session,(char*)data,client->need);
+			
+			int i;
+		    for (i = 0; i < client->need; ++i) {
+		        data[i] = data[i] ^ client->seed;
+		        client->seed += data[i];
+		    }
 
-			    uint16_t sum = checksum((uint16_t*)data,client->need);
-			    uint16_t order = data[2] | data[3] << 8;
-			    uint16_t id = data[4] | data[5] << 8;
+		    uint16_t sum = checksum((uint16_t*)data,client->need);
+		    uint16_t order = data[2] | data[3] << 8;
+		    uint16_t id = data[4] | data[5] << 8;
 
-			    if (sum != 0 || order != client->order) {
-			    	error_happen(ev_session, client);
-				    if (data != CACHED_BUFFER)
-				    	free(data);
-					return;
-			    } else {
-			    	client->order++;
-			    }
-			    client->freq++;
-			    client->tick = loop_ctx_now(client->manager->loop_ctx);
-			    client->manager->data_func(client->manager->ud,client->id,id,&data[6],client->need - 6);
-
+		    if (sum != 0 || order != client->order) {
+		    	error_happen(ev_session, client);
 			    if (data != CACHED_BUFFER)
 			    	free(data);
+				return;
+		    } else {
+		    	client->order++;
+		    }
+		    client->freq++;
+		    client->tick = loop_ctx_now(client->manager->loop_ctx);
+		    client->manager->data_func(client->manager->ud,client->id,id,&data[6],client->need - 6);
 
-			    client->need = 0;
-			} else {
-				break;
-			}
+		    if (data != CACHED_BUFFER)
+		    	free(data);
+
+		    client->need = 0;
 		}
 	}
 	if (client->mark) {
@@ -161,7 +158,7 @@ timeout(struct ev_loop* loop,struct ev_timer* io,int revents) {
 	struct ev_client* client = io->data;
 
 	if (ev_session_output_size(client->session) > WARN_OUTPUT_FLOW) {
-		fprintf(stderr,"client:%d more then %dkb flow need to send out",client->id,WARN_OUTPUT_FLOW/1024);
+		fprintf(stderr,"client:%ld more then %dkb flow need to send out",client->id,WARN_OUTPUT_FLOW/1024);
 	}
 
 	if (client->freq > MAX_FREQ) {
