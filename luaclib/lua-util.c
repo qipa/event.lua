@@ -303,6 +303,14 @@ ltostring(lua_State* L) {
     return 1;
 }
 
+int
+ltype(lua_State* L) {
+    int t = lua_type(L, 1);
+    luaL_argcheck(L, t != LUA_TNONE, 1, "value expected");
+    lua_pushinteger(L, t);
+    return 1;
+}
+
 static lua_State* gL = NULL;
 
 void completion(const char* str,linenoiseCompletions* lc) {
@@ -602,6 +610,7 @@ luaopen_util_core(lua_State* L){
         { "time", ltime },
         { "print", lprint },
         { "tostring", ltostring },
+        { "type", ltype },
         { "readline", lreadline },
         { "getaddrinfo", lgetaddrinfo },
         { "abort", labort },

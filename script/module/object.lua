@@ -2,6 +2,10 @@ local event = require "event"
 local util = require "util"
 local model = require "model"
 
+local pairs = pairs
+local setmetatable = setmetatable
+local type = type
+
 class_ctx = class_ctx or {}
 
 object_ctx = object_ctx or {}
@@ -157,9 +161,12 @@ end
 
 function cls_base:pack(clone)
 	local cls = class.get(self:get_type())
+	local pack_fields = cls.__pack_fields
+	local save_fields = cls.__save_fields
+
 	local result = {}
 	for k,v in pairs(self) do
-		if cls.__pack_fields[k] or cls.__save_fields[k] then
+		if pack_fields[k] or save_fields[k] then
 			if type(v) == "table" then
 				if v.__name then
 					result[k] = v:pack(true)

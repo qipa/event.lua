@@ -15,6 +15,11 @@ local LOG_TAG = {
 	[LOG_LV_DEBUG] 	= "D",
 }
 
+local tconcat = table.concat
+local strformat = string.format
+local tostring = tostring
+local os_time = os.time
+local os_date = os.date
 
 local logger_container = {}
 
@@ -49,24 +54,24 @@ local function get_debug_info(logger)
 end
 
 local function append_log(logger,log_lv,...)
-	local log = table.concat({...},"\t")
+	local log = tconcat({...},"\t")
 	local content
 
 	if not source_name then
 		local list = env.name:split("/")
 		source_name = list[#list]
 	end
-
+	
 	if log_lv == LOG_LV_ERROR then
 		local source,line = get_debug_info(logger)
-		content = string.format("[%s:%s][%s %s %s:%s] %s",LOG_TAG[log_lv],logger.log_type,os.date("%Y-%m-%d %H:%M:%S",os.time()),source_name,source,tostring(line),log)
+		content = strformat("[%s:%s][%s %s %s:%s] %s",LOG_TAG[log_lv],logger.log_type,os_date("%Y-%m-%d %H:%M:%S",os_time()),source_name,source,tostring(line),log)
 	else
-		content = string.format("[%s:%s][%s %s] %s",LOG_TAG[log_lv],logger.log_type,os.date("%Y-%m-%d %H:%M:%S",os.time()),source_name,log)
+		content = strformat("[%s:%s][%s %s] %s",LOG_TAG[log_lv],logger.log_type,os_date("%Y-%m-%d %H:%M:%S",os_time()),source_name,log)
 	end
 
 	if not model.get_logger_channel or not model.get_logger_channel() then
 		if not tmp_FILE then
-			local name = string.format("./log/tmp_%d.log",util.thread_id())
+			local name = strformat("./log/%s_%d.log",source_name,util.thread_id())
 			tmp_FILE = assert(io.open(name,"a+"))
 		end
 		tmp_FILE:write(content.."\r\n")
