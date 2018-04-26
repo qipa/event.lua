@@ -1,12 +1,12 @@
 #!/bin/bash
 
 
-if [ ! -d "./data" ];then
-	mkdir ./data
+if [ -d "./data" ];then
+	rm -rf ./data
 fi
 
-if [ ! -d "./log" ];then
-	mkdir ./log
+if [ -d "./log" ];then
+	rm -r ./log
 fi
 
 if [ -f "./data/master/dist_id" ];then
