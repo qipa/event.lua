@@ -379,9 +379,10 @@ static int
 lclient_manager_stop(lua_State* L) {
 	struct lclient_manager* client_manager = lua_touserdata(L, 1);
 	if (client_manager_stop(client_manager->manager) < 0) {
-		luaL_error(L,"client manager already stop");
+		lua_pushboolean(L, false);
 	}
-	return 0;
+	lua_pushboolean(L, true);
+	return 1;
 }
 
 static int

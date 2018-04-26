@@ -11,6 +11,7 @@ local common = import "common.common"
 
 _user_token = _user_token or {}
 _enter_user = _enter_user or {}
+_server_stop = _server_stop or false
 
 local client_manager
 
@@ -210,4 +211,25 @@ function get_all_enter_user(self)
 		result[info.account] = {uid = info.uid,agent_server = env.dist_id}
 	end
 	return result
+end
+
+function server_stop()
+	_server_stop = true
+	client_manager:stop()
+
+	for cid,enter_info in pairs(_enter_user)
+		client_manager:close(cid)
+		local user = model.fetch_agent_user_with_uid(enter_info.uid)
+		if user then
+			_enter_user.mutex(user_leave,user)
+		end
+	end
+
+	local db_channel = model.get_db_channel()
+	db_channel:set_db("common")
+	
+	local updater = {}
+	updater["$inc"] = {version = 1}
+	updater["$set"] = {time = os.time()}
+	db_channel:findAndModify("agent_version",{query = {uid = env.dist_id},update = updater,upsert = true})
 end

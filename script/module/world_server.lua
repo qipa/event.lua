@@ -5,6 +5,8 @@ local database_manager = import "module.database_manager"
 local world_user = import "module.world_user"
 import "handler.world_handler"
 
+_agent_server_status = _agent_server_status or {}
+
 function __init__(self)
 	self.timer = event.timer(30,function ()
 		local db_channel = model.get_db_channel()
@@ -71,4 +73,9 @@ function leave(self,user_uid)
 	user:save(db_channel)
 	user:release()
 	return true
+end
+
+function server_stop(self,agent_id)
+	_agent_server_status[agent_id] = true
+
 end
