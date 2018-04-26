@@ -223,6 +223,7 @@ function server_stop()
 		if user then
 			enter_info.mutex(user_leave,self,user)
 		end
+		_enter_user[cid] = nil
 	end
 
 	local db_channel = model.get_db_channel()

@@ -1,5 +1,11 @@
 #!/bin/bash
 
+function read_env()
+{
+	result=`./lua ./script/common/env_reader.lua $1`
+	echo $result
+}
+
 if [ ! -d "./data" ];then
 	mkdir ./data
 fi
@@ -20,8 +26,7 @@ fi
 proc=("logger" "world" "login" "scene" "agent")
 
 user=`whoami`
-uid=`./lua ./script/common/env_reader.lua uid`
-
+uid=$(read_env "uid")
 
 ps -C -elf -U${user} |grep @0*$uid|awk '{print $1,$4}'|while read line
 do
@@ -43,6 +48,11 @@ fi
 
 # gdb --args ./event server/logger  server/world  server/login server/agent server/agent server/scene server/scene server/scene 
 
+log_path=$(read_env "log_path")
+login_addr=$(read_env "login_addr")
+echo "server uid:${uid}"
+echo "server log_path:${log_path}"
+echo "server login_addr:${login_addr}"
 
 ./event server/logger &
 ./event server/world &

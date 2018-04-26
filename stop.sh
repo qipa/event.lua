@@ -23,7 +23,6 @@ result=`ps -C -elf -U${user} |grep @0*$uid|awk '{print $1,$4}'|grep login|wc -l`
 if [ $result -ne "0" ];then
 	echo "login server is running,try to notify stop"
 	./event console@stop
-	echo $?
 	if [[ $? != 0 ]];then
 		echo "server recive stop"
 	else
