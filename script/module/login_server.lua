@@ -140,6 +140,21 @@ end
 function server_stop(self)
 	local client_manager = model.get_client_manager()
 	client_manager:stop()
+
+	local all = model.fetch_login_user()
+	for _,user in pairs(all) do
+		user:leave()
+	end
+
+	local db_channel = model.get_db_channel()
+	db_channel:set_db("common")
+	
+	local updater = {}
+	updater["$inc"] = {version = 1}
+	updater["$set"] = {time = os.time()}
+	db_channel:findAndModify("login_version",{query = {uid = env.dist_id},update = updater,upsert = true})
+
+
 	local agent_set = server_manager:how_many_agent()
 	for _,agent_id in pairs(agent_set) do
 		server_manager:send_agent(agent_id,"handler.agent_handler","server_stop")
