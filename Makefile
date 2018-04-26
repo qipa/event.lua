@@ -166,6 +166,7 @@ cleanall :
 	make clean
 	cd $(LUA_PATH) && make clean
 	cd $(LIBEV_PATH) && make clean
-	cd $(TC_PATH) && make distclean
+	# cd $(TC_PATH) && make distclean
+	cd $(TC_PATH) && make clean
 	cd $(EFENCE_PATH) && make clean
 	
