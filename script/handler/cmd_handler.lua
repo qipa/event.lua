@@ -9,6 +9,7 @@ function stop()
 end
 
 function mem()
+	table.print(_G)
 	local mem = collectgarbage("count")
 	return string.format("lua mem:%fkb,c mem:%fkb",mem,helper.allocated() / 1024)
 end
