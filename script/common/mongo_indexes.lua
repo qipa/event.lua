@@ -14,7 +14,8 @@ world_user = {
 }
 
 login_user = {
-	save_version = {{unique = true,index = {uid = 1}}}
+	role_list = {{unique = true,index = {account = 1}}},
+	save_version = {{unique = true,index = {uid = 1}}},
 }
 
 common = {
