@@ -18,3 +18,8 @@ function forward(_,args)
 		route.dispatch_client(args.message_id,args.message,nil,user)
 	end
 end
+
+function rpc_server_stop(_,args)
+
+	world_server:server_stop(args.id)
+end

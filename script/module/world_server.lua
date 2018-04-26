@@ -1,6 +1,7 @@
 local event = require "event"
 local model = require "model"
 
+local server_manager = import "module.server_manager"
 local database_manager = import "module.database_manager"
 local world_user = import "module.world_user"
 import "handler.world_handler"
@@ -77,5 +78,24 @@ end
 
 function server_stop(self,agent_id)
 	_agent_server_status[agent_id] = true
+	local agent_set = server_manager:how_many_agent()
 
+	local all_agent_done = true
+	for _,id in pairs(agent_set) do
+		if not _agent_server_status[id] then
+			all_agent_done = false
+			break
+		end
+	end
+
+	if all_agent_done then
+		local db_channel = model.get_db_channel()
+		db_channel:set_db("common")
+		
+		local updater = {}
+		updater["$inc"] = {version = 1}
+		updater["$set"] = {time = os.time()}
+		db_channel:findAndModify("world_version",{query = {uid = env.dist_id},update = updater,upsert = true})
+	end
+	return all_agent_done
 end

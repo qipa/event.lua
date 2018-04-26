@@ -232,4 +232,8 @@ function server_stop()
 	updater["$inc"] = {version = 1}
 	updater["$set"] = {time = os.time()}
 	db_channel:findAndModify("agent_version",{query = {uid = env.dist_id},update = updater,upsert = true})
+
+	local world_channel = model.get_world_channel()
+	world_channel:call("handler.world_handler","rpc_server_stop",{id = env.dist_id})
+	event.breakout()
 end
