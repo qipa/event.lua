@@ -48,6 +48,9 @@ fi
 
 # gdb --args ./event server/logger  server/world  server/login server/agent server/agent server/scene server/scene server/scene 
 
+libev_path=`cd ./3rd/libev/.libs && pwd`
+export LD_LIBRARY_PATH=${libev_path}":"$LD_LIBRARY_PATH
+
 log_path=$(read_env "log_path")
 login_addr=$(read_env "login_addr")
 echo "server uid:${uid}"
