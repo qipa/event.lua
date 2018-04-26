@@ -135,7 +135,7 @@ function _M.to_date(unix_time)
     return os.date("*t",unix_time)
 end
 
-function _M.to_unix(year,mon,day,hour,min,sec)
+function _M.to_unixtime(year,mon,day,hour,min,sec)
     local time = {
         year = year,
         month = mon,
@@ -147,9 +147,14 @@ function _M.to_unix(year,mon,day,hour,min,sec)
     return os.time(time)
 end
 
-function _M.format_to_unix(str)
+function _M.format_to_unixtime(str)
     local year,mon,day,hour,min,sec = string.match(str,"(.*)-(.*)-(.*) (.*):(.*):(.*)")
-    return _M.to_unix(year,mon,day,hour,min,sec)
+    return _M.to_unixtime(year,mon,day,hour,min,sec)
+end
+
+function _M.format_to_daytime(unix_time,str)
+    local hour,min = string.match(str,"(%d+):(%d+)")
+    return _M.daytime(unix_time,tonumber(hour),tonumber(min))
 end
 
 function _M.daytime(unix_time,hour,min,sec)
@@ -166,11 +171,6 @@ function _M.daytime(unix_time,hour,min,sec)
         result = result + sec
     end
     return result
-end
-
-function _M.format_to_daytime(unix_time,str)
-    local hour,min = string.match(str,"(%d+):(%d+)")
-    return _M.daytime(unix_time,tonumber(hour),tonumber(min))
 end
 
 function _M.next_time(unix_time,sec)
