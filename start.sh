@@ -36,8 +36,12 @@ if [ ! -d "./data" ];then
 	mkdir ./data
 fi
 
-if [ ! -d "./log" ];then
-	mkdir ./log
+log_path=$(read_env "log_path")
+
+if [ $log_path -ne "nil" ];then
+	if [ ! -d $log_path ];then
+		mkdir $log_path
+	fi
 fi
 
 if [ -f "./data/master/dist_id" ];then

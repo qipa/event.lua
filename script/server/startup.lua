@@ -20,12 +20,16 @@ function mongodb_channel:disconnect()
 	os.exit(1)
 end
 
-function run(db_addr,config_path,protocol_path)
+function run(monitor_collect,db_addr,config_path,protocol_path)
 	connect_server("logger")
 	
 	local runtime_logger = logger:create("runtime",5)
 	event.error = function (...)
 		runtime_logger:ERROR(...)
+	end
+
+	if monitor_collect then
+		monitor.start()
 	end
 
 	if config_path then

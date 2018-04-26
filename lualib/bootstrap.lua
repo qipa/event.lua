@@ -14,7 +14,6 @@ local debugger = require "debugger"
 local helper = require "helper"
 local profiler = require "profiler.core"
 local worker = require "worker"
-local monitor = require "monitor"
 
 table.print = util.dump
 table.encode = serialize.pack
@@ -84,7 +83,6 @@ else
 	worker.dispatch(args[#args])
 end
 
--- monitor.start()
 
 local ok,err = xpcall(func,debug.traceback,table.unpack(args,3))
 if not ok then
