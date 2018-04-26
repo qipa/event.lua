@@ -30,9 +30,9 @@ FILE:close()
 
 print(util.week_start(os.time()))
 
-util.time_diff("day start 2",function ()
-	for i = 1,1024 * 1024 do
-		print(util.same_day(os.time(),1524672000))
+util.time_diff("day start",function ()
+	for i = 1,1024  * 1024 do
+		util.to_date(os.time())
 	end
 end)
 

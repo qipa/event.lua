@@ -96,7 +96,7 @@ else
 	worker.dispatch(args[#args])
 end
 
-monitor.start()
+-- monitor.start()
 
 local ok,err = xpcall(func,debug.traceback,table.unpack(args,3))
 if not ok then
