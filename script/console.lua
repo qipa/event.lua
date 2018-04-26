@@ -32,11 +32,10 @@ event.fork(function ()
 	elseif args == "index" then
 		local channel,err = event.connect(env.mongodb,4,true,mongo)
 		if not channel then
-			event.error(err)
+			event.error(string.format("connect mongodb %s failed:%s",env.mongodb,err))
 			os.exit(1)
 			return
 		end
-
 
 		for db,info in pairs(mongo_indexes) do
 			channel:set_db(db)
