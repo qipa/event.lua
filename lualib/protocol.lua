@@ -43,9 +43,15 @@ _M.decode = {}
 
 local _protocol_raw = {}
 
-function _M.parse(file)
-	local fullfile = string.format("%s.protocol",file)
-	local tbl = parser.parse("./protocol/",fullfile)
+function _M.parse(fullfile)
+	local path_info = fullfile:split("/")
+	local path = {}
+	for i = 1,#path_info - 1 do
+		table.insert(path,path_info[i])
+	end
+	local file = path_info[#path_info]
+
+	local tbl = parser.parse(table.concat(path,"/").."/",file)
 	remake_field(tbl.root.children)
 	replace_sub_protocol(tbl.root.children,function (protocol)
 		for _,field in pairs(protocol.fields) do
@@ -66,7 +72,7 @@ function _M.parse(file)
 	end)
 
 	for name,proto in pairs(tbl.root.children) do
-		if proto.file ~= fullfile then
+		if proto.file ~= file then
 			tbl.root.children[name] = nil
 		end
 	end

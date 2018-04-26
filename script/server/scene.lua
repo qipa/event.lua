@@ -25,7 +25,7 @@ end
 event.fork(function ()
 	-- helper.heap.start("scene")
 
-	startup.run(env.mongodb)
+	startup.run(env.mongodb,env.config,env.protocol)
 
 	startup.connect_server("world")
 

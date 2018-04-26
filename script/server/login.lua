@@ -51,7 +51,7 @@ local function client_close(cid)
 end
 
 event.fork(function ()
-	startup.run(env.mongodb)
+	startup.run(env.mongodb,env.config,env.protocol)
 
 	startup.connect_server("world")
 

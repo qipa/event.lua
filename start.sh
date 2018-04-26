@@ -52,14 +52,16 @@ fi
 libev_path=`cd ./3rd/libev/.libs && pwd`
 export LD_LIBRARY_PATH=${libev_path}":"$LD_LIBRARY_PATH
 
+config=$(read_env "config")
 log_path=$(read_env "log_path")
 login_addr=$(read_env "login_addr")
 mongodb_addr=$(read_env "mongodb")
 
 echo "server uid:${uid}"
-echo "server log_path:${log_path}"
-echo "server login_addr:${login_addr}"
-echo "server mongodb_addr:${mongodb_addr}"
+echo "server config path:${config}"
+echo "server log path:${log_path}"
+echo "server login addr:${login_addr}"
+echo "server mongodb addr:${mongodb_addr}"
 
 
 ./event console@index

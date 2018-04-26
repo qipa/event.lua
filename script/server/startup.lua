@@ -20,12 +20,31 @@ function mongodb_channel:disconnect()
 	os.exit(1)
 end
 
-function run(db_addr)
+function run(db_addr,config_path,protocol_path)
 	connect_server("logger")
 	
 	local runtime_logger = logger:create("runtime",5)
 	event.error = function (...)
 		runtime_logger:ERROR(...)
+	end
+
+	if config_path then
+		_G.config = {}
+		local list = util.list_dir(config_path,true,"lua",true)
+		for _,path in pairs(list) do
+			local file = table.remove(path:split("/"))
+			local name = file:match("%S[^%.]+")
+			local data = loadfile(path)()
+			_G.config[name] = data
+		end
+	end
+
+	if protocol_path then
+		local list = util.list_dir(protocol_path,true,"protocol",true)
+		for _,file in pairs(list) do
+			protocol.parse(file)
+		end
+		protocol.load()
 	end
 
 	if db_addr then
@@ -40,9 +59,6 @@ function run(db_addr)
 
 		event.error(string.format("connect mongodb:%s success",db_addr))
 	end
-
-	protocol.parse("login")
-	protocol.load()
 end
 
 function apply_id()

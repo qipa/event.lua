@@ -30,7 +30,7 @@ local function channel_accept()
 end
 
 event.fork(function ()
-	startup.run(env.mongodb)
+	startup.run(env.mongodb,env.config,env.protocol)
 
 	env.dist_id = server_manager:apply_id()
 	id_builder:init(env.dist_id)

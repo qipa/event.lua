@@ -40,18 +40,6 @@ _G.env = {}
 local FILE = assert(io.open("./.env","r"))
 assert(load(FILE:read("*a"),"env","text",_G.env))()
 
-if env.config ~= nil then
-	_G.config = {}
-	local list = util.list_dir(env.config,true,"lua",true)
-	for _,path in pairs(list) do
-		local file = table.remove(path:split("/"))
-		local name = file:match("%S[^%.]+")
-		local data = loadfile(path)()
-		config[name] = data
-		print("load:",path)
-	end
-end
-
 local args = {...}
 
 local main = args[1]

@@ -41,7 +41,7 @@ end
 
 
 event.fork(function ()
-	startup.run(env.mongodb)
+	startup.run(env.mongodb,env.config,env.protocol)
 
 	startup.connect_server("login")
 	startup.connect_server("world")
