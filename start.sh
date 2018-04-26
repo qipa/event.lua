@@ -1,27 +1,14 @@
 #!/bin/bash
 
+if [ ! -f "./event" ];then
+	make
+fi
+
 function read_env()
 {
 	result=`./lua ./script/common/env_reader.lua $1`
 	echo $result
 }
-
-if [ ! -d "./data" ];then
-	mkdir ./data
-fi
-
-if [ ! -d "./log" ];then
-	mkdir ./log
-fi
-
-if [ -f "./data/master/dist_id" ];then
-	rm -rf ./data/master/dist_id
-fi
-
-files=$(ls *.ipc 2> /dev/null | wc -l)
-if [ "$files" != "0" ]; then
-	rm ./*.ipc
-fi
 
 proc=("logger" "world" "login" "scene" "agent")
 
@@ -45,6 +32,22 @@ if [ $result -ne "0" ];then
 	exit 1
 fi
 
+if [ ! -d "./data" ];then
+	mkdir ./data
+fi
+
+if [ ! -d "./log" ];then
+	mkdir ./log
+fi
+
+if [ -f "./data/master/dist_id" ];then
+	rm -rf ./data/master/dist_id
+fi
+
+files=$(ls *.ipc 2> /dev/null | wc -l)
+if [ "$files" != "0" ]; then
+	rm ./*.ipc
+fi
 
 libev_path=`cd ./3rd/libev/.libs && pwd`
 export LD_LIBRARY_PATH=${libev_path}":"$LD_LIBRARY_PATH
