@@ -37,8 +37,7 @@ if [ ! -d "./data" ];then
 fi
 
 log_path=$(read_env "log_path")
-
-if [ $log_path -ne "nil" ];then
+if [ $log_path != "nil" ];then
 	if [ ! -d $log_path ];then
 		mkdir $log_path
 	fi
