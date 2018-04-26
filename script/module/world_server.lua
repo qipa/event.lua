@@ -21,6 +21,7 @@ end
 
 function start(self)
 	import "module.scene_manager"
+	import "handler.cmd_handler"
 	local db_channel = model.get_db_channel()
 	db_channel:set_db("common")
 	local guild_info = db_channel:findAll("guild")

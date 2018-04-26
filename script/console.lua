@@ -13,6 +13,10 @@ function console_channel:disconnect()
 	event.error("console channel disconnect")
 end
 
+local function rpc(channel,method,...)
+	table.print(channel:call("handler.cmd_handler",method,{...}))
+end
+
 event.fork(function ()
 	
 	if args == "stop" then
@@ -45,7 +49,13 @@ event.fork(function ()
 			end
 		end
 		os.exit(0)
-	else
+	elseif args == "debugger" then
+		local channel,err = event.connect(env.world,4,true,console_channel)
+		if not channel then
+			event.error(err)
+			os.exit(1)
+			return
+		end
 		while true do
 			local line = util.readline(">>")
 			if line then
