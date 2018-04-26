@@ -34,12 +34,6 @@ event.fork(function ()
 
 	env.dist_id = server_manager:apply_id()
 	id_builder:init(env.dist_id)
-	
-	local db_channel = model.get_db_channel()
-	db_channel:set_db("world_user")
-	for name,indexes in pairs(mongo_indexes.world_user) do
-		db_channel:ensureIndex(name,indexes)
-	end
 
 	local ok,reason = event.listen(env.world,4,channel_accept,agent_channel)
 	if not ok then

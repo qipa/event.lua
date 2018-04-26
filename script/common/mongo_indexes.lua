@@ -18,5 +18,7 @@ login_user = {
 }
 
 common = {
-	
+	login_version = {{unique = true,index = {uid = 1}}},
+	agent_version = {{unique = true,index = {uid = 1}}},
+	world_version = {{unique = true,index = {uid = 1}}},
 }

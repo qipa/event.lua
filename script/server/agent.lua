@@ -61,12 +61,6 @@ event.fork(function ()
 
 	event.error(string.format("scene ready:%s",table.concat(scene_set,",")))
 
-	local db_channel = model.get_db_channel()
-	db_channel:set_db("agent_user")
-	for name,indexes in pairs(mongo_indexes.agent_user) do
-		db_channel:ensureIndex(name,indexes)
-	end
-
 	local client_manager = event.client_manager(1024)
 	client_manager:set_callback(client_accept,client_close,client_data)
 	local port,reason = client_manager:start("0.0.0.0",0)

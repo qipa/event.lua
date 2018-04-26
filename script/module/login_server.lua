@@ -154,7 +154,6 @@ function server_stop(self)
 	updater["$set"] = {time = os.time()}
 	db_channel:findAndModify("login_version",{query = {uid = env.dist_id},update = updater,upsert = true})
 
-
 	local agent_set = server_manager:how_many_agent()
 	for _,agent_id in pairs(agent_set) do
 		server_manager:send_agent(agent_id,"handler.agent_handler","server_stop")

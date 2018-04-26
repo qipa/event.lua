@@ -46,8 +46,6 @@ if [ $result -ne "0" ];then
 fi
 
 
-# gdb --args ./event server/logger  server/world  server/login server/agent server/agent server/scene server/scene server/scene 
-
 libev_path=`cd ./3rd/libev/.libs && pwd`
 export LD_LIBRARY_PATH=${libev_path}":"$LD_LIBRARY_PATH
 
@@ -57,6 +55,9 @@ echo "server uid:${uid}"
 echo "server log_path:${log_path}"
 echo "server login_addr:${login_addr}"
 
+echo "try to build mongo index"
+./event console@index
+
 ./event server/logger &
 ./event server/world &
 ./event server/login &
@@ -65,3 +66,6 @@ echo "server login_addr:${login_addr}"
 ./event server/scene &
 ./event server/agent &
 ./event server/agent &
+
+
+# gdb --args ./event server/logger  server/world  server/login server/agent server/agent server/scene server/scene server/scene 

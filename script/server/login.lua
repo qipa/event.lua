@@ -105,12 +105,6 @@ event.fork(function ()
 	event.error(string.format("login listen client success",reason))
 	model.set_client_manager(client_manager)
 
-	local db_channel = model.get_db_channel()
-	db_channel:set_db("login_user")
-	for name,indexes in pairs(mongo_indexes.login_user) do
-		db_channel:ensureIndex(name,indexes)
-	end
-
 
 	import "handler.login_handler"
 end)
