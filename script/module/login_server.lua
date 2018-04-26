@@ -136,3 +136,12 @@ function user_leave_agent(self,account)
 		user:auth()
 	end
 end
+
+function server_stop(self)
+	local client_manager = model.get_client_manager()
+	client_manager:stop()
+	local agent_set = server_manager:how_many_agent()
+	for _,agent_id in pairs(agent_set) do
+		server_manager:send_agent(agent_id,"handler.agent_handler","server_stop")
+	end
+end

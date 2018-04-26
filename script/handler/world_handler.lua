@@ -19,7 +19,6 @@ function forward(_,args)
 	end
 end
 
-function rpc_server_stop(_,args)
-
+function server_stop(_,args)
 	world_server:server_stop(args.id)
 end

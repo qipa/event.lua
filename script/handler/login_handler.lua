@@ -45,6 +45,7 @@ function rpc_timeout_agent(self,args)
 end
 
 function req_stop_server()
+	login_server:server_stop()
 	if _server_status == "stop" then
 		return false
 	end

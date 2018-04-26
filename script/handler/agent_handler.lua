@@ -42,3 +42,7 @@ end
 function get_enter_user(_,_)
 	return agent_server:get_all_enter_user()
 end
+
+function server_stop()
+	agent_server:server_stop()
+end

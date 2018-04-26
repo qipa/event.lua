@@ -103,8 +103,17 @@ function leave_scene(self,user_uid,switch)
 	return fighter_data
 end
 
+function transfer_scene_inside(self,user_uid,to_scene_uid,pos)
+	local fighter = model.fetch_scene_user_with_uid(user_uid)
 
-function transfer_scene(self,fighter,scene_id,scene_uid,x,z)
+	local scene = self:get_scene(fighter.scene_info.scene_uid)
+	scene:leave(fighter)
+
+	local scene = self:get_scene(to_scene_uid)
+	scene:enter(fighter,pos)
+end
+
+function launch_transfer_scene(self,fighter,scene_id,scene_uid,x,z)
 	local world_channel = model.get_world_channel()
 	world_channel:send("module.scene_manager","transfer_scene",{scene_id = scene_id,scene_uid = scene_uid,pos = {x = x,z = z},fighter = fighter:pack()})
 end

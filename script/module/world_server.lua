@@ -2,6 +2,7 @@ local event = require "event"
 local model = require "model"
 
 local server_manager = import "module.server_manager"
+local scene_manager = import "module.scene_manager"
 local database_manager = import "module.database_manager"
 local world_user = import "module.world_user"
 import "handler.world_handler"
@@ -96,6 +97,14 @@ function server_stop(self,agent_id)
 		updater["$inc"] = {version = 1}
 		updater["$set"] = {time = os.time()}
 		db_channel:findAndModify("world_version",{query = {uid = env.dist_id},update = updater,upsert = true})
+
+		event.fork(function ()
+			while scene_manager:all_user_leave() == false do
+				event.error(string.format("waiting for all scene user leave"))
+				event.sleep(1)
+			end
+			event.breakout()
+		end)
 	end
 	return all_agent_done
 end

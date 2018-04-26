@@ -145,6 +145,17 @@ function execute_enter_scene(user_info,fighter_data,scene_id,scene_uid,scene_pos
 	end
 
 	local scene_server,scene_addr,scene_uid = mutex(do_enter_scene,scene_id,scene_uid)
+
+	if scene_server == user_info.scene_server then
+		server_manager:send_scene(scene_server,"handler.scene_handler","transfer_inside",{user_uid = user_info.user_uid,
+																					      scene_uid = scene_uid,
+																					      pos = scene_pos})
+		user_info.scene_id = scene_id
+		user_info.scene_uid = scene_uid
+		user_info.scene_server = scene_server
+		return
+	end
+
 	local result = server_manager:call_agent(user_info.user_agent,"handler.agent_handler","prepare_enter_scene",{user_uid = user_info.user_uid,
 																					 scene_id = scene_id,
 																					 scene_uid = scene_uid,
@@ -221,4 +232,13 @@ function delete_scene(_,args)
 	local scene_info = _scene_ctx[args.scene_id]
 	local info = scene_info[args.scene_uid]
 	info.clean = true
+end
+
+function all_user_leave(self)
+	for _,user_info in pairs(_user_ctx) do
+		if user_info.scene_uid then
+			return false
+		end
+	end
+	return true
 end

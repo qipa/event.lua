@@ -113,6 +113,6 @@ event.fork(function ()
 	protocol.parse("login")
 	protocol.load()
 	
-	bench(1)
+	bench(1000)
 end)
 

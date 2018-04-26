@@ -17,6 +17,10 @@ function leave_scene(_,args)
 	return scene_server:leave_scene(args.user_uid,args.switch)
 end
 
+function transfer_inside(_,args)
+	scene_server:transfer_scene_inside(args.user_uid,args.to_scene_uid,args.pos)
+end
+
 function create_scene(_,args)
 	return scene_server:create_scene(args.scene_id)
 end
@@ -24,7 +28,6 @@ end
 function delete_scene(_,args)
 	return scene_server:delete_scene(args.scene_uid)
 end
-
 
 function forward(_,args)
 	local user = model.fetch_scene_user_with_uid(args.uid)

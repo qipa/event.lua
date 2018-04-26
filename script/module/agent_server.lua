@@ -217,11 +217,11 @@ function server_stop()
 	_server_stop = true
 	client_manager:stop()
 
-	for cid,enter_info in pairs(_enter_user)
+	for cid,enter_info in pairs(_enter_user) do
 		client_manager:close(cid)
 		local user = model.fetch_agent_user_with_uid(enter_info.uid)
 		if user then
-			_enter_user.mutex(user_leave,user)
+			enter_info.mutex(user_leave,self,user)
 		end
 	end
 
@@ -234,6 +234,5 @@ function server_stop()
 	db_channel:findAndModify("agent_version",{query = {uid = env.dist_id},update = updater,upsert = true})
 
 	local world_channel = model.get_world_channel()
-	world_channel:call("handler.world_handler","rpc_server_stop",{id = env.dist_id})
-	event.breakout()
+	world_channel:send("handler.world_handler","server_stop",{id = env.dist_id})
 end
