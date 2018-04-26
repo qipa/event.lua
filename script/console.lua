@@ -2,6 +2,8 @@ local event = require "event"
 local channel = require "channel"
 local util = require "util"
 
+local args = ...
+
 local console_channel = channel:inherit()
 
 function console_channel:disconnect()
@@ -14,13 +16,21 @@ local function rpc(channel,method,...)
 end
 
 event.fork(function ()
-	local channel,err = event.connect(string.format("tcp://127.0.0.1:%d",env.master),4,console_channel)
+	local channel,err = event.connect(env.login,4,true,console_channel)
 	if not channel then
 		event.error(err)
+		os.exit(1)
 		return
 	end
-	channel:call("handler.master_handler","register","console")
-	
+
+	if args == "stop" then
+		local result = channel:call("handler.login_handler","req_stop_server")
+		if result then
+			os.exit(0)
+		else
+			os.exit(1)
+		end
+	end
 	while true do
 		local line = util.readline(">>")
 		if line then

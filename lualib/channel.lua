@@ -74,7 +74,7 @@ local function call_method(channel,session,file,method,args)
 		if not ok then
 			channel:ret(session,false,result)
 		else
-			channel:ret(session,result or {})
+			channel:ret(session,true,result)
 		end
 	end
 end
@@ -159,11 +159,11 @@ function channel:call(file,method,args)
 
 	monitor.report_output(file,method,size)
 
-	local ok,err = event.wait(session)
+	local ok,value = event.wait(session)
 	if not ok then
-		error(err)
+		error(value)
 	end
-	return ok
+	return value
 end
 
 function channel:ret(session,...)
