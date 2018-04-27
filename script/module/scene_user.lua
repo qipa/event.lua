@@ -55,15 +55,9 @@ end
 
 function cls_scene_user:transfer_scene(scene_id,scene_uid,x,z)
 	local scene = scene_server:get_scene(scene_uid)
-	if scene then
-		if self.scene == scene then
-			self:set_pos(x,z)
-			return
-		end
-		self.scene:leave(self)
-		scene:enter(self,{x = x,z = z})
+	if scene and self.scene = scene then
+		self:set_pos(x,z)
 		return
 	end
-
-	scene_server:transfer_scene(self,scene_id,scene_uid,x,z)
+	scene_server:launch_transfer_scene(self,scene_id,scene_uid,x,z)
 end

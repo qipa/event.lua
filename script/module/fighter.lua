@@ -5,6 +5,7 @@ local util = require "util"
 
 local database_object = import "module.database_object"
 local scene_server = import "module.scene_server"
+local move_controller = import "module.move_controller"
 cls_fighter = database_object.cls_database:inherit("fighter")
 
 function __init__(self)
@@ -19,6 +20,7 @@ function cls_fighter:init(data)
 	-- self.scene_info = data.scene_info
 	-- self.fighter_info = data.fighter_info
 	self.view_list = {}
+	self.move_ctrl = nil
 end
 
 function cls_fighter:destroy()
@@ -68,9 +70,11 @@ function cls_fighter:pos_around_movable(x,z,depth)
 end
 
 function cls_fighter:move(x,z)
-	self.scene:fighter_move(self,x,z)
-	self.scene_info.x = x
-	self.scene_info.z = z
+	if self.move_ctrl then
+		self.move_ctrl:disable()
+		self.move_ctrl = nil
+	end
+	self.move_ctrl = move_controller.new(self,self.speed,x,z)
 end
 
 function cls_fighter:set_pos(x,z)
@@ -79,4 +83,7 @@ end
 
 function cls_fighter:update()
 	-- print(self.uid,"update")
+	if self.move_ctrl then
+		self.move_ctrl:update()
+	end
 end
