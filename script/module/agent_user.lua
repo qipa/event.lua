@@ -65,29 +65,24 @@ function cls_agent_user:leave_game()
 	event.error(string.format("user:%d leave agent:%d",self.uid,env.dist_id))
 end
 
-function cls_agent_user:prepare_enter_scene(scene_id,scene_uid,scene_server,scene_addr)
+function cls_agent_user:connect_scene_server(scene_server,scene_addr)
 	local scene_channel = _scene_channel_ctx[scene_server]
-	if not scene_channel then
-		local addr
-		if scene_addr.file then
-			addr = string.format("ipc://%s",scene_addr.file)
-		else
-			addr = string.format("tcp://%s:%d",scene_addr.ip,scene_addr.port)
-		end
-
-		local channel,reason = event.connect(addr,4,false,scene_channel)
-		if not channel then
-			print(string.format("connect scene server:%d faield:%s",addr,reason))
-			return false
-		end
-		_scene_channel_ctx[scene_server] = channel
-
-		channel:send("module.server_manager","register_agent_server",{ip = "0.0.0.0",port = port,id = env.dist_id})
+	if scene_channel then
+		return true
+	end
+	local addr
+	if scene_addr.file then
+		addr = string.format("ipc://%s",scene_addr.file)
+	else
+		addr = string.format("tcp://%s:%d",scene_addr.ip,scene_addr.port)
 	end
 
-	self.scene_id = scene_id
-	self.scene_uid = scene_uid
-	self.scene_server = scene_server
+	local channel,reason = event.connect(addr,4,false,scene_channel)
+	if not channel then
+		event.error(string.format("connect scene server:%d faield:%s",addr,reason))
+		return false
+	end
+	_scene_channel_ctx[scene_server] = channel
 	return true
 end
 

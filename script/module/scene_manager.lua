@@ -6,6 +6,7 @@ local server_manager = import "module.server_manager"
 _scene_ctx = _scene_ctx or {}
 _user_ctx = _user_ctx or {}
 _scene_mutex = _scene_mutex or {}
+_agent_server_status = _agent_server_status or {}
 
 function __init__(self)
 	server_manager:listen("agent",self,"agent_down")
@@ -13,6 +14,8 @@ function __init__(self)
 end
 
 function agent_down(self,server_id)
+	_agent_server_status[server_id] = nil
+
 	local set = {}
 	for uid,user_info in pairs(_user_ctx) do
 		if user_info.user_agent == server_id then
@@ -28,6 +31,12 @@ function agent_down(self,server_id)
 end
 
 function scene_down(self,server_id)
+	for agent_id,agent_info in pairs(_agent_server_status) do
+		if agent_info[server_id] then
+			agent_info[server_id] = false
+		end
+	end
+
 	for user_uid,user_info in pairs(_user_ctx) do
 		if user_info.server == server_id then
 			_user_ctx[user_uid] = nil
@@ -156,13 +165,26 @@ function execute_enter_scene(user_info,fighter_data,scene_id,scene_uid,scene_pos
 		return
 	end
 
-	local result = server_manager:call_agent(user_info.user_agent,"handler.agent_handler","prepare_enter_scene",{user_uid = user_info.user_uid,
-																					 scene_id = scene_id,
-																					 scene_uid = scene_uid,
+	local agent_info = _agent_server_status[user_info.user_agent]
+	local connected = false
+	if agent_info and agent_info[scene_server] then
+		connected = true
+	end
+
+	if not connected then
+		local result = server_manager:call_agent(user_info.user_agent,"handler.agent_handler","connect_scene_server",{user_uid = user_info.user_uid, 
 																					 scene_server = scene_server,
 																					 scene_addr = scene_addr})
-	if not result then
-		return
+		if not result then
+			return
+		end
+
+		local agent_info = _agent_server_status[user_info.user_agent]
+		if not agent_info then
+			agent_info = {}
+			_agent_server_status[user_info.user_agent] = agent_info
+		end
+		agent_info[scene_server] = true
 	end
 
 	local fighter_data = fighter_data
@@ -207,7 +229,7 @@ end
 
 function leave_scene(_,args)
 	local user_info = _user_ctx[args.uid]
-	if not user_info then
+	if not user_info or not user_info.scene_id then
 		return true
 	end
 	user_info.mutex(execute_leave_scene,user_info)

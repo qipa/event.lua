@@ -23,12 +23,12 @@ function user_kick(_,args)
 	agent_server:user_kick(args.uid)
 end
 
-function prepare_enter_scene(_,args)
+function connect_scene_server(_,args)
 	local user = model.fetch_agent_user_with_uid(args.user_uid)
 	if not user then
 		return false
 	end
-	return user:prepare_enter_scene(args.scene_id,args.scene_uid,args.scene_server,args.scene_addr)
+	return user:connect_scene_server(args.scene_server,args.scene_addr)
 end
 
 function forward_client(_,args)
