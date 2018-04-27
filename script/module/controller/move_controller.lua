@@ -36,7 +36,9 @@ function _M:update()
 
 	if vector2.distance(x,z,self.x,self.z) < 0.1 then
 		fighter.move_ctrl = nil
+		return false
 	end
+	return true
 end
 
 function _M:enable(val)

@@ -80,6 +80,7 @@ fi
 
 
 ./event server/logger &
+./event server/login &
 ./event server/world &
 ./event server/scene &
 ./event server/scene &

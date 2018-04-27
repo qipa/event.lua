@@ -84,6 +84,7 @@ function cls_fighter:move(x,z)
 	end
 	self.state = common.FIGHTER_STATE.MOVE
 	self.move_ctrl = move_controller.new(self,x,z)
+	print(self.move_ctrl,self.state == common.FIGHTER_STATE.MOVE)
 end
 
 function cls_fighter:use_skill(skill_id)
@@ -102,11 +103,13 @@ end
 function cls_fighter:update()
 	-- print(self.uid,"update")
 
-	-- if self.state == common.FIGHTER_STATE.MOVE then
-	-- 	self.move_ctrl:update()
-	-- elseif self.state == common.FIGHTER_STATE.KILL then
-	-- 	self.skill_ctrl:update()
-	-- else
-	-- 	self.ai_ctrl:update()
-	-- end
+	if self.state == common.FIGHTER_STATE.MOVE then
+		if not self.move_ctrl:update() then
+			self.state = common.FIGHTER_STATE.IDLE
+		end
+	elseif self.state == common.FIGHTER_STATE.KILL then
+		self.skill_ctrl:update()
+	else
+		self.ai_ctrl:update()
+	end
 end

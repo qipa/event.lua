@@ -110,5 +110,5 @@ event.fork(function ()
 	world_channel:send("module.server_manager","register_login_server",{id = env.dist_id})
 
 	login_server:start()
-	debugger("login_handler",20)
+	-- debugger("login_handler",20)
 end)
