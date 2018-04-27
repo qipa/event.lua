@@ -24,7 +24,7 @@ function __init__(self)
 
 end
 
-function stop()
+function flush()
 	local db_channel = model.get_db_channel()
 	local all = model.fetch_scene_user()
 	for _,fighter in pairs(all) do

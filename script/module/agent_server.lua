@@ -45,7 +45,7 @@ function start(self,client_mgr)
 	import "handler.cmd_handler"
 end
 
-function stop(self)
+function flush(self)
 	local db_channel = model.get_db_channel()
 	local all = model.fetch_agent_user()
 	for _,user in pairs(all) do

@@ -21,6 +21,14 @@ function start(self)
 	import "handler.cmd_handler"
 end
 
+function flush(self)
+	local db_channel = model.get_db_channel()
+	local all = model.fetch_login_user()
+	for _,user in pairs(all) do
+		user:save(db_channel)
+	end
+end
+
 function set_enter_user(self,enter_user)
 	_enter_agent_user = enter_user
 end

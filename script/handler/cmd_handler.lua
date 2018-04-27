@@ -34,6 +34,26 @@ function gc()
 	return string.format("lua mem:%fkb,c mem:%fkb",mem,helper.allocated() / 1024)
 end
 
+function flush()
+	if env.name == "server/world" then
+		local result = server_manager:broadcast("handler.cmd_handler","flush")
+		local world_server = import.import "module.world_server"
+		world_server:flush()
+		result[env.dist_id] = "ok"
+		return result
+	elseif env.name == "server/agent" then
+		local agent_server = import.import "module.agent_server"
+		agent_server:flush()
+	elseif env.name == "server/login" then
+		local login_server = import.import "module.login_server"
+		login_server:flush()
+	elseif env.name == "server/scene" then
+		local scene_server = import.import "module.scene_server"
+		scene_server:flush()
+	end
+	return "ok"
+end
+
 function mem_dump()
 	helper.heap.dump("dump")
 	return "ok"
