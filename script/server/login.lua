@@ -105,6 +105,9 @@ event.fork(function ()
 	event.error(string.format("login listen client success",reason))
 	model.set_client_manager(client_manager)
 
+	local world_channel = model.get_world_channel()
+	world_channel:send("module.server_manager","register_login_server",{id = env.dist_id})
 
-	import "handler.login_handler"
+	login_server:start()
+	
 end)

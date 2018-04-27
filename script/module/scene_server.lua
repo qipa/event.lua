@@ -4,6 +4,7 @@ local model = require "model"
 local scene = import "module.scene"
 local scene_user = import "module.scene_user"
 local id_builder = import "module.id_builder"
+import "handler.cmd_handler"
 
 _scene_ctx = _scene_ctx or {}
 _scene_uid2id = _scene_uid2id or {}

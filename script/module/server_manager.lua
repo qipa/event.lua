@@ -152,7 +152,6 @@ function find_min_scene_server(self)
 	local addr
 
 	for scene_server_id,scene_server in pairs(_scene_server_manager) do
-
 		if not min or min > scene_server.count then
 			min = scene_server.count
 			best = scene_server_id
@@ -189,9 +188,9 @@ function call_scene(self,scene_server_id,file,method,args)
 end
 
 function register_login_server(channel,args)
-	local login = {channel = channel,count = 0,id = args.id}
+	local login = {channel = channel,id = args.id}
 	_login_server = login
-	channel.name = "agent"
+	channel.name = "login"
 	channel.id = args.id
 	return true
 end
@@ -207,4 +206,19 @@ function listen(self,event,module,method)
 		_listener[event] = info
 	end
 	table.insert(info,{module = module,method = method})
+end
+
+function broadcast(self,file,method,args)
+	local result = {}
+	for id,server in pairs(_scene_server_manager) do
+		local value = server.channel:call(file,method,args)
+		result[id] = value
+	end
+	for id,server in pairs(_agent_server_manager) do
+		local value = server.channel:call(file,method,args)
+		result[id] = value
+	end
+	local value = _login_server.channel:call(file,method,args)
+	result[_login_server.id] = value
+	return result
 end

@@ -17,6 +17,8 @@ function start(self)
 		end
 	end)
 	server_manager:listen("agent",self,"agent_server_down")
+	import "handler.login_handler"
+	import "handler.cmd_handler"
 end
 
 function set_enter_user(self,enter_user)

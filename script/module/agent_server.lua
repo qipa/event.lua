@@ -42,6 +42,7 @@ function start(self,client_mgr)
 	end)
 
 	import "handler.agent_handler"
+	import "handler.cmd_handler"
 end
 
 function stop(self)
