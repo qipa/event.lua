@@ -84,6 +84,7 @@ function leave_scene(self,user_uid,switch)
 	local scene = self:get_scene(fighter.scene_info.scene_uid)
 	scene:leave(fighter)
 
+	fighter:dirty_field("scene_info")
 	local db_channel = model.get_db_channel()
 	fighter:save(db_channel)
 

@@ -53,8 +53,10 @@ end
 
 function response.s2c_login_auth(channel,message)
 	channel.list = message.list
+	table.print(message)
 	if #channel.list > 0 then
 		local uid = channel.list[1].uid
+		print("uid",uid)
 		channel:write(channel.packet:pack(protocol.encode.c2s_login_enter({account = channel.account,uid = uid})))
 	else
 		channel:write(channel.packet:pack(protocol.encode.c2s_create_role({career = 1})))
@@ -112,6 +114,6 @@ end
 event.fork(function ()
 	startup.run(nil,nil,env.config,env.protocol)
 	
-	bench(1000)
+	bench(1)
 end)
 

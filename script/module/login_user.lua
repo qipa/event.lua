@@ -21,7 +21,7 @@ local PHASE = {
 
 function cls_login_user:create(cid,account)
 	self.cid = cid
-	self.phase = PHASE.LOGIN
+	self.phase = PHASE.LOADING
 	self.account = account
 	model.bind_login_user_with_account(account,self)
 end
@@ -91,11 +91,6 @@ function cls_login_user:destroy()
 end
 
 function cls_login_user:leave()
-	if self.phase == PHASE.LOGIN then
-		self:release()
-		return
-	end
-
 	local db_channel = model.get_db_channel()
 	self:save(db_channel)
 	self:release()

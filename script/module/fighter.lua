@@ -71,6 +71,7 @@ function cls_fighter:pos_around_movable(x,z,depth)
 end
 
 function cls_fighter:move(x,z)
+	print("move")
 	if self.move_ctrl then
 		self.move_ctrl:disable()
 		self.move_ctrl = nil
