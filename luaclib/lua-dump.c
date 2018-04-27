@@ -266,30 +266,30 @@ pack_key(lua_State* L, struct write_buffer* buffer, int index, int depth) {
 			append_string(L, buffer, str, sz);
 			break;
 		}
-		// case LUA_TUSERDATA:
-		// case LUA_TLIGHTUSERDATA:
-		// {
-		// 	const void* pointer = lua_topointer(L,index);
-		// 	char str[64] = {0};
-		// 	snprintf(str,64,"<userdata:0x%x>",(uint32_t)(uintptr_t)pointer);
-		// 	buffer_addstring(buffer,str);
-		// 	break;
-		// }
-		// case LUA_TFUNCTION:
-		// {
-		// 	const void* pointer = lua_topointer(L,index);
-		// 	char str[64] = {0};
-		// 	snprintf(str,64,"<function:0x%x>",(uint32_t)(uintptr_t)pointer);
-		// 	buffer_addstring(buffer,str);
-		// 	break;
-		// }
-		// case LUA_TTHREAD:
-		// {
-		// 	const void* pointer = lua_topointer(L,index);
-		// 	char str[64] = {0};
-		// 	snprintf(str,64,"<thread:0x%x>",(uint32_t)(uintptr_t)pointer);
-		// 	buffer_addstring(buffer,str);
-		// }
+		case LUA_TUSERDATA:
+		case LUA_TLIGHTUSERDATA:
+		{
+			const void* pointer = lua_topointer(L,index);
+			char str[64] = {0};
+			snprintf(str,64,"<userdata:0x%x>",(uint32_t)(uintptr_t)pointer);
+			buffer_addstring(buffer,str);
+			break;
+		}
+		case LUA_TFUNCTION:
+		{
+			const void* pointer = lua_topointer(L,index);
+			char str[64] = {0};
+			snprintf(str,64,"<function:0x%x>",(uint32_t)(uintptr_t)pointer);
+			buffer_addstring(buffer,str);
+			break;
+		}
+		case LUA_TTHREAD:
+		{
+			const void* pointer = lua_topointer(L,index);
+			char str[64] = {0};
+			snprintf(str,64,"<thread:0x%x>",(uint32_t)(uintptr_t)pointer);
+			buffer_addstring(buffer,str);
+		}
 		default:
 			pack_error(L, buffer, "key not support type %s", lua_typename(L, type));
 			break;
@@ -340,30 +340,30 @@ pack_value(lua_State* L, struct write_buffer* buffer, int index, int depth, int 
 
 		   break;
 		}
-		// case LUA_TUSERDATA:
-		// case LUA_TLIGHTUSERDATA:
-		// {
-		// 	const void* pointer = lua_topointer(L,index);
-		// 	char str[64] = {0};
-		// 	snprintf(str,64,"<userdata:0x%x>",(uint32_t)(uintptr_t)pointer);
-		// 	buffer_addstring(buffer,str);
-		// 	break;
-		// }
-		// case LUA_TFUNCTION:
-		// {
-		// 	const void* pointer = lua_topointer(L,index);
-		// 	char str[64] = {0};
-		// 	snprintf(str,64,"<function:0x%x>",(uint32_t)(uintptr_t)pointer);
-		// 	buffer_addstring(buffer,str);
-		// 	break;
-		// }
-		// case LUA_TTHREAD:
-		// {
-		// 	const void* pointer = lua_topointer(L,index);
-		// 	char str[64] = {0};
-		// 	snprintf(str,64,"<thread:0x%x>",(uint32_t)(uintptr_t)pointer);
-		// 	buffer_addstring(buffer,str);
-		// }
+		case LUA_TUSERDATA:
+		case LUA_TLIGHTUSERDATA:
+		{
+			const void* pointer = lua_topointer(L,index);
+			char str[64] = {0};
+			snprintf(str,64,"<userdata:0x%x>",(uint32_t)(uintptr_t)pointer);
+			buffer_addstring(buffer,str);
+			break;
+		}
+		case LUA_TFUNCTION:
+		{
+			const void* pointer = lua_topointer(L,index);
+			char str[64] = {0};
+			snprintf(str,64,"<function:0x%x>",(uint32_t)(uintptr_t)pointer);
+			buffer_addstring(buffer,str);
+			break;
+		}
+		case LUA_TTHREAD:
+		{
+			const void* pointer = lua_topointer(L,index);
+			char str[64] = {0};
+			snprintf(str,64,"<thread:0x%x>",(uint32_t)(uintptr_t)pointer);
+			buffer_addstring(buffer,str);
+		}
 		default:
 			pack_error(L, buffer, "value not support type %s", lua_typename(L, type));
 			break;

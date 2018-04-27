@@ -81,7 +81,6 @@ fi
 
 ./event server/logger &
 ./event server/world &
-./event server/login &
 ./event server/scene &
 ./event server/scene &
 ./event server/scene &

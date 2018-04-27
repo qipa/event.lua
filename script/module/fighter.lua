@@ -102,11 +102,11 @@ end
 function cls_fighter:update()
 	-- print(self.uid,"update")
 
-	if self.state == common.FIGHTER_STATE.MOVE then
-		self.move_ctrl:update()
-	elseif self.state == common.FIGHTER_STATE.KILL then
-		self.skill_ctrl:update()
-	else
-		self.ai_ctrl:update()
-	end
+	-- if self.state == common.FIGHTER_STATE.MOVE then
+	-- 	self.move_ctrl:update()
+	-- elseif self.state == common.FIGHTER_STATE.KILL then
+	-- 	self.skill_ctrl:update()
+	-- else
+	-- 	self.ai_ctrl:update()
+	-- end
 end

@@ -6,6 +6,7 @@ local mongo = require "mongo"
 local channel = require "channel"
 local route = require "route"
 local http = require "http"
+local debugger = require "debugger"
 local startup = import "server.startup"
 local id_builder = import "module.id_builder"
 local server_manager = import "module.server_manager"
@@ -109,5 +110,5 @@ event.fork(function ()
 	world_channel:send("module.server_manager","register_login_server",{id = env.dist_id})
 
 	login_server:start()
-	
+	debugger("login_handler",20)
 end)

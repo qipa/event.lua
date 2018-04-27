@@ -1,5 +1,6 @@
 local import = require "import"
 local util = require "util"
+local dump_core = require "dump.core"
 
 local ldb = {}
 
@@ -133,7 +134,7 @@ function ldb:getlocal(from,to,name)
 	if next(result) == nil then
 		return false
 	end
-	return true,table.tostring(result)
+	return true,dump_core.tostring(result)
 end
 
 function ldb:getupvalue(name)
@@ -156,7 +157,7 @@ function ldb:getupvalue(name)
 	if next(result) == nil then
 		return false
 	end
-	return true,table.tostring(result)
+	return true,dump_core.tostring(result)
 end
 
 function ldb:getframestack()
@@ -264,7 +265,6 @@ local function hook(event,line)
 		if short ~= "@user" then
 			return
 		end
-
 		_debugger.current_frame = 4
 		_debugger.current_source = info.source
 		_debugger.current_line = info.currentline
@@ -365,7 +365,7 @@ function CMD.d(debugger,index)
 			end
 		end
 		debugger.breakpoint = {}
-		print(table.tostring(debugger.breakpoint))
+		print(dump_core.tostring(debugger.breakpoint))
 	else
 		local ok,source,line = debugger:breakpoint_delete(index)
 		if ok then
@@ -417,7 +417,7 @@ function CMD.i(debugger,args)
 		table.sort(result,function (l,r)
 			return l.index < r.index
 		end)
-		print(table.tostring(result))
+		print(dump_core.tostring(result))
 	elseif args == "args" then
 		local info = debug.getinfo(debugger.current_frame,"u")
 		local ok,result = debugger:getlocal(1,info.nparams)

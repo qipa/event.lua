@@ -114,6 +114,6 @@ end
 event.fork(function ()
 	startup.run(nil,nil,env.config,env.protocol)
 	
-	bench(3000)
+	bench(1)
 end)
 
