@@ -35,7 +35,7 @@ MAIN_OBJ = $(patsubst %.c,%.o,$(patsubst %.cc,%.o,$(MAIN_SRC)))
 TARGET ?= event
 
 CC=gcc
-CFLAGS=-g -Wall -fno-omit-frame-pointer $(DEFINE)
+CFLAGS=-g -Wall -O3 -fno-omit-frame-pointer $(DEFINE)
 
 LDFLAGS=-lrt -lm -ldl -lpthread -lssl -lunwind -lstdc++
 STATIC_LIBS=$(LUA_STATIC_LIB) $(TC_STATIC_LIB) 

@@ -5,7 +5,11 @@ local util = require "util"
 
 local database_object = import "module.database_object"
 local scene_server = import "module.scene_server"
-local move_controller = import "module.move_controller"
+local move_controller = import "module.controller.move_controller"
+local skill_controller = import "module.controller.skill_controller"
+local ai_controller = import "module.controller.ai_controller"
+local common = import "common.common"
+
 cls_fighter = database_object.cls_database:inherit("fighter")
 
 function __init__(self)
@@ -21,7 +25,10 @@ function cls_fighter:init(data)
 	-- self.fighter_info = data.fighter_info
 	self.view_list = {}
 	self.move_ctrl = nil
+	self.skill_ctrl = nil
+	self.ai_ctrl = ai_controller.new(self,1)
 	self.speed = 5
+	self.state = common.FIGHTER_STATE.IDLE
 end
 
 function cls_fighter:destroy()
@@ -72,10 +79,20 @@ end
 
 function cls_fighter:move(x,z)
 	if self.move_ctrl then
-		self.move_ctrl:disable()
+		self.move_ctrl:enable(false)
 		self.move_ctrl = nil
 	end
+	self.state = common.FIGHTER_STATE.MOVE
 	self.move_ctrl = move_controller.new(self,x,z)
+end
+
+function cls_fighter:use_skill(skill_id)
+	if self.skill_ctrl then
+		self.skill_ctrl:enable(false)
+		self.skill_ctrl = nil
+	end
+	self.state = common.FIGHTER_STATE.KILL
+	self.skill_ctrl = skill_controller.new(self,skill_id)
 end
 
 function cls_fighter:set_pos(x,z)
@@ -84,7 +101,12 @@ end
 
 function cls_fighter:update()
 	-- print(self.uid,"update")
-	if self.move_ctrl then
+
+	if self.state == common.FIGHTER_STATE.MOVE then
 		self.move_ctrl:update()
+	elseif self.state == common.FIGHTER_STATE.KILL then
+		self.skill_ctrl:update()
+	else
+		self.ai_ctrl:update()
 	end
 end

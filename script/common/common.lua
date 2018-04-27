@@ -29,3 +29,9 @@ LUA_TYPE = {
 	LUA_TUSERDATA = 7,
 	LUA_TTHREAD	= 8,
 }
+
+FIGHTER_STATE = {
+	IDLE = 1,
+	MOVE = 2,
+	SKILL = 3,
+}
