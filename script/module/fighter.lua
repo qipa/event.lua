@@ -84,7 +84,14 @@ function cls_fighter:move(x,z)
 	end
 	self.state = common.FIGHTER_STATE.MOVE
 	self.move_ctrl = move_controller.new(self,x,z)
-	print(self.move_ctrl,self.state == common.FIGHTER_STATE.MOVE)
+end
+
+function cls_fighter:stop_move()
+	if self.move_ctrl then
+		self.move_ctrl:enable(false)
+		self.move_ctrl = nil
+	end
+	self.state = common.FIGHTER_STATE.IDLE
 end
 
 function cls_fighter:use_skill(skill_id)
@@ -92,8 +99,17 @@ function cls_fighter:use_skill(skill_id)
 		self.skill_ctrl:enable(false)
 		self.skill_ctrl = nil
 	end
-	self.state = common.FIGHTER_STATE.KILL
+	self.state = common.FIGHTER_STATE.SKILL
 	self.skill_ctrl = skill_controller.new(self,skill_id)
+end
+
+function cls_fighter:break_skill()
+	if not self.skill_ctrl then
+		return
+	end
+	self.skill_ctrl:enable(false)
+	self.skill_ctrl = nil
+	self.state = common.FIGHTER_STATE.IDLE
 end
 
 function cls_fighter:set_pos(x,z)
@@ -107,8 +123,10 @@ function cls_fighter:update()
 		if not self.move_ctrl:update() then
 			self.state = common.FIGHTER_STATE.IDLE
 		end
-	elseif self.state == common.FIGHTER_STATE.KILL then
-		self.skill_ctrl:update()
+	elseif self.state == common.FIGHTER_STATE.SKILL then
+		if not self.skill_ctrl:update() then
+			self.state = common.FIGHTER_STATE.IDLE
+		end
 	else
 		self.ai_ctrl:update()
 	end
