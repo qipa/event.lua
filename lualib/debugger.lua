@@ -323,6 +323,8 @@ function CMD.q(debugger)
 end
 
 function CMD.c(debugger)
+	debugger.step_next = nil
+	debugger.step = false
 	return false
 end
 
@@ -382,6 +384,13 @@ function CMD.n(debugger)
 	print(table.concat(str,"\r\n"))
 	if debugger.current_line + 1 > info.lastlinedefined then
 		debugger.step_next = nil
+		local info = debug.getinfo(debugger.current_frame+1,"lnS")
+		local short = info.source:sub(1,5)
+		if short == "@user" then
+			if info.currentline + 1 <= info.lastlinedefined then
+				debugger.step_next = {source = info.source,name = info.name}
+			end
+		end
 	end
 
 	return false
