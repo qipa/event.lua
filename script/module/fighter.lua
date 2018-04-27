@@ -21,6 +21,7 @@ function cls_fighter:init(data)
 	-- self.fighter_info = data.fighter_info
 	self.view_list = {}
 	self.move_ctrl = nil
+	self.speed = 5
 end
 
 function cls_fighter:destroy()
@@ -74,7 +75,7 @@ function cls_fighter:move(x,z)
 		self.move_ctrl:disable()
 		self.move_ctrl = nil
 	end
-	self.move_ctrl = move_controller.new(self,self.speed,x,z)
+	self.move_ctrl = move_controller.new(self,x,z)
 end
 
 function cls_fighter:set_pos(x,z)

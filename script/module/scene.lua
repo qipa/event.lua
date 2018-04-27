@@ -76,6 +76,7 @@ function cls_scene:pos_around_movable(x,z,depth)
 end
 
 function cls_scene:fighter_move(fighter,x,z)
+	print(fighter.aoi_id,x,z)
 	local enter_set,leave_set = self.aoi:update(fighter.aoi_id,x,z)
 	
 	local enter_objs = {}

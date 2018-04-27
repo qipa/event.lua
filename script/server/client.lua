@@ -2,7 +2,7 @@ local event = require "event"
 local channel = require "channel"
 local util = require "util"
 local protocol = require "protocol"
-
+local startup = import "server.startup"
 
 local response = {}
 
@@ -72,12 +72,12 @@ end
 function response.s2c_scene_enter(channel,message)
 	table.print(message,"s2c_scene_enter")
 	event.fork(function ()
-		while true do
-			event.sleep(0.1)
-			for i = 1,5 do
-				channel:write(channel.packet:pack(protocol.encode.c2s_move({x = 100,z = 100})))
-			end
-		end
+		-- while true do
+		-- 	event.sleep(0.1)
+			-- for i = 1,5 do
+				channel:write(channel.packet:pack(protocol.encode.c2s_move({x = 50,z = 50})))
+			-- end
+		-- end
 	end)
 	
 end
@@ -110,8 +110,7 @@ function bench(count)
 end
 
 event.fork(function ()
-	protocol.parse("login")
-	protocol.load()
+	startup.run(nil,nil,env.config,env.protocol)
 	
 	bench(1000)
 end)

@@ -13,10 +13,12 @@ function _M.distance(from_x,from_z,to_x,to_z)
 end
 
 function _M.move_forward(from_x,from_z,to_x,to_z,pass)
-	local distance = vector2.distance(from_x,from_z,to_x,to_z)
+	local distance = _M.distance(from_x,from_z,to_x,to_z)
 	local ratio = pass / distance
 	if ratio > 1 then
 		ratio = 1
 	end
-	return _M.lerp(from_x,from_z,x,z)
+	return _M.lerp(from_x,from_z,to_x,to_z,ratio)
 end
+
+return _M

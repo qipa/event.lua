@@ -46,3 +46,11 @@ end
 function server_stop()
 	agent_server:server_stop()
 end
+
+function sync_scene_info(_,args)
+	local user = model.fetch_agent_user_with_uid(args.user_uid)
+	if not user then
+		return false
+	end
+	user:sync_scene_info(args.scene_server)
+end

@@ -82,6 +82,9 @@ function cls_agent_user:connect_scene_server(scene_server,scene_addr)
 		event.error(string.format("connect scene server:%d faield:%s",addr,reason))
 		return false
 	end
+
+	channel:call("module.server_manager","register_agent_server",{id = env.dist_id})
+
 	_scene_channel_ctx[scene_server] = channel
 	return true
 end
@@ -102,4 +105,8 @@ function cls_agent_user:send_scene(file,method,args)
 		return
 	end
 	scene_channel:send(file,method,args)
+end
+
+function cls_agent_user:sync_scene_info(scene_server)
+	self.scene_server = scene_server
 end

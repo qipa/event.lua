@@ -31,6 +31,7 @@ function agent_down(self,server_id)
 end
 
 function scene_down(self,server_id)
+	print("scene_down",server_id)
 	for agent_id,agent_info in pairs(_agent_server_status) do
 		if agent_info[server_id] then
 			agent_info[server_id] = false
@@ -38,8 +39,10 @@ function scene_down(self,server_id)
 	end
 
 	for user_uid,user_info in pairs(_user_ctx) do
-		if user_info.server == server_id then
-			_user_ctx[user_uid] = nil
+		if user_info.scene_server == server_id then
+			user_info.scene_id = nil
+			user_info.scene_uid = nil
+			user_info.scene_server = nil
 		end
 	end
 
@@ -224,7 +227,7 @@ end
 
 function leave_scene(_,args)
 	local user_info = _user_ctx[args.uid]
-	if not user_info or not user_info.scene_id then
+	if not user_info or not user_info.scene_server then
 		return true
 	end
 	user_info.mutex(execute_leave_scene,user_info)

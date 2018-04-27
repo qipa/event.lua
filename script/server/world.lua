@@ -35,7 +35,7 @@ event.fork(function ()
 	env.dist_id = server_manager:apply_id()
 	id_builder:init(env.dist_id)
 
-	local ok,reason = event.listen(env.world,4,channel_accept,agent_channel)
+	local ok,reason = event.listen(env.world,4,channel_accept,common_channel)
 	if not ok then
 		event.breakout(reason)
 		return

@@ -1,5 +1,5 @@
 local util = require "util"
-local vector2 = require "vector2"
+local vector2 = require "common.vector2"
 
 local _M = {}
 
@@ -17,15 +17,16 @@ function _M:update()
 
 	local now = util.time()
 	local interval = now - self.time
+	local pos = fighter.scene_info.scene_pos
+	local pass = (interval * fighter.speed) / 100
 
-	local pass = interval * fighter.speed
+	local x,z = vector2.move_forward(pos.x,pos.z,self.x,self.z,pass)
 
-	local x,z = vector2.move_forward(fighter.scene_info.x,fighter.scene_info.z,self.x,self.z,pass)
-
-	fighter.scene:fighter_move(self,x,z)
+	print(pos.x,pos.z,x,z)
+	fighter.scene:fighter_move(fighter,x,z)
 	
-	fighter.scene_info.x = x
-	fighter.scene_info.z = z
+	pos.x = x
+	pos.z = z
 
 	self.time = now
 
