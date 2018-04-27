@@ -76,11 +76,11 @@ function cls_scene:pos_around_movable(x,z,depth)
 end
 
 function cls_scene:fighter_move(fighter,x,z)
-	print(fighter.aoi_id,x,z)
 	local enter_set,leave_set = self.aoi:update(fighter.aoi_id,x,z)
 	
 	local enter_objs = {}
-	for _,uid in pairs(enter_set) do
+	for _,aoi_id in pairs(enter_set) do
+		local uid = self.aoi_ctx[aoi_id]
 		local other = self.fighter_ctx[uid]
 		other:object_enter({fighter})
 		table.insert(enter_objs,other)
@@ -89,7 +89,8 @@ function cls_scene:fighter_move(fighter,x,z)
 	fighter:object_enter(enter_objs)
 
 	local leave_objs = {}
-	for _,uid in pairs(leave_set) do
+	for _,aoi_id in pairs(leave_set) do
+		local uid = self.aoi_ctx[aoi_id]
 		local other = self.fighter_ctx[uid]
 		other:object_leave({fighter})
 		table.insert(leave_objs,other)

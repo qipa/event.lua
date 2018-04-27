@@ -220,6 +220,8 @@ function enter_scene(_,args)
 					 user_agent = user_agent,
 					 mutex = event.mutex()}
 		_user_ctx[user_uid] = user_info
+	else
+		user_info.user_agent = user_agent
 	end
 
 	user_info.mutex(execute_enter_scene,user_info,fighter_data,scene_id,scene_uid,scene_pos)

@@ -391,6 +391,8 @@ laoi_update(lua_State *L) {
 	int id = lua_tointeger(L, 2);
 
 	struct object* obj = container_get(aoi->container,id);
+	if (!obj)
+		luaL_error(L,"error aoi id:%d",id);
 
 	struct location np;
 	np.x = luaL_checknumber(L, 3);

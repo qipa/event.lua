@@ -22,7 +22,6 @@ function _M:update()
 
 	local x,z = vector2.move_forward(pos.x,pos.z,self.x,self.z,pass)
 
-	print(pos.x,pos.z,x,z)
 	fighter.scene:fighter_move(fighter,x,z)
 	
 	pos.x = x
