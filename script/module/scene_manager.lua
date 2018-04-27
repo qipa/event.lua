@@ -2,10 +2,10 @@ local event = require "event"
 local model = require "model"
 
 local server_manager = import "module.server_manager"
+local id_builder = import "module.id_builder"
 
 _scene_ctx = _scene_ctx or {}
 _user_ctx = _user_ctx or {}
-_scene_mutex = _scene_mutex or {}
 _agent_server_status = _agent_server_status or {}
 
 function __init__(self)
@@ -119,7 +119,8 @@ local function do_enter_scene(scene_id,scene_uid)
 	local scene_server,scene_uid = find_scene(scene_id,scene_uid)
 	if not scene_server then
 		scene_server = server_manager:find_min_scene_server()
-		scene_uid = server_manager:call_scene(scene_server,"handler.scene_handler","create_scene",{scene_id = scene_id})
+		scene_uid = id_builder:alloc_scene_uid()
+		server_manager:send_scene(scene_server,"handler.scene_handler","create_scene",{scene_id = scene_id,scene_uid = scene_uid})
 		add_scene(scene_id,scene_uid,scene_server)
 	end
 	add_scene_count(scene_id,scene_uid)
@@ -147,13 +148,7 @@ local function do_leave_scene(user_info,switch)
 end
 
 function execute_enter_scene(user_info,fighter_data,scene_id,scene_uid,scene_pos)
-	local mutex = _scene_mutex[scene_id]
-	if not mutex then
-		mutex = event.mutex()
-		_scene_mutex[scene_id] = mutex
-	end
-
-	local scene_server,scene_addr,scene_uid = mutex(do_enter_scene,scene_id,scene_uid)
+	local scene_server,scene_addr,scene_uid = do_enter_scene(scene_id,scene_uid)
 
 	if scene_server == user_info.scene_server then
 		server_manager:send_scene(scene_server,"handler.scene_handler","transfer_inside",{user_uid = user_info.user_uid,

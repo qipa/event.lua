@@ -22,7 +22,7 @@ function transfer_inside(_,args)
 end
 
 function create_scene(_,args)
-	return scene_server:create_scene(args.scene_id)
+	scene_server:create_scene(args.scene_id,args.scene_uid)
 end
 
 function delete_scene(_,args)
