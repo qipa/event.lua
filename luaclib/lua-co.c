@@ -6,21 +6,10 @@
 
 #include <time.h>
 
-#ifdef USE_TC
-#include "malloc_hook_c.h"
-#endif
 
 #define NANOSEC 1000000000
 
 //#define DEBUG_LOG
-
-
-__thread int hook_mem = 0;
-
-void 
-malloc_hook(const void* ptr, size_t size) {
-	hook_mem += size;
-}
 
 static inline double
 get_time() {
@@ -43,16 +32,12 @@ diff_time(double start) {
 
 static int
 lstart(lua_State *L) {
-	if (lua_gettop(L) != 0) {
-		lua_settop(L,1);
-		luaL_checktype(L, 1, LUA_TTHREAD);
-	} else {
-		lua_pushthread(L);
-	}
+	lua_pushthread(L);
+
 	lua_pushvalue(L, 1);	// push coroutine
 	lua_rawget(L, lua_upvalueindex(2));
 	if (!lua_isnil(L, -1)) {
-		return luaL_error(L, "Thread %p start profile more than once", lua_topointer(L, 1));
+		return luaL_error(L, "coroutine %p start profile more than once", lua_topointer(L, 1));
 	}
 	lua_pushvalue(L, 1);	// push coroutine
 	lua_pushnumber(L, 0);
@@ -60,29 +45,20 @@ lstart(lua_State *L) {
 
 	lua_pushvalue(L, 1);	// push coroutine
 	double ti = get_time();
-#ifdef DEBUG_LOG
-	fprintf(stderr, "PROFILE [%p] start\n", L);
-#endif
+
 	lua_pushnumber(L, ti);
 	lua_rawset(L, lua_upvalueindex(1));
 
-	hook_mem = 0;
-	MallocHook_AddNewHook(malloc_hook);
 	return 0;
 }
 
 static int
 lstop(lua_State *L) {
-	if (lua_gettop(L) != 0) {
-		lua_settop(L,1);
-		luaL_checktype(L, 1, LUA_TTHREAD);
-	} else {
-		lua_pushthread(L);
-	}
+	lua_pushthread(L);
 	lua_pushvalue(L, 1);	// push coroutine
 	lua_rawget(L, lua_upvalueindex(1));
 	if (lua_type(L, -1) != LUA_TNUMBER) {
-		return luaL_error(L, "Call profile.start() before profile.stop()");
+		return luaL_error(L, "call profile.start() before profile.stop()");
 	} 
 	double ti = diff_time(lua_tonumber(L, -1));
 	lua_pushvalue(L, 1);	// push coroutine
@@ -99,16 +75,8 @@ lstop(lua_State *L) {
 
 	total_time += ti;
 	lua_pushnumber(L, total_time);
-#ifdef DEBUG_LOG
-	fprintf(stderr, "PROFILE [%p] stop (%lf/%lf)\n", lua_tothread(L,1), ti, total_time);
-#endif
 
-	lua_pushinteger(L, hook_mem);
-
-	MallocHook_RemoveNewHook(malloc_hook);
-	hook_mem = 0;
-
-	return 2;
+	return 1;
 }
 
 static int
@@ -120,9 +88,7 @@ timing_resume(lua_State *L) {
 	} else {
 		lua_pop(L,1);
 		double ti = get_time();
-#ifdef DEBUG_LOG
-		fprintf(stderr, "PROFILE [%p] resume %lf\n", lua_tothread(L, -1), ti);
-#endif
+
 		lua_pushnumber(L, ti);
 		lua_rawset(L, lua_upvalueindex(1));	// set start time
 	}
@@ -141,9 +107,6 @@ lresume(lua_State *L) {
 
 static int
 timing_yield(lua_State *L) {
-#ifdef DEBUG_LOG
-	lua_State *from = lua_tothread(L, -1);
-#endif
 	lua_pushvalue(L, -1);
 	lua_rawget(L, lua_upvalueindex(2));	// check total time
 	if (lua_isnil(L, -1)) {
@@ -159,10 +122,6 @@ timing_yield(lua_State *L) {
 
 		double diff = diff_time(starttime);
 		ti += diff;
-#ifdef DEBUG_LOG
-		fprintf(stderr, "PROFILE [%p] yield (%lf/%lf)\n", from, diff, ti);
-#endif
-
 		lua_pushvalue(L, -1);	// push coroutine
 		lua_pushnumber(L, ti);
 		lua_rawset(L, lua_upvalueindex(2));

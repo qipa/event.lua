@@ -2,7 +2,12 @@ local co_core = require "co.core"
 local event = require "event"
 
 function test()
+	event.sleep(1)
 	event.fork(function ()
+		for i = 1,1024 * 1024 do
+			local t = {}
+		end
+		print("!!")
 		event.sleep(1)
 	end)
 end
