@@ -38,8 +38,6 @@ end
 local report = {}
 
 local call_info = {name = "root",childs = {}}
-local root_call = call_info
-
 
 local function hook(ev)
 	local info = debug.getinfo(2,"Snl")

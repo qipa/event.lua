@@ -6,9 +6,21 @@
 
 #include <time.h>
 
+#ifdef USE_TC
+#include "malloc_hook_c.h"
+#endif
+
 #define NANOSEC 1000000000
 
 //#define DEBUG_LOG
+
+
+__thread int hook_mem = 0;
+
+void 
+malloc_hook(const void* ptr, size_t size) {
+	hook_mem += size;
+}
 
 static inline double
 get_time() {
@@ -54,6 +66,8 @@ lstart(lua_State *L) {
 	lua_pushnumber(L, ti);
 	lua_rawset(L, lua_upvalueindex(1));
 
+	hook_mem = 0;
+	MallocHook_AddNewHook(malloc_hook);
 	return 0;
 }
 
@@ -89,7 +103,12 @@ lstop(lua_State *L) {
 	fprintf(stderr, "PROFILE [%p] stop (%lf/%lf)\n", lua_tothread(L,1), ti, total_time);
 #endif
 
-	return 1;
+	lua_pushinteger(L, hook_mem);
+
+	MallocHook_RemoveNewHook(malloc_hook);
+	hook_mem = 0;
+
+	return 2;
 }
 
 static int

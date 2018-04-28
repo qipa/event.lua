@@ -154,7 +154,7 @@ $(LUA_CLIB_PATH)/filter.so : $(LUA_CLIB_SRC)/lua-filter.c | $(LUA_CLIB_PATH)
 	$(CC) $(CFLAGS) $(SHARED) $^ -o $@ -I$(LUA_INC)	-I./3rd/klib
 
 $(LUA_CLIB_PATH)/co.so : $(LUA_CLIB_SRC)/lua-co.c | $(LUA_CLIB_PATH)
-	$(CC) $(CFLAGS) $(SHARED) $^ -o $@ -I$(LUA_INC)
+	$(CC) $(CFLAGS) $(SHARED) $^ -o $@ -I$(LUA_INC) -I$(TC_INC)
 	
 clean :
 	rm -rf $(TARGET) $(TARGET).raw

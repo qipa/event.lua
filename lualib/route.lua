@@ -21,7 +21,7 @@ function _M.dispatch(file,method,...)
 
 	co_core.start()
 	local result = func(...)
-	local diff = co_core.stop()
+	local diff,mem = co_core.stop()
 	monitor.report_diff(file,method,diff)
 	return result
 end
