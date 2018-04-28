@@ -1,6 +1,6 @@
 local event = require "event"
 local util = require "util"
-
+local snapshot = require "snapshot"
 
 
 
@@ -92,6 +92,9 @@ event.fork(function ()
 	end)
 
 	for _,info in ipairs(list) do
-		print(string.format("%- 30s %- 10d %- 30f %- 30f",info.name,info.count,info.time * 10 / info.count,info.mem/info.count))
+		print(string.format("%- 30s %- 10d %- 20f %- 20f",info.name,info.count,info.time * 10 / info.count,info.mem/info.count))
 	end
+
+	local dump = snapshot()
+	table.print(dump)
 end)
