@@ -62,6 +62,8 @@ protocol=$(read_env "protocol")
 log_path=$(read_env "log_path")
 login_addr=$(read_env "login_addr")
 mongodb_addr=$(read_env "mongodb")
+agent_num=$(read_env "agent_num")
+scene_num=$(read_env "scene_num")
 
 echo "server uid:${uid}"
 echo "server config path:${config}"
@@ -79,14 +81,31 @@ if [[ $? != 0 ]];then
 fi
 
 
+
 ./event server/logger &
+echo "logger server start"
+
 ./event server/login &
+echo "login server start"
+
 ./event server/world &
-./event server/scene &
-./event server/scene &
-./event server/scene &
-./event server/agent &
-./event server/agent &
+echo "world server start"
+
+i=0
+while [ $i -lt $scene_num ]
+do
+	./event server/scene &
+	echo "scene server start"
+	let i++
+done
+
+i=0
+while [ $i -lt $agent_num ]
+do
+	./event server/agent &
+	echo "agent server start"
+	let i++
+done
 
 
 # gdb --args ./event server/logger  server/world  server/login server/agent server/agent server/scene server/scene server/scene 
