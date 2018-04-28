@@ -1,4 +1,3 @@
-local co_core = require "co.core"
 local route = require "route"
 local event = require "event"
 local monitor = require "monitor"
@@ -79,17 +78,6 @@ local function call_method(channel,session,file,method,args)
 	end
 end
 
-local function diff_method(channel,session,file,method,args)
-	co_core.start()
-
-	call_method(channel,session,file,method,args)
-
-	local diff = co_core.stop()
-
-	monitor.report_diff(file,method,diff)
-	
-end
-
 function channel:dispatch(message,size)
 	if message.ret then
 		local call_ctx = self.session_ctx[message.session]
@@ -101,7 +89,7 @@ function channel:dispatch(message,size)
 		self.session_ctx[message.session] = nil
 	else
 		monitor.report_input(message.file,message.method,size)
-		event.fork(diff_method,self,message.session,message.file,message.method,message.args)
+		event.fork(call_method,self,message.session,message.file,message.method,message.args)
 	end
 end
 

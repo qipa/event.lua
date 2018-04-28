@@ -18,27 +18,32 @@ local output_monitor = {}
 
 local _M = {}
 
-local function update()
-	local logs = {}
-
+function _M.dump()
 	local lua_mem = collectgarbage("count")
-	tinsert(logs,str_format("lua mem:%fkb,c mem:%fkb",lua_mem,helper.allocated()/1024))
+	print(str_format("lua mem:%fkb,c mem:%fkb",lua_mem,helper.allocated()/1024))
 
+	print(string.format("monitor:%s",env.name))
+	print("time diff:")
 	for name,info in pairs(diff_monitor) do
-		local average = info.total / info.count
-		tinsert(logs,str_format("%s time diff:average:%f,min:%f,max:%f,count:%d",name,average,info.min,info.max,info.count))
+		local average = math.modf(info.total / info.count)
+		local min = math.modf(info.min)
+		local max = math.modf(info.max)
+		print(str_format("%- 50s average:%- 10d,min:%- 10d,max:%- 10d,count:%- 10d",name,average,min,max,info.count))
 	end
 
+	print("input flow:")
 	for name,info in pairs(input_monitor) do
-		local average = info.total / info.count
-		tinsert(logs,str_format("%s input flow:average:%f,min:%d,max:%d,count:%d",name,average,info.min,info.max,info.count))
+		local average = math.modf(info.total / info.count)
+		print(str_format("%- 50s average:%- 10d,min:%- 10d,max:%- 10d,count:%- 10d",name,average,info.min,info.max,info.count))
 	end
 
+	print("output flow:")
 	for name,info in pairs(output_monitor) do
-		local average = info.total / info.count
-		tinsert(logs,str_format("%s output flow:average:%f,min:%d,max:%d,count:%d",name,average,info.min,info.max,info.count))
+		local average = math.modf(info.total / info.count)
+		print(str_format("%- 50s average:%- 10d,min:%- 10d,max:%- 10d,count:%- 10d",name,average,info.min,info.max,info.count))
 	end
-	logger_obj:WARN(tconcat(logs,"\n"))
+
+	print("===========================================")
 end
 
 function _M.report_diff(file,method,diff)
@@ -106,10 +111,7 @@ function _M.start()
 	if start then
 		return
 	end
-
-	timer = event.timer(10,update)
 	start = true
-	logger_obj = logger:create("monitor")
 end
 
 return _M

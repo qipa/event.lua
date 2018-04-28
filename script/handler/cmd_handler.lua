@@ -2,6 +2,7 @@ local event = require "event"
 local import = require "import"
 local model = require "model"
 local helper = require "helper"
+local monitor = require "monitor"
 local dump_core = require "dump.core"
 local server_manager = import.import "module.server_manager"
 
@@ -53,6 +54,19 @@ function flush()
 	end
 	return "ok"
 end
+
+function monitor_dump()
+	if env.name == "server/world" then
+		monitor.dump()
+		local result = server_manager:broadcast("handler.cmd_handler","monitor_dump")
+		result[env.dist_id] = "ok"
+		return result
+	else
+		monitor.dump()
+	end
+	return "ok"
+end
+
 
 function mem_dump()
 	helper.heap.dump("dump")

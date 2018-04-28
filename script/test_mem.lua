@@ -94,6 +94,6 @@ event.fork(function ()
 	end)
 
 	for _,info in ipairs(list) do
-		print(string.format("%- 30s %- 10d %- 10d %- 30d",info.name,info.count,info.time * 10,info.mem))
+		print(string.format("%- 30s %- 10d %- 30f %- 30f",info.name,info.count,info.time * 10 / info.count,info.mem/info.count))
 	end
 end)

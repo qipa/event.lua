@@ -1,4 +1,6 @@
 local protocol = require "protocol"
+local co_core = require "co.core"
+local monitor = require "monitor"
 local event = require "event"
 local import = require "import"
 
@@ -16,7 +18,12 @@ function _M.dispatch(file,method,...)
 	if not func then
 		error(string.format("no such method:%s",method))
 	end
-	return func(...)
+
+	co_core.start()
+	local result = func(...)
+	local diff = co_core.stop()
+	monitor.report_diff(file,method,diff)
+	return result
 end
 
 function _M.dispatch_client(message_id,data,size,...)
@@ -25,7 +32,13 @@ function _M.dispatch_client(message_id,data,size,...)
 		event.error(string.format("no such id:%d proto:%s ",message_id,name))
 		return
 	end
+
+	monitor.report_input(protocol,message_id,size)
+
+	co_core.start()
 	protocol.handler[name](...,message)
+	local diff = co_core.stop()
+	monitor.report_diff("protocol",message_id,diff)
 end
 
 
