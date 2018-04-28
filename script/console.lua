@@ -60,13 +60,26 @@ event.fork(function ()
 			end
 		end
 
-		local fs = persistence:open("id_builder")
-		local list = util.list_dir("./data/id_builder")
-		for _,name in pairs(list) do
-			if name:match("user") then
-				local data = fs:load(name)
-			end
-		end
+		-- local fs = persistence:open("id_builder")
+		-- local list = util.list_dir("./data/id_builder")
+
+		-- local tmp_max_user
+		-- for _,name in pairs(list) do
+		-- 	if name:match("user") then
+		-- 		local data = fs:load(name)
+		-- 		local max = data.begin + data.offset
+		-- 		local max_uid = tmp_max_user * 1000 + 999
+		-- 		if not tmp_max_user or tmp_max_user < max_uid then
+		-- 			tmp_max_user = max_uid
+		-- 		end
+		-- 	end
+		-- end
+
+		-- tmp_max_user = tmp_max_user * 1000 + 999
+		-- if tmp_max_user < max_user_uid then
+		-- 	print("max user uid error")
+		-- 	os.exit(1)
+		-- end
 		-- channel:set_db("common")
 		-- local query = {}
 		-- query["uid"] = {["$gt"] = 100000000}
