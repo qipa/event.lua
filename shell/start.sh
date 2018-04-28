@@ -29,15 +29,18 @@ done
 
 result=`ps -C -elf -U${user} |grep @0*$uid|awk '{print $1,$4}'|wc -l`
 
+#仍然有此服务器id的集群进程在，停此启动
 if [ $result -ne "0" ];then
 	echo "server is running,please stop first"
 	exit 1
 fi
 
+#data目录必须先建立，主要做本地数据保存，比如玩家唯一id
 if [ ! -d "./data" ];then
 	mkdir ./data
 fi
 
+#建立日志文件目录
 log_path=$(read_env "log_path")
 if [ $log_path != "nil" ];then
 	if [ ! -d $log_path ];then
@@ -45,15 +48,18 @@ if [ $log_path != "nil" ];then
 	fi
 fi
 
+#集群id记录表,每次重启都要册掉
 if [ -f "./data/master/dist_id" ];then
 	rm -rf ./data/master/dist_id
 fi
 
+#删除所有无用的ipc文件
 files=$(ls *.ipc 2> /dev/null | wc -l)
 if [ "$files" != "0" ]; then
 	rm ./*.ipc
 fi
 
+#把所有依赖的so文件路径添加到进程环境变量里
 libev_path=`cd ./3rd/libev/.libs && pwd`
 export LD_LIBRARY_PATH=${libev_path}":"$LD_LIBRARY_PATH
 
@@ -72,15 +78,14 @@ echo "server log path:${log_path}"
 echo "server login addr:${login_addr}"
 echo "server mongodb addr:${mongodb_addr}"
 
-
-./event console@index
+#服务器集群初始化临时进程
+#主要建立表索引，做一些校验工作
+./event console@startup
 
 if [[ $? != 0 ]];then
 	echo "mongod server:${mongodb_addr} not start"
 	exit 0
 fi
-
-
 
 ./event server/logger &
 echo "logger server start"

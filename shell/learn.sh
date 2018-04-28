@@ -135,3 +135,11 @@ read_env "config" #直接调用
 read_env config   #直接调用,等效于上
 
 echo a,"a"
+
+int=2
+str="1"
+if [ $int = $str ];then
+	echo "true!"
+else
+	echo "false!"
+fi

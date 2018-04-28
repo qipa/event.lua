@@ -11,6 +11,7 @@ local scene_server = import "module.scene_server"
 cls_scene_user = fighter.cls_fighter:inherit("scene_user","uid")
 
 function __init__(self)
+	self.cls_scene_user:save_field("base_info")
 	self.cls_scene_user:save_field("fighter_info")
 	self.cls_scene_user:save_field("scene_info")
 end

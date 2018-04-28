@@ -11,6 +11,7 @@ local server_manager = import "module.server_manager"
 cls_login_user = database_object.cls_database:inherit("login_user","account")
 
 function __init__(self)
+	self.cls_login_user:save_field("base_info")
 	self.cls_login_user:save_field("role_list")
 end
 
