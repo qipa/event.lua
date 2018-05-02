@@ -118,20 +118,24 @@ end
 
 
 function cls_base:new(...)
-	local obj = {__dirty = {},__name = self.__name}
+	local object = { __dirty = {},
+				 	 __name = self.__name,
+				 	 __alive = true}
 	local self = class_ctx[self.__name]
-	new_object(self,obj)
+	new_object(self,object)
 
-	obj:create(...)
-	obj:init()
+	object:create(...)
+	object:init()
 
-	return obj
+	return object
 end
 
 function cls_base:instance_from(data)
 	local object_type = self:get_type()
 	local class = class_ctx[object_type]
-	local object = {__dirty = {},__name = self.__name}
+	local object = { __dirty = {},
+				 	 __name = self.__name,
+				 	 __alive = true}
 	new_object(class,object)
 	for k,v in pairs(data) do
 		object[k] = v
@@ -141,6 +145,7 @@ function cls_base:instance_from(data)
 end
 
 function cls_base:release()
+	self.__alive = false
 	self:destroy()
 end
 

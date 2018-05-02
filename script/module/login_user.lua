@@ -17,13 +17,13 @@ function __init__(self)
 end
 
 local PHASE = {
-	LOADING = 1,
-	LOGIN = 2,
+	LOAD = 1,
+	AUTH = 2,
 }
 
 function cls_login_user:create(cid,account)
 	self.cid = cid
-	self.phase = PHASE.LOADING
+	self.phase = PHASE.LOAD
 	self.account = account
 	model.bind_login_user_with_account(account,self)
 end
@@ -40,13 +40,12 @@ end
 
 function cls_login_user:auth()
 	local db_channel = model.get_db_channel()
-	
-	self.phase = PHASE.LOADING
-	self:load(db_channel)
-	self.phase = PHASE.LOGIN
 
-	local self = model.fetch_login_user_with_account(self.account)
-	if not self then
+	self:load(db_channel)
+	self.phase = PHASE.AUTH
+
+	local user_self = model.fetch_login_user_with_account(self.account)
+	if not user_self or user_self ~= self then
 		return
 	end
 
