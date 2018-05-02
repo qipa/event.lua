@@ -8,6 +8,9 @@ _login_ctx = _login_ctx or {}
 _account_queue = _account_queue or {}
 _enter_agent_user = _enter_agent_user or {}
 
+_name_set = _name_set or {}
+_id_set = _id_set or {}
+
 function start(self)
 	self.db_timer = event.timer(30,function ()
 		local db_channel = model.get_db_channel()
@@ -16,6 +19,17 @@ function start(self)
 			user:save(db_channel)
 		end
 	end)
+
+	local db_channel = model.get_db_channel()
+	db_channel:set_db("login_user")
+	local result = db_channel:findAll("role_list")
+	for _,info in pairs(result) do
+		for _,detail in pairs(info.list) do
+			_name_set[detail.name] = info.account
+			_id_set[detail.uid] = info.account
+		end
+	end
+
 	server_manager:listen("agent",self,"agent_server_down")
 	import "handler.login_handler"
 	import "handler.cmd_handler"

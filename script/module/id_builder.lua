@@ -82,7 +82,6 @@ function init(self,dist_id)
 			result.offset = id_section
 		end
 
-
 		local updator = {}
 		updator["$set"] = result
 		db_channel:update("id_builder",{id = dist_id,key = field},updator,true)
