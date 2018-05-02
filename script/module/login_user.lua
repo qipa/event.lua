@@ -16,14 +16,8 @@ function __init__(self)
 	self.cls_login_user:save_field("forbid_info")
 end
 
-local PHASE = {
-	LOAD = 1,
-	AUTH = 2,
-}
-
 function cls_login_user:create(cid,account)
 	self.cid = cid
-	self.phase = PHASE.LOAD
 	self.account = account
 	model.bind_login_user_with_account(account,self)
 end
@@ -42,7 +36,6 @@ function cls_login_user:auth()
 	local db_channel = model.get_db_channel()
 
 	self:load(db_channel)
-	self.phase = PHASE.AUTH
 
 	local user_self = model.fetch_login_user_with_account(self.account)
 	if not user_self or user_self ~= self then
