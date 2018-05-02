@@ -19,10 +19,10 @@ function _M.dispatch(file,method,...)
 		error(string.format("no such method:%s",method))
 	end
 
-	co_core.start()
+	-- co_core.start()
 	local result = func(...)
-	local diff,mem = co_core.stop()
-	monitor.report_diff(file,method,diff)
+	-- local diff = co_core.stop()
+	-- monitor.report_diff(file,method,diff)
 	return result
 end
 
@@ -35,10 +35,10 @@ function _M.dispatch_client(message_id,data,size,...)
 
 	monitor.report_input(protocol,message_id,size)
 
-	co_core.start()
+	-- co_core.start()
 	protocol.handler[name](...,message)
-	local diff = co_core.stop()
-	monitor.report_diff("protocol",message_id,diff)
+	-- local diff = co_core.stop()
+	-- monitor.report_diff("protocol",message_id,diff)
 end
 
 

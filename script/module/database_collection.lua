@@ -11,7 +11,7 @@ function cls_collection:save_data()
 	for field in pairs(self.__save_fields) do
 		local data = self[field]
 		if data then
-			if data.save_data then
+			if type(data) == "table" and data.save_data then
 				result[field] = data:save_data()
 			else
 				result[field] = data

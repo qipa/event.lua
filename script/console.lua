@@ -42,7 +42,7 @@ event.fork(function ()
 			return
 		end
 
-		local max_user_uid
+		local max_uid_ctx = {}
 		for db,info in pairs(mongo_indexes) do
 			channel:set_db(db)
 			for name,indexes in pairs(info) do
@@ -51,11 +51,8 @@ event.fork(function ()
 			end
 			local base_info = channel:findAll("base_info",{selector = {uid = 1}})
 			if #base_info ~= 0 then
-				table.sort(base_info,function (l,r)
-					return l.uid > r.uid
-				end)
-				if not max_user_uid or base_info[1].uid > max_user_uid then
-					max_user_uid = base_info[1].uid
+				for _,info in pairs(base_info) do
+					local dist_id = util.decimal_sub(info.uid,2,1)
 				end
 			end
 		end

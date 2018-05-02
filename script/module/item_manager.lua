@@ -8,8 +8,14 @@ local database_collection = import "module.database_collection"
 
 cls_item_mgr = database_collection.cls_collection:inherit("item_mgr")
 
-function cls_item_mgr:create()
+function __init__(self)
+	self.cls_item_mgr:save_field("uid")
+	self.cls_item_mgr:save_field("mgr")
+end
 
+function cls_item_mgr:create(uid)
+	self.uid = uid
+	self.mgr = {}
 end
 
 function cls_item_mgr:init()

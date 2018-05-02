@@ -13,6 +13,7 @@ cls_login_user = database_object.cls_database:inherit("login_user","account")
 function __init__(self)
 	self.cls_login_user:save_field("base_info")
 	self.cls_login_user:save_field("role_list")
+	self.cls_login_user:save_field("forbid_info")
 end
 
 local PHASE = {
@@ -47,6 +48,11 @@ function cls_login_user:auth()
 	local self = model.fetch_login_user_with_account(self.account)
 	if not self then
 		return
+	end
+
+	if not self.base_info then
+		self.base_info = {uid = self.uid,account = self.account}
+		self:dirty_field("base_info")
 	end
 
 	if not self.role_list then

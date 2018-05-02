@@ -7,6 +7,7 @@ local protocol = require "protocol"
 
 local database_object = import "module.database_object"
 local module_item_mgr = import "module.item_manager"
+local module_task_mgr = import "module.task_manager"
 
 _scene_channel_ctx = _scene_channel_ctx or {}
 
@@ -21,8 +22,9 @@ cls_agent_user = database_object.cls_database:inherit("agent_user","uid","cid")
 
 function __init__(self)
 	self.cls_agent_user:save_field("base_info")
-	self.cls_agent_user:save_field("user_info")
 	self.cls_agent_user:save_field("scene_info")
+	self.cls_agent_user:save_field("item_mgr")
+	self.cls_agent_user:save_field("task_mgr")
 end
 
 
@@ -54,10 +56,21 @@ function cls_agent_user:forward_client(message_id,data)
 end
 
 function cls_agent_user:enter_game()
-	local item_mgr = self.item_mgr
-	if not item_mgr then
-		item_mgr = module_item_mgr.cls_item_mgr:new(self.uid)
+	if not self.base_info then
+		self.base_info = {uid = self.uid}
+		self:dirty_field("base_info")
 	end
+
+	if not self.item_mgr then
+		self.item_mgr = module_item_mgr.cls_item_mgr:new(self.uid)
+		self:dirty_field("item_mgr")
+	end
+
+	if not self.task_mgr then
+		self.task_mgr = module_task_mgr.cls_task_mgr:new(self.uid)
+		self:dirty_field("task_mgr")
+	end
+	
 	self:send_client("s2c_agent_enter",{user_uid = self.uid})
 	event.error(string.format("user:%d enter agent:%d",self.uid,env.dist_id))
 end

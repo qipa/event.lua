@@ -150,7 +150,7 @@ function user_enter(self,cid,uid,account)
 	local user = agent_user.cls_agent_user:new(cid,uid,account)
 	
 	user:load(db_channel)
-	
+
 	user:enter_game()
 
 	local world = model.get_world_channel()
