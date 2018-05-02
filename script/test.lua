@@ -44,3 +44,8 @@ print(util.daytime(os.time()),util.daytime(1524671999))
 -- 	end
 -- end)
 
+util.time_diff("decimal_bit",function ()
+	for i = 1,1024*1024 do
+		util.decimal_bit(1989,2)
+	end
+end)

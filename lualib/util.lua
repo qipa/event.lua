@@ -235,4 +235,20 @@ function _M.time_diff(desc,func)
     print(string.format("%s:%f",desc,(_M.time() - now) * 10))
 end
 
+--十进制右边数起第b位
+function _M.decimal_bit(value,b)
+    local l,r = math.modf((value % (10^b)) / (10^(b-1)))
+    return l
+end
+
+--十进制右边数起第from到to位的数字
+function _M.decimal_sub(value,from,to)
+    local result = 0
+    for i=from,to do
+        local var = _M.decimal_bit(value,i)
+        result = result + var * 10^(i-from)
+    end
+    return result
+end
+
 return _M
