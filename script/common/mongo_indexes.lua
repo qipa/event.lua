@@ -22,5 +22,5 @@ common = {
 	login_version = {{unique = true,index = {uid = 1}}},
 	agent_version = {{unique = true,index = {uid = 1}}},
 	world_version = {{unique = true,index = {uid = 1}}},
-	id_builder = {{unique = true,index = {id = 1,key = 1}}},
+	id_builder = {{unique = true,index = {id = 1,key = 1}}}, --复合索引,通id和id,key查询都通过索引,key查询就不是通过索引(explain)
 }
