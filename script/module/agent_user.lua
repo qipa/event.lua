@@ -7,7 +7,7 @@ local protocol = require "protocol"
 
 local database_object = import "module.database_object"
 local module_item_mgr = import "module.item_manager"
-local module_task_mgr = import "module.task_manager"
+local task_manager = import "module.task_manager"
 
 _scene_channel_ctx = _scene_channel_ctx or {}
 
@@ -67,8 +67,7 @@ function cls_agent_user:enter_game()
 	end
 
 	if not self.task_mgr then
-		self.task_mgr = module_task_mgr.cls_task_mgr:new(self.uid)
-		self:dirty_field("task_mgr")
+		task_manager.init(self)
 	end
 	
 	self:send_client("s2c_agent_enter",{user_uid = self.uid})
