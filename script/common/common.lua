@@ -40,3 +40,9 @@ FIGHTER_STATE = {
 	MOVE = 2,
 	SKILL = 3,
 }
+
+ITEM_TYPE = {
+	CURRENCY = 1,
+	EQUIPMENT = 2,
+	MATERIAL = 3
+}

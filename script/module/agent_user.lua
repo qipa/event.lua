@@ -66,7 +66,6 @@ function cls_agent_user:enter_game()
 		self:dirty_field("item_mgr")
 	end
 
-	table.print(self.item_mgr)
 	if not self.task_mgr then
 		self.task_mgr = module_task_mgr.cls_task_mgr:new(self.uid)
 		self:dirty_field("task_mgr")
