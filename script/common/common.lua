@@ -14,6 +14,11 @@ SERVER_TYPE = {
 	SCENE = 2
 }
 
+SCENE_TYPE = {
+	CITY = 1,
+	STAGE = 2	
+}
+
 PROTOCOL_FORWARD = {
 	c2s_move = SERVER_TYPE.SCENE
 }

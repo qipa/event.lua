@@ -58,7 +58,6 @@ function run(monitor_collect,db_addr,config_path,protocol_path)
 			print(string.format("%s connect db:%s faield:%s",env.name,env.mongodb,reason))
 			os.exit()
 		end
-		db_channel:init("sunset")
 		model.set_db_channel(db_channel)
 
 		event.error(string.format("connect mongodb:%s success",db_addr))

@@ -22,4 +22,5 @@ common = {
 	login_version = {{unique = true,index = {uid = 1}}},
 	agent_version = {{unique = true,index = {uid = 1}}},
 	world_version = {{unique = true,index = {uid = 1}}},
+	id_builder = {{unique = true,index = {id = 1,key = 1}}},
 }
