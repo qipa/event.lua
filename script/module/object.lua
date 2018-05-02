@@ -164,6 +164,22 @@ function cls_base:destroy()
 
 end
 
+local function clone_table(data)
+	local result = {}
+	for k,v in pairs(data) do
+		if type(v) == "table" then
+			if v.__name then
+				result[k] = v:pack(true)
+			else
+				result[k] = clone_table(v)
+			end
+		else
+			result[k] = v
+		end
+	end
+	return result
+end
+
 function cls_base:pack(clone)
 	local cls = class.get(self:get_type())
 	local pack_fields = cls.__pack_fields
@@ -176,7 +192,7 @@ function cls_base:pack(clone)
 				if v.__name then
 					result[k] = v:pack(true)
 				else
-					result[k] = v
+					result[k] = clone_table(v)
 				end
 			else
 				result[k] = v
@@ -192,8 +208,8 @@ function cls_base:pack(clone)
 end
 
 function cls_base:unpack(...)
-	local data = table.decode(...)
-	return class.instance_from(self.__name,data)
+	local inst = table.decode(...)
+	return class.instance_from(self.__name,inst)
 end
 
 function cls_base:save_field(field)
@@ -211,18 +227,24 @@ function class.new(name,...)
 	return cls:new(...)
 end
 
-function class.instance_from(name,data)
-	local cls = class.get(name)
-	assert(cls ~= nil,name)
-	local obj = cls:instance_from(data)
-	for key,value in pairs(obj) do
-		if type(value) == "table" then
-			if value.__name then
-				obj[key] = class.instance_from(value.__name,value)
+local function foreach_instance(inst)
+	for k,v in pairs(inst) do
+		if type(v) == "table" then
+			if v.__name then
+				inst[k] = class.instance_from(v.__name,v)
+			else
+				foreach_instance(v)
 			end
 		end
 	end
-	return obj
+end
+
+function class.instance_from(name,data)
+	local cls = class.get(name)
+	assert(cls ~= nil,name)
+	local inst = cls:instance_from(data)
+	foreach_instance(inst)
+	return inst
 end
 
 function class.get(name)
