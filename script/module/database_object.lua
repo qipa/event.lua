@@ -2,6 +2,9 @@ local object = import "module.object"
 
 cls_database = object.cls_base:inherit("database_object")
 
+local pairs = pairs
+local type = type
+
 function cls_database:dirty_field(field)
 	self.__dirty[field] = true
 end
@@ -71,7 +74,7 @@ function cls_database:save(db_channel)
 					if data.save_data then
 						updater["$set"] = data:save_data()
 					else
-						updater["$set"] = clone_table(data)
+						updater["$set"] = data
 					end
 				else
 					updater["$set"] = data
