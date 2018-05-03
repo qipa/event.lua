@@ -1,3 +1,5 @@
+#!/bin/bash
+
 cd ..
 
 function read_env()
