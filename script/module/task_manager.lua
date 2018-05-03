@@ -10,9 +10,11 @@ function __init__(self)
 end
 
 function init(user)
-	user.task_mgr = {}
-	user:dirty_field("task_mgr")
-
+	if not user.task_mgr then
+		user.task_mgr = {}
+		user:dirty_field("task_mgr")
+	end
+	
 	user:register_event(self,"ENTER_GAME","enter_game")
 	user:register_event(self,"LEAVE_GAME","leave_game")
 end
