@@ -73,20 +73,35 @@ event.fork(function ()
 			local info = builder_ctx[id]
 			if not info then
 				print("id builder rebuild error")
-				os.exit(1)
-			end
-			local uid = info.begin * 100 + id
-			if uid < max then
-				print(string.format("dist id:%d max user uid:%d more than db max uid:%d,need to rebuild",id,max,uid))
-				info.begin = math.modf(max / 100) + 1
+				-- os.exit(1)
+			else
+				local uid = info.begin * 100 + id
+				if uid < max then
+					print(string.format("dist id:%d max user uid:%d more than db max uid:%d,need to rebuild",id,max,uid))
+					info.begin = math.modf(max / 100) + 1
 
-				local updator = {}
-				updator["$set"] = info
-				channel:findAndModify("id_builder",{query = {id = id,key = "user"},update = updator})
+					local updator = {}
+					updator["$set"] = info
+					channel:findAndModify("id_builder",{query = {id = id,key = "user"},update = updator})
+				end
 			end
 		end
 
 		os.exit(0)
+	elseif args == "drop" then
+		local channel,err = event.connect(env.mongodb,4,true,mongo)
+		if not channel then
+			event.error(string.format("connect mongodb %s failed:%s",env.mongodb,err))
+			os.exit(1)
+			return
+		end
+
+		for db in pairs(mongo_indexes) do
+			channel:set_db(db)
+			table.print(channel:runCommand("dropDatabase"))
+		end
+		os.exit(1)
+
 	elseif args == "debugger" then
 		local channel,err = event.connect(env.world,4,true,console_channel)
 		if not channel then

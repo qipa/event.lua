@@ -84,7 +84,7 @@ function init(self,dist_id)
 
 		local updator = {}
 		updator["$set"] = result
-		channel:update("id_builder",{id = dist_id,key = field},updator,true)
+		db_channel:update("id_builder",{id = dist_id,key = field},updator,true)
 
 		local cursor = result.begin
 		local max = result.begin + result.offset
