@@ -83,7 +83,6 @@ echo "server mongodb addr:${mongodb_addr}"
 ./event console@startup
 
 if [[ $? != 0 ]];then
-	echo "mongod server:${mongodb_addr} not start"
 	exit 0
 fi
 

@@ -82,7 +82,7 @@ event.fork(function ()
 
 				local updator = {}
 				updator["$set"] = info
-				channel:update("id_builder",{id = id,key = "user"},updator,true)
+				channel:findAndModify("id_builder",{query = {id = id,key = "user"},update = updator})
 			end
 		end
 
