@@ -11,7 +11,7 @@ local function clone_table(data)
 	for k,v in pairs(data) do
 		if type(v) == "table" then
 			if v.save_data then
-				result[k] = v:save_data(false)
+				result[k] = v:save_data()
 			else
 				result[k] = clone_table(v)
 			end
@@ -29,7 +29,7 @@ function cls_table:save_data(root)
 		if data then
 			if type(data) == "table" then
 				if data.save_data then
-					result[field] = data:save_data(false)
+					result[field] = data:save_data()
 				else
 					if have_object then
 						result[field] = clone_table(data)
