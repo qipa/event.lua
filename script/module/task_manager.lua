@@ -9,9 +9,9 @@ function __init__(self)
 	
 end
 
-function init(user)
+function init(self,user)
 	if not user.task_mgr then
-		user.task_mgr = {}
+		user.task_mgr = {uid = user.uid,task_info = {}}
 		user:dirty_field("task_mgr")
 	end
 	
@@ -28,12 +28,12 @@ function leave_game(self,user)
 	user:deregister_event(self,"LEAVE_GAME")
 end
 
-function accept(user)
+function accept(self,user)
 
 
 end
 
-function submit(user)
+function submit(self,user)
 
 end
 

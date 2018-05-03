@@ -40,14 +40,17 @@ function cls_database:save(db_channel)
 				local updater = {}
 				if type(data) == "table" then
 					if data.save_data then
-						updater["$set"] = data:save_data()
+						local set,unset = data:save_data(true)
+						if next(set) ~= nil then
+							updater["$set"] = set
+						end
+						if next(unset) ~= nil then
+							updater["$unset"] = unset
+						end
 					else
 						updater["$set"] = data
 					end
-				else
-					updater["$set"] = data
 				end
-				
 				db_channel:update(field,self:db_index(),updater,true)
 			end
 		end

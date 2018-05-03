@@ -17,16 +17,25 @@ function __init__(self)
 	self.cls_item_mgr:save_field("mgr")
 end
 
-function cls_item_mgr:create(uid)
-	self.uid = uid
+function cls_item_mgr:create(user)
+	self.uid = user.uid
 	self.mgr = {}
 	self.cid_ctx = {}
 	self.slot_count = 0
+
+	self:dirty_field("uid")
+	self:dirty_field("mgr")
+
+	user:dirty_field("item_mgr")
 end
 
 function cls_item_mgr:init(user)
 	user:register_event(self,"ENTER_GAME","enter_game")
 	user:register_event(self,"LEAVE_GAME","leave_game")
+	self.mgr = {}
+	self:dirty_field("mgr")
+
+	user:dirty_field("item_mgr")
 end
 
 function cls_item_mgr:destroy()

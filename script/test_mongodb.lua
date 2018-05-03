@@ -12,5 +12,5 @@ db_channel:init("sunset")
 -- end
 
 local updater = {}
-updater["$set"] = {name = "fuck",account = "m111q"}
-db_channel:update("role",{account = "mrq"},updater,1)
+updater["$set"] = {["list.a"] = 3}
+db_channel:update("role",{account = "m111q"},updater,1)

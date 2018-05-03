@@ -62,10 +62,10 @@ function cls_agent_user:enter_game()
 	end
 
 	if not self.item_mgr then
-		self.item_mgr = module_item_mgr.cls_item_mgr:new(self.uid)
+		self.item_mgr = module_item_mgr.cls_item_mgr:new(self)
 	end
 	self.item_mgr:init(self)
-	task_manager.init(self)
+	task_manager:init(self)
 	
 	self:fire_event("ENTER_GAME")
 	self:send_client("s2c_agent_enter",{user_uid = self.uid})

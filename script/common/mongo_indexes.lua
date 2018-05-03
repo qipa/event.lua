@@ -1,7 +1,9 @@
 
 
 agent_user = {
-	save_version = {{unique = true,index = {uid = 1}}}
+	save_version = {{unique = true,index = {uid = 1}}},
+	base_info = {{unique = true,index = {uid = 1}}},
+	task_mgr = {{unique = true,index = {uid = 1}}},
 }
 
 scene_user = {

@@ -68,6 +68,7 @@ end
 
 function enter_scene(self,fighter_data,user_agent,scene_uid,pos)
 	local fighter = scene_user.cls_scene_user:unpack(fighter_data)
+	fighter:init()
 	fighter.user_agent = user_agent
 
 	model.bind_scene_user_with_uid(fighter.uid,fighter)
