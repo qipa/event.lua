@@ -212,12 +212,12 @@ function cls_base:unpack(...)
 	return class.instance_from(self.__name,inst)
 end
 
-function cls_base:save_field(field)
-	self.__save_fields[field] = true
+function cls_base:save_field(field,have_object)
+	self.__save_fields[field] = have_object or false
 end
 
-function cls_base:pack_field(field)
-	self.__pack_fields[field] = true
+function cls_base:pack_field(field,have_object)
+	self.__pack_fields[field] = have_object or false
 end
 
 function cls_base:register_event(inst,ev,method)

@@ -32,14 +32,19 @@ function cls_collection:save_data(root)
 		local set = {}
 		local unset = {}
 		for field in pairs(self.__dirty) do
-			if self.__save_fields[field] then
+			local have_object = self.__save_fields[field]
+			if have_object ~= nil then
 				local data = self[field]
 				if data then
 					if type(data) == "table" then
 						if data.save_data then
 							set[field] = data:save_data(false)
 						else
-							set[field] = clone_table(data)
+							if have_object then
+								set[field] = clone_table(data)
+							else
+								set[field] = data
+							end
 						end
 					else
 						set[field] = data
@@ -53,14 +58,18 @@ function cls_collection:save_data(root)
 		return set,unset
 	else
 		local result = {}
-		for field in pairs(self.__save_fields) do
+		for field,have_object in pairs(self.__save_fields) do
 			local data = self[field]
 			if data then
 				if type(data) == "table" then
 					if data.save_data then
 						result[field] = data:save_data(false)
 					else
-						result[field] = clone_table(data)
+						if have_object then
+							result[field] = clone_table(data)
+						else
+							result[field] = data
+						end
 					end
 				else
 					result[field] = data
