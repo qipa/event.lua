@@ -34,7 +34,7 @@ end
 function cls_database:save(db_channel)
 	db_channel:set_db(self:get_type())
 	for field in pairs(self.__dirty) do
-		if self.__save_fields[field] then
+		if self.__save_fields[field] ~= nil then
 			local data = self[field]
 			if data then
 				local updater = {}

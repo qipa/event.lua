@@ -18,6 +18,7 @@ function __init__(self)
 end
 
 function cls_item_mgr:create(user)
+	database_collection.cls_collection.create(self,user)
 	self.uid = user.uid
 	self.mgr = {}
 	self.cid_ctx = {}
@@ -25,8 +26,6 @@ function cls_item_mgr:create(user)
 
 	self:dirty_field("uid")
 	self:dirty_field("mgr")
-
-	user:dirty_field("item_mgr")
 end
 
 function cls_item_mgr:init(user)
@@ -34,8 +33,6 @@ function cls_item_mgr:init(user)
 	user:register_event(self,"LEAVE_GAME","leave_game")
 	self.mgr = {}
 	self:dirty_field("mgr")
-
-	user:dirty_field("item_mgr")
 end
 
 function cls_item_mgr:destroy()

@@ -6,9 +6,14 @@ function __init__(self)
 	self.cls_collection:save_field("__name")
 end
 
+function cls_collection:create(parent)
+	self.__parent = parent
+end
+
 function cls_collection:dirty_field(field)
 	self.__dirty[field] = true
 	self.__dirty["__name"] = true
+	self.__parent:dirty_field(self:get_type())
 end
 
 local function clone_table(data)
@@ -16,7 +21,7 @@ local function clone_table(data)
 	for k,v in pairs(data) do
 		if type(v) == "table" then
 			if v.save_data then
-				result[k] = v:save_data(false)
+				result[k] = v:save_data()
 			else
 				result[k] = clone_table(v)
 			end
@@ -27,55 +32,32 @@ local function clone_table(data)
 	return result
 end
 
-function cls_collection:save_data(root)
-	if root then
-		local set = {}
-		local unset = {}
-		for field in pairs(self.__dirty) do
-			local have_object = self.__save_fields[field]
-			if have_object ~= nil then
-				local data = self[field]
-				if data then
-					if type(data) == "table" then
-						if data.save_data then
-							set[field] = data:save_data(false)
-						else
-							if have_object then
-								set[field] = clone_table(data)
-							else
-								set[field] = data
-							end
-						end
-					else
-						set[field] = data
-					end
-				else
-					unset[field] = true
-				end
-			end
-		end
-
-		return set,unset
-	else
-		local result = {}
-		for field,have_object in pairs(self.__save_fields) do
+function cls_collection:save_data()
+	local set = {}
+	local unset = {}
+	for field in pairs(self.__dirty) do
+		local have_object = self.__save_fields[field]
+		if have_object ~= nil then
 			local data = self[field]
 			if data then
 				if type(data) == "table" then
 					if data.save_data then
-						result[field] = data:save_data(false)
+						set[field] = data:save_data()
 					else
 						if have_object then
-							result[field] = clone_table(data)
+							set[field] = clone_table(data)
 						else
-							result[field] = data
+							set[field] = data
 						end
 					end
 				else
-					result[field] = data
+					set[field] = data
 				end
+			else
+				unset[field] = true
 			end
 		end
-		return result
 	end
+
+	return set,unset
 end
