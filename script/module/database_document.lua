@@ -1,10 +1,10 @@
 local object = import "module.object"
 
 --对应着mongodb中的文档(document)概念
-cls_table = object.cls_base:inherit("database_collection")
+cls_document = object.cls_base:inherit("database_collection")
 
 function __init__(self)
-	self.cls_table:save_field("__name")
+	self.cls_document:save_field("__name")
 end
 
 local function clone_table(data)
@@ -23,7 +23,7 @@ local function clone_table(data)
 	return result
 end
 
-function cls_table:save_data(root)
+function cls_document:save_data(root)
 	local result = {}
 	for field,have_object in pairs(self.__save_fields) do
 		local data = self[field]
