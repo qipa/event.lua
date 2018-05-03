@@ -2,6 +2,20 @@
 
 cd ..
 
+function read_env()
+{
+	result=`./lua ./script/common/env_reader.lua $1`
+	echo $result
+}
+
+addr=$(read_env mongodb)
+if [ $addr == "nil" ];then
+	echo "mongo addr not found in .env"
+	exit 0
+fi
+
+port=$(echo $addr|grep -P ':[0-9]+' -o|grep -P '[0-9]+' -o)
+
 path=`pwd`
 conf_path=${path}/mongo_data/mongod.conf
 
@@ -26,12 +40,12 @@ if [ $result -eq 0 ];then
 		echo "logpath=${path}/mongo_data/mongod.log" >> $mongod_conf
 		echo "logappend=true" >> $mongod_conf
 		echo "fork=true" >> $mongod_conf
-		echo "port=10105" >> $mongod_conf
+		echo "port=${port}" >> $mongod_conf
 		echo "pidfilepath=${path}/mongo_data/mongod.pid" >> $mongod_conf
 	fi
 
 	mongod -f ${path}/mongo_data/mongod.conf &
 else
-	pid=`ps -U${user}|grep mongod|awk '{print $1}'`
+	pid=`ps -U${user} -elf|grep mongod|grep ${conf_path}|grep -v grep|awk '{print $4}'`
 	echo "mongod:${pid} already running"
 fi
