@@ -13,9 +13,10 @@ now=`date +%Y_%m_%d_%H_%M`
 for db in ${dbs[@]};
 do
 	mongodump -h 127.0.0.1:10105 -d $db -o ./$now
-	tar zcvf ${db}.tar.gz  ./$now/$db/
-	mv ${db}.tar.gz ./$now/
-	rm -rf ./$now/$db/
+	cd ./$now
+	tar zcvf ${db}.tar.gz  ./$db
+	rm -rf ./$db/
+	cd ..
 done
 
 
