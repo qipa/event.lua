@@ -248,7 +248,8 @@ function _M.decimal_sub(value,from,to)
         local var = _M.decimal_bit(value,i)
         result = result + var * 10^(i-from)
     end
-    return result
+    local l,r = math.modf(result)
+    return l
 end
 
 return _M

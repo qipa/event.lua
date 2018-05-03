@@ -25,8 +25,9 @@ function mongo_channel:set_db(db)
 end
 
 function mongo_channel:data(data,size)
+	local data = string.copy(data,size)
 	local result = {}
-	local succ,	session, document, cursor, _ = driver.reply(string.copy(data,size),result)
+	local succ,	session, document, cursor, _ = driver.reply(data,result)
 	local session_ctx = self.session_ctx[session]
 
 	if not succ then

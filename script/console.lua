@@ -42,19 +42,47 @@ event.fork(function ()
 			return
 		end
 
-		local max_uid_ctx = {}
 		for db,info in pairs(mongo_indexes) do
 			channel:set_db(db)
 			for name,indexes in pairs(info) do
 				print(string.format("build db:%s,%s index",db,name))
 				table.print(channel:ensureIndex(name,indexes))
 			end
-			local base_info = channel:findAll("base_info",{selector = {uid = 1}})
-			if #base_info ~= 0 then
-				for _,info in pairs(base_info) do
-					local dist_id = util.decimal_sub(info.uid,2,1)
+		end
+
+		local max_uid_ctx = {}
+		channel:set_db("login_user")
+		local role_list = channel:findAll("role_list",{selector = {list = 1}})
+		for _,each_list in pairs(role_list) do
+			for _,info in pairs(each_list.list) do
+				local dist_id = util.decimal_sub(info.uid,1,2)
+				if not max_uid_ctx[dist_id] or info.uid > max_uid_ctx[dist_id] then
+					max_uid_ctx[dist_id] = info.uid
 				end
 			end
+		end
+
+		channel:set_db("common")
+		local id_builder_info = channel:findAll("id_builder",{query = {key = "user"}})
+		local builder_ctx = {}
+		for _,info in pairs(id_builder_info) do
+			builder_ctx[info.id] = info
+		end
+
+		for id,max in pairs(max_uid_ctx) do
+			local info = builder_ctx[id]
+			if info then
+				local uid = info.begin * 100 + id
+				if uid < max then
+					print(string.format("dist id:%d max user uid:%d more than db max uid:%d,need to rebuild",id,max,uid))
+					info.begin = math.modf(max / 100) + 1
+
+					local updator = {}
+					updator["$set"] = info
+					channel:update("id_builder",{id = id,key = "user"},updator,true)
+				end
+			end
+			
 		end
 
 		os.exit(0)
