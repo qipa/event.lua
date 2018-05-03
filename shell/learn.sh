@@ -143,3 +143,8 @@ if [ $int = $str ];then
 else
 	echo "false!"
 fi
+
+
+#&&命令返回值为0时为true,才执行后面的命令
+type mongod && echo "mongod exit"
+#||命令返回值为false,才执行后面的命令

@@ -2,6 +2,8 @@
 
 cd ..
 
+type mongod >/dev/null 2>&1 || { echo "mongod require,but not install in system";exit 1; }
+
 function read_env()
 {
 	result=`./lua ./script/common/env_reader.lua $1`
@@ -11,7 +13,7 @@ function read_env()
 addr=$(read_env mongodb)
 if [ $addr == "nil" ];then
 	echo "mongo addr not found in .env"
-	exit 0
+	exit 1
 fi
 
 port=$(echo $addr|grep -P ':[0-9]+' -o|grep -P '[0-9]+' -o)
@@ -45,7 +47,9 @@ if [ $result -eq 0 ];then
 	fi
 
 	mongod -f ${path}/mongo_data/mongod.conf &
+	exit 0
 else
 	pid=`ps -U${user} -elf|grep mongod|grep ${conf_path}|grep -v grep|awk '{print $4}'`
 	echo "mongod:${pid} already running"
+	exit 1
 fi
