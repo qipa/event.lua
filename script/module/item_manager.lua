@@ -24,7 +24,16 @@ function cls_item_mgr:create(uid)
 	self.slot_count = 0
 end
 
-function cls_item_mgr:init()
+function cls_item_mgr:init(user)
+	user:register_event(self,"ENTER_GAME","enter_game")
+	user:register_event(self,"LEAVE_GAME","leave_game")
+end
+
+function cls_item_mgr:destroy()
+
+end
+
+function cls_item_mgr:enter_game(user)
 	local total = 0
 	for uid,item in pairs(self.mgr) do
 		local same_info = self.cid_ctx[item.cid]
@@ -36,17 +45,16 @@ function cls_item_mgr:init()
 		total = total + 1
 	end
 	self.slot_count = total
-end
 
-function cls_item_mgr:destroy()
-
-end
-
-function cls_item_mgr:enter_game()
 	local mb = {}
 	for uid,item in pairs(self.mgr) do
 		table.insert(mb,item:get_info())
 	end
+end
+
+function cls_item_mgr:leave_game(user)
+	user:deregister_event(self,"ENTER_GAME")
+	user:deregister_event(self,"LEAVE_GAME")
 end
 
 function cls_item_mgr:insert_item_by_cid(cid,amount)

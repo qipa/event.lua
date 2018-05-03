@@ -166,8 +166,6 @@ function user_enter(self,cid,uid,account)
 		fighter.scene_info = {scene_id = 1001,scene_pos = {x = 100,z = 100}}
 	end
 
-
-
 	local world_channel = model.get_world_channel()
 	world_channel:send("module.scene_manager","enter_scene",{uid = user.uid,
 															  scene_id = fighter.scene_info.scene_id,

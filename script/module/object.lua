@@ -120,12 +120,12 @@ end
 function cls_base:new(...)
 	local object = { __dirty = {},
 				 	 __name = self.__name,
-				 	 __alive = true}
+				 	 __alive = true,
+				 	 __event = {}}
 	local self = class_ctx[self.__name]
 	new_object(self,object)
 
 	object:create(...)
-	object:init()
 
 	return object
 end
@@ -135,12 +135,12 @@ function cls_base:instance_from(data)
 	local class = class_ctx[object_type]
 	local object = { __dirty = {},
 				 	 __name = self.__name,
-				 	 __alive = true}
+				 	 __alive = true,
+				 	 __event = {}}
 	new_object(class,object)
 	for k,v in pairs(data) do
 		object[k] = v
 	end
-	object:init()
 	return object
 end
 
@@ -218,6 +218,42 @@ end
 
 function cls_base:pack_field(field)
 	self.__pack_fields[field] = true
+end
+
+function cls_base:register_event(inst,ev,method)
+	local ev_list = self.__event[ev]
+	if not ev_list then
+		ev_list = {}
+		self.__event[ev] = ev_list
+	end
+	ev_list[inst] = method
+end
+
+function cls_base:deregister_event(inst,ev)
+	local ev_list = self.__event[ev]
+	if not ev_list then
+		return
+	end
+	ev_list[inst] = nil
+end
+
+function cls_base:fire_event(ev,...)
+	local ev_list = self.__event
+	if not ev_list then
+		return
+	end
+	for inst,method in pairs(ev_list) do
+		local func = inst[method]
+		if not func then
+			event.error(string.format("fire event error,no such method:%s",method))
+		else
+			local ok,err = xpcall(func,debug.traceback,inst,self,...)
+			if not ok then
+				event.error(err)
+			end
+		end
+		
+	end
 end
 
 class = {}

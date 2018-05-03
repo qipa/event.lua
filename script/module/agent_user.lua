@@ -63,18 +63,20 @@ function cls_agent_user:enter_game()
 
 	if not self.item_mgr then
 		self.item_mgr = module_item_mgr.cls_item_mgr:new(self.uid)
-		self:dirty_field("item_mgr")
+		self.item_mgr:init(self)
 	end
 
 	if not self.task_mgr then
 		task_manager.init(self)
 	end
 	
+	self:fire_event("ENTER_GAME")
 	self:send_client("s2c_agent_enter",{user_uid = self.uid})
 	event.error(string.format("user:%d enter agent:%d",self.uid,env.dist_id))
 end
 
 function cls_agent_user:leave_game()
+	self:fire_event("LEAVE_GAME")
 	event.error(string.format("user:%d leave agent:%d",self.uid,env.dist_id))
 end
 
