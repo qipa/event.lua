@@ -1,5 +1,6 @@
 local object = import "module.object"
 
+--对应着mongodb中的database概念
 cls_database = object.cls_base:inherit("database_object")
 
 local pairs = pairs

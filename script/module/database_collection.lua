@@ -1,5 +1,6 @@
 local object = import "module.object"
 
+--对应着mongodb中的文档集合(collection)概念
 cls_collection = object.cls_base:inherit("database_collection")
 
 function __init__(self)
