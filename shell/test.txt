@@ -1,6 +1,6 @@
 
 test0 test1
-fuck 
+/fuck 
 test
 
 mrq
