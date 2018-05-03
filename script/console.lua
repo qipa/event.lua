@@ -71,18 +71,19 @@ event.fork(function ()
 
 		for id,max in pairs(max_uid_ctx) do
 			local info = builder_ctx[id]
-			if info then
-				local uid = info.begin * 100 + id
-				if uid < max then
-					print(string.format("dist id:%d max user uid:%d more than db max uid:%d,need to rebuild",id,max,uid))
-					info.begin = math.modf(max / 100) + 1
-
-					local updator = {}
-					updator["$set"] = info
-					channel:update("id_builder",{id = id,key = "user"},updator,true)
-				end
+			if not info then
+				print("id builder rebuild error")
+				os.exit(1)
 			end
-			
+			local uid = info.begin * 100 + id
+			if uid < max then
+				print(string.format("dist id:%d max user uid:%d more than db max uid:%d,need to rebuild",id,max,uid))
+				info.begin = math.modf(max / 100) + 1
+
+				local updator = {}
+				updator["$set"] = info
+				channel:update("id_builder",{id = id,key = "user"},updator,true)
+			end
 		end
 
 		os.exit(0)
