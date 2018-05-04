@@ -73,7 +73,7 @@ event.fork(function ()
 			local info = builder_ctx[id]
 			if not info then
 				print("id builder rebuild error")
-				-- os.exit(1)
+				os.exit(1)
 			else
 				local uid = info.begin * 100 + id
 				if uid < max then
