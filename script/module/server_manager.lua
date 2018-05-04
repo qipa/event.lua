@@ -2,6 +2,7 @@ local model = require "model"
 local event = require "event"
 local persistence = require "persistence"
 local util = require "util"
+local module_object = import "module.object"
 
 _agent_server_manager = _agent_server_manager or {}
 
@@ -11,7 +12,7 @@ _login_server = _login_server or nil
 
 _server_counter = 1
 
-_listener = _listener or {}
+_event_listener = _event_listener or module_object.cls_base:new()
 
 function __init__(self)
 	self.fs = persistence:open("master")
@@ -61,12 +62,8 @@ function agent_server_down(self,agent_server_id)
 	local agent_info = _agent_server_manager[agent_server_id]
 	_agent_server_manager[agent_server_id] = nil
 
-	local agent_listener = _listener["agent"]
-	if agent_listener then
-		for _,info in pairs(agent_listener) do
-			info.module[info.method](info.module,agent_server_id)
-		end
-	end
+
+	_event_listener:fire_event("AGENT_DOWN",agent_server_id)
 end
 
 function agent_count_add(self,agent_server_id)
@@ -128,12 +125,7 @@ function scene_server_down(self,scene_server_id)
 	local scene_server = _scene_server_manager[scene_server_id]
 	_scene_server_manager[scene_server_id] = nil
 
-	local scene_listener = _listener["scene"]
-	if scene_listener then
-		for _,info in pairs(scene_listener) do
-			info.module[info.method](info.module,scene_server_id)
-		end
-	end
+	_event_listener:fire_event("SCENE_DOWN",scene_server_id)
 end
 
 function scene_server_add_count(self,scene_server_id)
@@ -207,13 +199,8 @@ function login_server_down(self)
 	_login_server = nil
 end
 
-function listen(self,event,module,method)
-	local info = _listener[event]
-	if not info then
-		info = {}
-		_listener[event] = info
-	end
-	table.insert(info,{module = module,method = method})
+function listen(self,event,inst,method)
+	_event_listener:register_event(inst,event,method)
 end
 
 function broadcast(self,file,method,args)

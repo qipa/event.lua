@@ -9,11 +9,11 @@ _user_ctx = _user_ctx or {}
 _agent_server_status = _agent_server_status or {}
 
 function __init__(self)
-	server_manager:listen("agent",self,"agent_down")
-	server_manager:listen("scene",self,"scene_down")
+	server_manager:listen("AGENT_DOWN",self,"agent_down")
+	server_manager:listen("SCENE_DOWN",self,"scene_down")
 end
 
-function agent_down(self,server_id)
+function agent_down(self,listener,server_id)
 	_agent_server_status[server_id] = nil
 
 	local set = {}
@@ -30,7 +30,7 @@ function agent_down(self,server_id)
 	end
 end
 
-function scene_down(self,server_id)
+function scene_down(self,listener,server_id)
 	print("scene_down",server_id)
 	for agent_id,agent_info in pairs(_agent_server_status) do
 		if agent_info[server_id] then

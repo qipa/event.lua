@@ -18,8 +18,8 @@ function __init__(self)
 		end
 	end)
 
-	server_manager:listen("agent",self,"agent_down")
-	server_manager:listen("scene",self,"scene_down")
+	server_manager:listen("AGENT_DOWN",self,"agent_down")
+	server_manager:listen("SCENE_DOWN",self,"scene_down")
 end
 
 function start(self)
@@ -42,7 +42,7 @@ function flush(self)
 	end
 end
 
-function agent_down(self,server_id)
+function agent_down(self,listener,server_id)
 	local all = model.fetch_world_user()
 	for _,user in pairs(all) do
 		if user.agent_id == server_id then
@@ -51,7 +51,7 @@ function agent_down(self,server_id)
 	end
 end
 
-function scene_down(self,server_id)
+function scene_down(self,listener,server_id)
 	local all = model.fetch_world_user()
 	for _,user in pairs(all) do
 		if user.scene_server == server_id then

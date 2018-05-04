@@ -30,7 +30,7 @@ function start(self)
 		end
 	end
 
-	server_manager:listen("agent",self,"agent_server_down")
+	server_manager:listen("AGENT_DOWN",self,"agent_down")
 	import "handler.login_handler"
 	import "handler.cmd_handler"
 end
@@ -47,7 +47,7 @@ function set_enter_user(self,enter_user)
 	_enter_agent_user = enter_user
 end
 
-function agent_server_down(self,agent_id)
+function agent_down(self,listener,agent_id)
 	for account,info in pairs(_enter_agent_user) do
 		if info.agent_server == agent_id then
 			_enter_agent_user[account] = nil
