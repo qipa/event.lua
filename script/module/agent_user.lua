@@ -1,7 +1,7 @@
 local event = require "event"
 local cjson = require "cjson"
 local model = require "model"
-local channel = require "channel"
+
 local util = require "util"
 local protocol = require "protocol"
 
@@ -9,13 +9,6 @@ local database_object = import "module.database_object"
 local module_item_mgr = import "module.item_manager"
 local task_manager = import "module.task_manager"
 
-_scene_channel_ctx = _scene_channel_ctx or {}
-
-local scene_channel = channel:inherit()
-
-function scene_channel:disconnect()
-	_scene_channel_ctx[self.id] = nil
-end
 
 cls_agent_user = database_object.cls_database:inherit("agent_user","uid","cid")
 
@@ -77,30 +70,6 @@ function cls_agent_user:leave_game()
 	event.error(string.format("user:%d leave agent:%d",self.uid,env.dist_id))
 end
 
-function cls_agent_user:connect_scene_server(scene_server,scene_addr)
-	local scene_channel = _scene_channel_ctx[scene_server]
-	if scene_channel then
-		return true
-	end
-	local addr
-	if scene_addr.file then
-		addr = string.format("ipc://%s",scene_addr.file)
-	else
-		addr = string.format("tcp://%s:%d",scene_addr.ip,scene_addr.port)
-	end
-
-	local channel,reason = event.connect(addr,4,false,scene_channel)
-	if not channel then
-		event.error(string.format("connect scene server:%d faield:%s",addr,reason))
-		return false
-	end
-
-	channel:call("module.server_manager","register_agent_server",{id = env.dist_id})
-
-	_scene_channel_ctx[scene_server] = channel
-	return true
-end
-
 function cls_agent_user:forward_world(message_id,message)
 	local world_channel = model.get_world_channel()
 	world_channel:send("handler.world_handler","forward",{uid = self.uid, message_id = message_id, message = message})
@@ -111,7 +80,7 @@ function cls_agent_user:forward_scene(message_id,message)
 end
 
 function cls_agent_user:send_scene(file,method,args)
-	local scene_channel = _scene_channel_ctx[self.scene_server]
+	local scene_channel = self.scene_channel
 	if not scene_channel then
 		print(string.format("scene server:%d not connected",self.scene_server))
 		return
@@ -119,6 +88,16 @@ function cls_agent_user:send_scene(file,method,args)
 	scene_channel:send(file,method,args)
 end
 
-function cls_agent_user:sync_scene_info(scene_server)
+function cls_agent_user:sync_scene_info(scene_id,scene_uid,scene_server)
+	self.scene_id = scene_id
+	self.scene_uid = scene_uid
 	self.scene_server = scene_server
+	self.scene_channel = agent_server:get_scene_channel(scene_server)
+end
+
+function cls_agent_user:scene_down()
+	self.scene_id = nil
+	self.scene_uid = nil
+	self.scene_server = nil
+	self.scene_channel = nil
 end

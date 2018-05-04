@@ -24,11 +24,7 @@ function user_kick(_,args)
 end
 
 function connect_scene_server(_,args)
-	local user = model.fetch_agent_user_with_uid(args.user_uid)
-	if not user then
-		return false
-	end
-	return user:connect_scene_server(args.scene_server,args.scene_addr)
+	return agent_server:connect_scene_server(args.scene_server,args.scene_addr)
 end
 
 function forward_client(_,args)
@@ -52,5 +48,5 @@ function sync_scene_info(_,args)
 	if not user then
 		return false
 	end
-	user:sync_scene_info(args.scene_server)
+	user:sync_scene_info(args.scene_id,args.scene_uid,args.scene_server)
 end

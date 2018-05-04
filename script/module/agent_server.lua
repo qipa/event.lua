@@ -4,7 +4,9 @@ local util = require "util"
 local route = require "route"
 local cjson = require "cjson"
 local protocol = require "protocol"
+local channel = require "channel"
 
+local module_object = import "module.object"
 local agent_user = import "module.agent_user"
 local scene_user = import "module.scene_user"
 local common = import "common.common"
@@ -12,15 +14,23 @@ local common = import "common.common"
 _user_token = _user_token or {}
 _enter_user = _enter_user or {}
 _server_stop = _server_stop or false
+_scene_channel_ctx = _scene_channel_ctx or {}
+_client_manager = _client_manager or nil
+_channel_event_listener = _channel_event_listener or module_object.cls_base:new()
 
-local client_manager
+local scene_channel = channel:inherit()
+
+function scene_channel:disconnect()
+	_scene_channel_ctx[self.id] = nil
+	_channel_event_listener:fire_event("SCENE_DOWN",self.id)
+end
 
 function __init__(self)
-
+	_channel_event_listener:register_event(self,"SCENE_DOWN","scene_down")
 end
 
 function start(self,client_mgr)
-	client_manager = client_mgr
+	_client_manager = client_mgr
 	self.db_timer = event.timer(30,function ()
 		local db_channel = model.get_db_channel()
 		local all = model.fetch_agent_user()
@@ -113,13 +123,13 @@ function user_kick(self,uid)
 	if not enter_info then
 		return
 	end
-	client_manager:close(user.cid)
+	_client_manager:close(user.cid)
 	_enter_user.mutex(user_leave,user)
 end
 
 function user_auth(self,cid,token)
 	if not _user_token[token] then
-		client_manager:close(cid)
+		_client_manager:close(cid)
 		return
 	end
 
@@ -128,14 +138,14 @@ function user_auth(self,cid,token)
 
 	local now = util.time()
 	if now - info.time >= 60 * 100 then
-		client_manager:close(cid)
+		_client_manager:close(cid)
 		return
 	end
 
 	local token_info = util.authcode(token,info.time,0)
 	token_info = cjson.decode(token_info)
 	if token_info.uid ~= info.uid then
-		client_manager:close(cid)
+		_client_manager:close(cid)
 		return
 	end
 
@@ -215,12 +225,50 @@ function get_all_enter_user(self)
 	return result
 end
 
+function connect_scene_server(scene_server,scene_addr)
+	local scene_channel = _scene_channel_ctx[scene_server]
+	if scene_channel then
+		return true
+	end
+	local addr
+	if scene_addr.file then
+		addr = string.format("ipc://%s",scene_addr.file)
+	else
+		addr = string.format("tcp://%s:%d",scene_addr.ip,scene_addr.port)
+	end
+
+	local channel,reason = event.connect(addr,4,false,scene_channel)
+	if not channel then
+		event.error(string.format("connect scene server:%d faield:%s",addr,reason))
+		return false
+	end
+
+	channel:call("module.server_manager","register_agent_server",{id = env.dist_id})
+	channel.id = scene_server
+
+	_scene_channel_ctx[scene_server] = channel
+	return true
+end
+
+function scene_down(self,scene_server_id)
+	local all = model.fetch_agent_user()
+	for _,user in pairs(all) do
+		if user.scene_server == scene_server_id then
+			user:scene_down()
+		end
+	end
+end
+
+function get_scene_channel(self,scene_server_id)
+	return _scene_channel_ctx[scene_server_id]
+end
+
 function server_stop()
 	_server_stop = true
-	client_manager:stop()
+	_client_manager:stop()
 
 	for cid,enter_info in pairs(_enter_user) do
-		client_manager:close(cid)
+		_client_manager:close(cid)
 		local user = model.fetch_agent_user_with_uid(enter_info.uid)
 		if user then
 			enter_info.mutex(user_leave,self,user)

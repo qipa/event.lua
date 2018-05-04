@@ -170,8 +170,7 @@ function execute_enter_scene(user_info,fighter_data,scene_id,scene_uid,scene_pos
 	end
 
 	if not connected then
-		local result = server_manager:call_agent(user_info.user_agent,"handler.agent_handler","connect_scene_server",{user_uid = user_info.user_uid, 
-																					 scene_server = scene_server,
+		local result = server_manager:call_agent(user_info.user_agent,"handler.agent_handler","connect_scene_server",{ scene_server = scene_server,
 																					 scene_addr = scene_addr})
 		if not result then
 			return
