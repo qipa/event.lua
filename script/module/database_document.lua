@@ -8,13 +8,14 @@ function __init__(self)
 end
 
 local function clone_table(data)
+	depth = depth + 1
 	local result = {}
 	for k,v in pairs(data) do
 		if type(v) == "table" then
 			if v.save_data then
-				result[k] = v:save_data()
+				result[k] = v:save_data(depth)
 			else
-				result[k] = clone_table(v)
+				result[k] = clone_table(v,depth)
 			end
 		else
 			result[k] = v
@@ -23,16 +24,17 @@ local function clone_table(data)
 	return result
 end
 
-function cls_document:save_data(root)
+function cls_document:save_data(depth)
+	depth = depth + 1
 	local result = {}
 	for field in pairs(self.__save_fields) do
 		local data = self[field]
 		if data then
 			if type(data) == "table" then
 				if data.save_data then
-					result[field] = data:save_data()
+					result[field] = data:save_data(depth)
 				else
-					result[field] = clone_table(data)
+					result[field] = clone_table(data,depth)
 				end
 			else
 				result[field] = data

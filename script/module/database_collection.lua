@@ -17,14 +17,15 @@ function cls_collection:dirty_field(field)
 	self.__parent:dirty_field(self:get_type())
 end
 
-local function clone_table(data)
+local function clone_table(data,depth)
+	depth = depth + 1
 	local result = {}
 	for k,v in pairs(data) do
 		if type(v) == "table" then
 			if v.save_data then
-				result[k] = v:save_data()
+				result[k] = v:save_data(depth)
 			else
-				result[k] = clone_table(v)
+				result[k] = clone_table(v,depth)
 			end
 		else
 			result[k] = v
@@ -43,9 +44,9 @@ function cls_collection:save_data()
 			if data then
 				if type(data) == "table" then
 					if data.save_data then
-						set[field] = data:save_data()
+						set[field] = data:save_data(2)
 					else
-						set[field] = clone_table(data)
+						set[field] = clone_table(data,2)
 					end
 				else
 					set[field] = data
