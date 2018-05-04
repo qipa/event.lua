@@ -25,18 +25,14 @@ end
 
 function cls_document:save_data(root)
 	local result = {}
-	for field,have_object in pairs(self.__save_fields) do
+	for field in pairs(self.__save_fields) do
 		local data = self[field]
 		if data then
 			if type(data) == "table" then
 				if data.save_data then
 					result[field] = data:save_data()
 				else
-					if have_object then
-						result[field] = clone_table(data)
-					else
-						result[field] = data
-					end
+					result[field] = clone_table(data)
 				end
 			else
 				result[field] = data

@@ -34,22 +34,18 @@ local function clone_table(data)
 end
 
 function cls_collection:save_data()
+	local save_fields = self.__save_fields
 	local set = {}
 	local unset = {}
 	for field in pairs(self.__dirty) do
-		local have_object = self.__save_fields[field]
-		if have_object ~= nil then
+		if save_fields[field] ~= nil then
 			local data = self[field]
 			if data then
 				if type(data) == "table" then
 					if data.save_data then
 						set[field] = data:save_data()
 					else
-						if have_object then
-							set[field] = clone_table(data)
-						else
-							set[field] = data
-						end
+						set[field] = clone_table(data)
 					end
 				else
 					set[field] = data

@@ -186,7 +186,7 @@ function cls_base:pack()
 	local save_fields = cls.__save_fields
 	local result = {}
 	for k,v in pairs(self) do
-		if pack_fields[k] ~= nil or save_fields[k] ~= nil then
+		if pack_fields[k] or save_fields[k] then
 			result[k] = v
 		end
 	end
@@ -198,12 +198,12 @@ function cls_base:unpack(...)
 	return class.instance_from(self.__name,inst)
 end
 
-function cls_base:save_field(field,have_object)
-	self.__save_fields[field] = have_object or false
+function cls_base:save_field(field)
+	self.__save_fields[field] = true
 end
 
-function cls_base:pack_field(field,have_object)
-	self.__pack_fields[field] = have_object or false
+function cls_base:pack_field(field)
+	self.__pack_fields[field] = true
 end
 
 function cls_base:register_event(inst,ev,method)
