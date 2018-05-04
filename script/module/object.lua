@@ -180,31 +180,17 @@ local function clone_table(data)
 	return result
 end
 
-function cls_base:pack(clone)
+function cls_base:pack()
 	local cls = class.get(self:get_type())
 	local pack_fields = cls.__pack_fields
 	local save_fields = cls.__save_fields
-
 	local result = {}
 	for k,v in pairs(self) do
-		if pack_fields[k] or save_fields[k] then
-			if type(v) == "table" then
-				if v.__name then
-					result[k] = v:pack(true)
-				else
-					result[k] = clone_table(v)
-				end
-			else
-				result[k] = v
-			end
+		if pack_fields[k] ~= nil or save_fields[k] ~= nil then
+			result[k] = v
 		end
 	end
-
-	if clone then
-		return result
-	else
-		return table.tostring(result)
-	end
+	return result
 end
 
 function cls_base:unpack(...)

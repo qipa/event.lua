@@ -14,6 +14,7 @@ function __init__(self)
 	self.cls_scene_user:save_field("base_info")
 	self.cls_scene_user:save_field("fighter_info")
 	self.cls_scene_user:save_field("scene_info")
+	self.cls_scene_user:save_field("item_mgr")
 end
 
 function cls_scene_user:create(uid)

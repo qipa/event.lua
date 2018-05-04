@@ -283,6 +283,26 @@ wb_table(lua_State *L, struct write_block *wb, int index, int depth) {
 	if (index < 0) {
 		index = lua_gettop(L) + index + 1;
 	}
+
+	lua_pushstring(L, "__name");
+	lua_rawget(L, index);
+	if (lua_type(L, -1) != LUA_TNIL) {
+		lua_pop(L, 1);
+		lua_getfield(L, index, "pack");
+		if (lua_type(L, -1) == LUA_TFUNCTION) {
+			lua_pushvalue(L, index);
+			if (lua_pcall(L, 1, 1, 0) == LUA_OK) {
+				lua_remove(L, index);
+				lua_insert(L, index);
+			} else {
+				lua_pop(L, 1);
+			}
+		} else {
+			lua_pop(L, 1);
+		}
+	} else {
+		lua_pop(L, 1);
+	}
 	if (luaL_getmetafield(L, index, "__pairs") != LUA_TNIL) {
 		wb_table_metapairs(L, wb, index, depth);
 	} else {
