@@ -47,7 +47,17 @@ end
 function cls_scene_user:do_enter(scene_id,scene_uid,aoi_id)
 	fighter.cls_fighter.do_enter(self,scene_id,scene_uid,aoi_id)
 	self:dirty_field("scene_info")
-	self:send_agent("handler.agent_handler","sync_scene_info",{user_uid = self.uid,scene_server = env.dist_id})
+	
+	self:send_agent("handler.agent_handler","sync_scene_info",{user_uid = self.uid,
+															   scene_id = scene_id,
+															   scene_uid = scene_uid,
+															   scene_server = env.dist_id})
+
+	self:send_world("handler.world_handler","sync_scene_info",{user_uid = self.uid,
+															   scene_id = scene_id,
+															   scene_uid = scene_uid,
+															   scene_server = env.dist_id})
+	
 	self:send_client("s2c_scene_enter",{scene_id = scene_id,scene_uid = scene_uid})
 end
 

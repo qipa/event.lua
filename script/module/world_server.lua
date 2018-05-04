@@ -17,6 +17,9 @@ function __init__(self)
 			user:save(db_channel)
 		end
 	end)
+
+	server_manager:listen("agent",self,"agent_down")
+	server_manager:listen("scene",self,"scene_down")
 end
 
 function start(self)
@@ -36,6 +39,27 @@ function flush(self)
 	local all = model.fetch_world_user()
 	for _,user in pairs(all) do
 		user:save(db_channel)
+	end
+end
+
+function agent_down(self,server_id)
+	local all = model.fetch_world_user()
+	for _,user in pairs(all) do
+		if user.agent_id == server_id then
+			self:leave(user.uid)
+		end
+	end
+end
+
+function scene_down(self,server_id)
+	local all = model.fetch_world_user()
+	for _,user in pairs(all) do
+		if user.scene_server == server_id then
+			user.scene_server = nil
+			user.scene_id = nil
+			user.scene_uid = nil
+			user.scene_channel = nil
+		end
 	end
 end
 

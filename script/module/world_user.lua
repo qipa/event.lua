@@ -14,9 +14,10 @@ function __init__(self)
 end
 
 
-function cls_world_user:create(uid,user_agent)
+function cls_world_user:create(uid,agent_id)
 	self.uid = uid
-	self.user_agent = user_agent
+	self.agent_id = agent_id
+	self.agent_channel = server_manager:get_agent_channel(agent_id)
 	self.loading = false
 	model.bind_world_user_with_uid(self.uid,self)
 end
@@ -35,8 +36,7 @@ function cls_world_user:send_client(proto,args)
 end
 
 function cls_world_user:send_agent(file,method,args,callback)
-	local agent_channel = server_manager:get_agent_channel(self.user_agent)
-	agent_channel:send(file,method,args,callback)
+	self.agent_channel:send(file,method,args,callback)
 end
 
 function cls_world_user:enter()
@@ -48,3 +48,9 @@ function cls_world_user:leave()
 	event.error(string.format("user:%d leave world:%d",self.uid,env.dist_id))
 end
 
+function cls_world_user:sync_scene_info(scene_server,scene_id,scene_uid)
+	self.scene_server = scene_server
+	self.scene_id = scene_id
+	self.scene_uid = scene_uid
+	self.scene_channel = server_manager:get_scene_channel(scene_server)
+end

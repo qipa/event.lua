@@ -187,6 +187,14 @@ function call_scene(self,scene_server_id,file,method,args)
 	return scene_info.channel:call(file,method,args,callback)
 end
 
+function get_scene_channel(self,id)
+	local scene_info = _scene_server_manager[id]
+	if not scene_info then
+		return
+	end
+	return scene_info.channel
+end
+
 function register_login_server(channel,args)
 	local login = {channel = channel,id = args.id}
 	_login_server = login
