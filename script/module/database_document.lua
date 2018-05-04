@@ -9,6 +9,9 @@ end
 
 local function clone_table(data)
 	depth = depth + 1
+	if depth > 3 then
+		error(string.format("table is too depth:%d",depth))
+	end
 	local result = {}
 	for k,v in pairs(data) do
 		if type(v) == "table" then
@@ -26,6 +29,9 @@ end
 
 function cls_document:save_data(depth)
 	depth = depth + 1
+	if depth > 3 then
+		error(string.format("table is too depth:%d",depth))
+	end
 	local result = {}
 	for field in pairs(self.__save_fields) do
 		local data = self[field]

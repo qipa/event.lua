@@ -7,18 +7,21 @@ function __init__(self)
 	self.cls_collection:save_field("__name")
 end
 
-function cls_collection:create(parent)
-	self.__parent = parent
-end
-
 function cls_collection:dirty_field(field)
 	self.__dirty[field] = true
 	self.__dirty["__name"] = true
 	self.__parent:dirty_field(self:get_type())
 end
 
+function cls_collection:attach_db(parent)
+	self.__parent = parent
+end
+
 local function clone_table(data,depth)
 	depth = depth + 1
+	if depth > 3 then
+		error(string.format("table is too depth:%d",depth))
+	end
 	local result = {}
 	for k,v in pairs(data) do
 		if type(v) == "table" then
@@ -34,7 +37,11 @@ local function clone_table(data,depth)
 	return result
 end
 
-function cls_collection:save_data()
+function cls_collection:save_data(depth)
+	if depth ~= 1 then
+		error(string.format("cls type:%s inherit from cls_collection,must be first object",self.__name))
+	end
+	depth = depth + 1
 	local save_fields = self.__save_fields
 	local set = {}
 	local unset = {}
@@ -44,9 +51,9 @@ function cls_collection:save_data()
 			if data then
 				if type(data) == "table" then
 					if data.save_data then
-						set[field] = data:save_data(2)
+						set[field] = data:save_data(depth)
 					else
-						set[field] = clone_table(data,2)
+						set[field] = clone_table(data,depth)
 					end
 				else
 					set[field] = data

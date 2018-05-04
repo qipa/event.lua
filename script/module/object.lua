@@ -224,7 +224,7 @@ function cls_base:deregister_event(inst,ev)
 end
 
 function cls_base:fire_event(ev,...)
-	local ev_list = self.__event
+	local ev_list = self.__event[ev]
 	if not ev_list then
 		return
 	end
@@ -238,7 +238,6 @@ function cls_base:fire_event(ev,...)
 				event.error(err)
 			end
 		end
-		
 	end
 end
 

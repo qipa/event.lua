@@ -172,7 +172,7 @@ function user_enter(self,cid,uid,account)
 															  scene_uid = fighter.scene_info.scene_uid,
 															  scene_pos = fighter.scene_info.scene_pos,
 															  agent = env.dist_id,
-															  fighter_data = fighter:pack()})
+															  fighter_data = table.tostring(fighter)})
 	fighter:release()
 end
 

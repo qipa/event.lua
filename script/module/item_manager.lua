@@ -18,7 +18,8 @@ function __init__(self)
 end
 
 function cls_item_mgr:create(user)
-	database_collection.cls_collection.create(self,user)
+	self:attach_db(user)
+	
 	self.uid = user.uid
 	self.mgr = {}
 	self.cid_ctx = {}
@@ -29,6 +30,8 @@ function cls_item_mgr:create(user)
 end
 
 function cls_item_mgr:init(user)
+	self:attach_db(user)
+
 	user:register_event(self,"ENTER_GAME","enter_game")
 	user:register_event(self,"LEAVE_GAME","leave_game")
 	self.mgr = {}
