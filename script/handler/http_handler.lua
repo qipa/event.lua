@@ -40,8 +40,6 @@ end
 
 
 function handler(channel,header,url,body)
-	table.print(header)
-	channel:set_cookie("fuck","mrq")
 	channel:session_expire(os.time() + 300)
 	local args = url:split("/")
 
