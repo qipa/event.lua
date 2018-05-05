@@ -16,17 +16,17 @@ _enter_user = _enter_user or {}
 _server_stop = _server_stop or false
 _scene_channel_ctx = _scene_channel_ctx or {}
 _client_manager = _client_manager or nil
-_channel_event_listener = _channel_event_listener or module_object.cls_base:new()
+_event_listener = _event_listener or module_object.cls_base:new()
 
 local scene_channel = channel:inherit()
 
 function scene_channel:disconnect()
 	_scene_channel_ctx[self.id] = nil
-	_channel_event_listener:fire_event("SCENE_DOWN",self.id)
+	_event_listener:fire_event("SCENE_DOWN",self.id)
 end
 
 function __init__(self)
-	_channel_event_listener:register_event(self,"SCENE_DOWN","scene_down")
+	_event_listener:register_event(self,"SCENE_DOWN","scene_down")
 end
 
 function start(self,client_mgr)

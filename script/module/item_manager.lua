@@ -32,8 +32,8 @@ end
 function cls_item_mgr:init(user)
 	self:attach_db(user)
 
-	user:register_event(self,"ENTER_GAME","enter_game")
-	user:register_event(self,"LEAVE_GAME","leave_game")
+	user:register_event("ENTER_GAME",self,"enter_game")
+	user:register_event("LEAVE_GAME",self,"leave_game")
 	self.mgr = {}
 	self:dirty_field("mgr")
 end
@@ -62,8 +62,8 @@ function cls_item_mgr:enter_game(user)
 end
 
 function cls_item_mgr:leave_game(user)
-	user:deregister_event(self,"ENTER_GAME")
-	user:deregister_event(self,"LEAVE_GAME")
+	user:deregister_event("ENTER_GAME",self)
+	user:deregister_event("LEAVE_GAME",self)
 end
 
 function cls_item_mgr:insert_item_by_cid(cid,amount)

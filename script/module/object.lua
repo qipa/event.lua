@@ -206,7 +206,7 @@ function cls_base:pack_field(field)
 	self.__pack_fields[field] = true
 end
 
-function cls_base:register_event(inst,ev,method)
+function cls_base:register_event(ev,inst,method)
 	local ev_list = self.__event[ev]
 	if not ev_list then
 		ev_list = {}

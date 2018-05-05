@@ -200,7 +200,7 @@ function login_server_down(self)
 end
 
 function listen(self,event,inst,method)
-	_event_listener:register_event(inst,event,method)
+	_event_listener:register_event(event,inst,method)
 end
 
 function broadcast(self,file,method,args)
