@@ -15,20 +15,18 @@ function __init__(self)
 	end)
 	
 	self.db_timer = event.timer(30,function ()
-		local db_channel = model.get_db_channel()
 		local all = model.fetch_scene_user()
 		for _,fighter in pairs(all) do
-			fighter:save(db_channel)
+			fighter:save()
 		end
 	end)
 
 end
 
 function flush()
-	local db_channel = model.get_db_channel()
 	local all = model.fetch_scene_user()
 	for _,fighter in pairs(all) do
-		fighter:save(db_channel)
+		fighter:save()
 	end
 end
 
@@ -86,14 +84,15 @@ function leave_scene(self,user_uid,switch)
 	scene:leave(fighter)
 
 	fighter:dirty_field("scene_info")
-	local db_channel = model.get_db_channel()
-	fighter:save(db_channel)
+	
+	fighter:save()
 
+	local db_channel = model.get_db_channel()
 	if not switch then
 		local updater = {}
 		updater["$inc"] = {version = 1}
 		updater["$set"] = {time = os.time()}
-		db_channel:findAndModify("save_version",{query = {uid = fighter.uid},update = updater,upsert = true})
+		db_channel:findAndModify("scene_user","save_version",{query = {uid = fighter.uid},update = updater,upsert = true})
 	end
 
 	local fighter_data

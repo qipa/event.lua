@@ -43,16 +43,14 @@ event.fork(function ()
 		end
 
 		for db,info in pairs(mongo_indexes) do
-			channel:set_db(db)
 			for name,indexes in pairs(info) do
 				print(string.format("build db:%s,%s index",db,name))
-				table.print(channel:ensureIndex(name,indexes))
+				table.print(channel:ensureIndex(db,name,indexes))
 			end
 		end
 
 		local max_uid_ctx = {}
-		channel:set_db("login_user")
-		local role_list = channel:findAll("role_list",{selector = {list = 1}})
+		local role_list = channel:findAll("login_user","role_list",{selector = {list = 1}})
 		for _,each_list in pairs(role_list) do
 			for _,info in pairs(each_list.list) do
 				local dist_id = util.decimal_sub(info.uid,1,2)
@@ -62,8 +60,7 @@ event.fork(function ()
 			end
 		end
 
-		channel:set_db("common")
-		local id_builder_info = channel:findAll("id_builder",{query = {key = "user"}})
+		local id_builder_info = channel:findAll("common","id_builder",{query = {key = "user"}})
 		local builder_ctx = {}
 		for _,info in pairs(id_builder_info) do
 			builder_ctx[info.id] = info
@@ -97,8 +94,7 @@ event.fork(function ()
 		end
 
 		for db in pairs(mongo_indexes) do
-			channel:set_db(db)
-			table.print(channel:runCommand("dropDatabase"))
+			table.print(channel:runCommand(db,"dropDatabase"))
 		end
 		os.exit(1)
 

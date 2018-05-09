@@ -13,16 +13,14 @@ _id_set = _id_set or {}
 
 function start(self)
 	self.db_timer = event.timer(30,function ()
-		local db_channel = model.get_db_channel()
 		local all = model.fetch_login_user()
 		for _,user in pairs(all) do
-			user:save(db_channel)
+			user:save()
 		end
 	end)
 
 	local db_channel = model.get_db_channel()
-	db_channel:set_db("login_user")
-	local result = db_channel:findAll("role_list")
+	local result = db_channel:findAll("login_user","role_list")
 	for _,info in pairs(result) do
 		for _,detail in pairs(info.list) do
 			_name_set[detail.name] = info.account
@@ -36,10 +34,9 @@ function start(self)
 end
 
 function flush(self)
-	local db_channel = model.get_db_channel()
 	local all = model.fetch_login_user()
 	for _,user in pairs(all) do
-		user:save(db_channel)
+		user:save()
 	end
 end
 
@@ -171,12 +168,11 @@ function server_stop(self)
 	end
 
 	local db_channel = model.get_db_channel()
-	db_channel:set_db("common")
 	
 	local updater = {}
 	updater["$inc"] = {version = 1}
 	updater["$set"] = {time = os.time()}
-	db_channel:findAndModify("login_version",{query = {uid = env.dist_id},update = updater,upsert = true})
+	db_channel:findAndModify("common","login_version",{query = {uid = env.dist_id},update = updater,upsert = true})
 
 	local agent_set = server_manager:how_many_agent()
 	for _,agent_id in pairs(agent_set) do

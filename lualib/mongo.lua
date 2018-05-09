@@ -12,16 +12,7 @@ function mongo_channel:disconnect()
 end
 
 function mongo_channel:init(db)
-	self.db = db
 	self.session_ctx = {}
-end
-
-function mongo_channel:set_db(db)
-	if not db then
-		return self.db
-	end
-	self.db = db
-	return self.db
 end
 
 function mongo_channel:data(data,size)
@@ -67,8 +58,8 @@ function mongo_channel:data(data,size)
 	end
 end
 
-function mongo_channel:runCommand(cmd,cmd_v,...)
-	local full_name = string.format("%s.$cmd",self.db)
+function mongo_channel:runCommand(db,cmd,cmd_v,...)
+	local full_name = string.format("%s.$cmd",db)
 	local bson_cmd
 	if not cmd_v then
 		bson_cmd = bson.encode_order(cmd,1)
@@ -93,9 +84,9 @@ function mongo_channel:runCommand(cmd,cmd_v,...)
 	return result[1]
 end
 
-local function find(self,name,query,selector,count,callback)
+local function find(self,db,name,query,selector,count,callback)
 	local session = event.gen_session()
-	name = string.format("%s.%s",self.db,name)
+	name = string.format("%s.%s",db,name)
 	self.session_ctx[session] = {count = count,name = name,hold = {},result = {},callback = callback}
 	local data = driver.query(session, 0, name, 0, count, query and bson.encode(query) or empty_bson, selector and bson.encode(selector))
 	self.buffer:write(data)
@@ -113,9 +104,9 @@ end
 --name:collection
 --args:{query,selector}
 --callback:
-function mongo_channel:findOne(name,args,callback)
+function mongo_channel:findOne(db,name,args,callback)
 	args = args or {}
-	local result,err = find(self,name,args.query,args.selector,1,callback)
+	local result,err = find(self,db,name,args.query,args.selector,1,callback)
 	if result then
 		return result[1]
 	end
@@ -125,20 +116,20 @@ end
 --name:collection
 --args:{query,selector}
 --callback:
-function mongo_channel:findAll(name,args,callback)
+function mongo_channel:findAll(db,name,args,callback)
 	args = args or {}
-	return find(self,name,args.query,args.selector,5000,callback)
+	return find(self,db,name,args.query,args.selector,5000,callback)
 end
 
-function mongo_channel:update(name,selector,update,upsert,multi)
-	name = string.format("%s.%s",self.db,name)
+function mongo_channel:update(db,name,selector,update,upsert,multi)
+	name = string.format("%s.%s",db,name)
 	local flags	= (upsert and 1	or 0) +	(multi and 2 or	0)
 	local data = driver.update(name, flags, bson.encode(selector), bson.encode(update))
 	self:write(data)
 end
 
-function mongo_channel:insert(name,doc)
-	name = string.format("%s.%s",self.db,name)
+function mongo_channel:insert(db,name,doc)
+	name = string.format("%s.%s",db,name)
 
 	if doc._id == nil then
 		doc._id	= bson.objectid()
@@ -148,11 +139,11 @@ function mongo_channel:insert(name,doc)
 	self:write(data)
 end
 
-function mongo_channel:drop(name)
-	return self:runCommand("drop",name)
+function mongo_channel:drop(db,name)
+	return self:runCommand(db,"drop",name)
 end
 
-function mongo_channel:findAndModify(name,doc)
+function mongo_channel:findAndModify(db,name,doc)
 	assert(doc.query)
 	assert(doc.update or doc.remove)
 
@@ -161,10 +152,10 @@ function mongo_channel:findAndModify(name,doc)
 		table.insert(cmd, k)
 		table.insert(cmd, v)
 	end
-	return self:runCommand(table.unpack(cmd))
+	return self:runCommand(db,table.unpack(cmd))
 end
 
-function mongo_channel:ensureIndex(name,indexes)
+function mongo_channel:ensureIndex(db,name,indexes)
 	local function make_index(index,unique)
 		local list = {}
 		local name = "_index_"
@@ -185,7 +176,7 @@ function mongo_channel:ensureIndex(name,indexes)
 		idx[i] = make_index(index.index,index.unique or true)
 	end
 
-	return self:runCommand("createIndexes",name,"indexes",idx)
+	return self:runCommand(db,"createIndexes",name,"indexes",idx)
 end
 
 

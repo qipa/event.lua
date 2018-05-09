@@ -20,12 +20,10 @@ end
 
 function update()
 	local db_channel = model.get_db_channel()
-	db_channel:set_db("common")
-
 	for data,info in pairs(_dirty_data) do
 		local updater = {}
 		updater["$set"] = data
-		db_channel:update(info.name,info.index,updater,true)
+		db_channel:update("common",info.name,info.index,updater,true)
 	end
 	_dirty_data = setmetatable({},{__mode = "k"})
 
@@ -37,7 +35,7 @@ function update()
 			updater["$set"] = data
 		end
 		
-		db_channel:update(info.name,object:db_index(),updater,true)
+		db_channel:update("common",info.name,object:db_index(),updater,true)
 	end
 	_dirty_object = setmetatable({},{__mode = "k"})
 end

@@ -11,10 +11,9 @@ _agent_server_status = _agent_server_status or {}
 
 function __init__(self)
 	self.timer = event.timer(30,function ()
-		local db_channel = model.get_db_channel()
 		local all = model.fetch_world_user()
 		for _,user in pairs(all) do
-			user:save(db_channel)
+			user:save()
 		end
 	end)
 
@@ -26,8 +25,7 @@ function start(self)
 	import "module.scene_manager"
 	import "handler.cmd_handler"
 	local db_channel = model.get_db_channel()
-	db_channel:set_db("common")
-	local guild_info = db_channel:findAll("guild")
+	local guild_info = db_channel:findAll("common","guild")
 	for _,info in pairs(guild_info) do
 
 	end
@@ -35,10 +33,9 @@ end
 
 function flush(self)
 	database_manager:flush()
-	local db_channel = model.get_db_channel()
 	local all = model.fetch_world_user()
 	for _,user in pairs(all) do
-		user:save(db_channel)
+		user:save()
 	end
 end
 
@@ -69,12 +66,10 @@ function enter(self,user_uid,user_agent)
 		user:leave()
 		user:release()
 	end
-
-	local db_channel = model.get_db_channel()
 	
 	local user = world_user.cls_world_user:new(user_uid,user_agent)
 	user.loading = true
-	user:load(db_channel)
+	user:load()
 	user.loading = false
 	local user = model.fetch_world_user_with_uid(user_uid)
 	if not user then
@@ -95,9 +90,7 @@ function leave(self,user_uid)
 	end
 
 	user:leave()
-	
-	local db_channel = model.get_db_channel()
-	user:save(db_channel)
+	user:save()
 	user:release()
 	return true
 end
@@ -116,12 +109,11 @@ function server_stop(self,agent_id)
 
 	if all_agent_done then
 		local db_channel = model.get_db_channel()
-		db_channel:set_db("common")
-		
+
 		local updater = {}
 		updater["$inc"] = {version = 1}
 		updater["$set"] = {time = os.time()}
-		db_channel:findAndModify("world_version",{query = {uid = env.dist_id},update = updater,upsert = true})
+		db_channel:findAndModify("common","world_version",{query = {uid = env.dist_id},update = updater,upsert = true})
 
 		event.fork(function ()
 			while scene_manager:all_user_leave() == false do

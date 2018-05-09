@@ -1,3 +1,4 @@
+local model = require "model"
 local object = import "module.object"
 
 --对应着mongodb中的database概念
@@ -15,13 +16,14 @@ function cls_database:db_index()
 	return {id = self.__uid}
 end
 
-function cls_database:load(db_channel)
-	db_channel:set_db(self:get_type())
+function cls_database:load()
+	local db_channel = model.get_db_channel()
+	local db = self:get_type()
 	for field in pairs(self.__save_fields) do
 		if not self.__alive then
 			break
 		end
-		local result = db_channel:findOne(field,{query = self:db_index()})
+		local result = db_channel:findOne(db,field,{query = self:db_index()})
 		if result then
 			if result.__name then
 				self[field] = class.instance_from(result.__name,result)
@@ -32,8 +34,9 @@ function cls_database:load(db_channel)
 	end
 end
 
-function cls_database:save(db_channel)
-	db_channel:set_db(self:get_type())
+function cls_database:save()
+	local db_channel = model.get_db_channel()
+	local db = self:get_type()
 	for field in pairs(self.__dirty) do
 		if self.__save_fields[field] ~= nil then
 			local data = self[field]
@@ -52,7 +55,7 @@ function cls_database:save(db_channel)
 						updater["$set"] = data
 					end
 				end
-				db_channel:update(field,self:db_index(),updater,true)
+				db_channel:update(db,field,self:db_index(),updater,true)
 			end
 		end
 	end

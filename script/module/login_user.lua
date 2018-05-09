@@ -33,9 +33,7 @@ function cls_login_user:send_client(proto,args)
 end
 
 function cls_login_user:auth()
-	local db_channel = model.get_db_channel()
-
-	self:load(db_channel)
+	self:load()
 
 	local user_self = model.fetch_login_user_with_account(self.account)
 	if not user_self or user_self ~= self then
@@ -90,8 +88,7 @@ function cls_login_user:destroy()
 end
 
 function cls_login_user:leave()
-	local db_channel = model.get_db_channel()
-	self:save(db_channel)
+	self:save()
 	self:release()
 end
 

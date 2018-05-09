@@ -32,10 +32,9 @@ end
 function start(self,client_mgr)
 	_client_manager = client_mgr
 	self.db_timer = event.timer(30,function ()
-		local db_channel = model.get_db_channel()
 		local all = model.fetch_agent_user()
 		for _,user in pairs(all) do
-			user:save(db_channel)
+			user:save()
 		end
 	end)
 
@@ -56,10 +55,9 @@ function start(self,client_mgr)
 end
 
 function flush(self)
-	local db_channel = model.get_db_channel()
 	local all = model.fetch_agent_user()
 	for _,user in pairs(all) do
-		user:save(db_channel)
+		user:save()
 	end
 end
 
@@ -78,6 +76,23 @@ function dispatch_client(self,cid,message_id,data,size)
 			route.dispatch_client(message_id,data,size,user)
 		end
 	end
+end
+
+
+function send_login(self,file,method,args,callback)
+
+end
+
+function call_login(self,file,method,args)
+
+end
+
+function send_world(self,file,method,args,callback)
+
+end
+
+function call_world(self,file,method,args)
+
 end
 
 function enter(self,cid,addr)
@@ -198,13 +213,13 @@ function user_leave(self,user)
 		world_channel:send("module.scene_manager","leave_scene",{uid = user.uid})
 	end
 
-	local db_channel = model.get_db_channel()
-	user:save(db_channel)
+	user:save()
 	
+	local db_channel = model.get_db_channel()
 	local updater = {}
 	updater["$inc"] = {version = 1}
 	updater["$set"] = {time = os.time()}
-	db_channel:findAndModify("save_version",{query = {uid = user.uid},update = updater,upsert = true})
+	db_channel:findAndModify("agent_user","save_version",{query = {uid = user.uid},update = updater,upsert = true})
 
 	user:release()
 
@@ -277,12 +292,11 @@ function server_stop()
 	end
 
 	local db_channel = model.get_db_channel()
-	db_channel:set_db("common")
 	
 	local updater = {}
 	updater["$inc"] = {version = 1}
 	updater["$set"] = {time = os.time()}
-	db_channel:findAndModify("agent_version",{query = {uid = env.dist_id},update = updater,upsert = true})
+	db_channel:findAndModify("common","agent_version",{query = {uid = env.dist_id},update = updater,upsert = true})
 
 	local world_channel = model.get_world_channel()
 	world_channel:send("handler.world_handler","server_stop",{id = env.dist_id})

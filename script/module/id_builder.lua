@@ -70,11 +70,10 @@ function init(self,dist_id)
 	end
 
 	local db_channel = model.get_db_channel()
-	db_channel:set_db("common")
 
 	for field,offset in pairs(unique_offset) do
 		local uname = string.format("%s%d",field,dist_id)
-		local result = db_channel:findOne("id_builder",{query = {id = dist_id,key = field}})
+		local result = db_channel:findOne("common","id_builder",{query = {id = dist_id,key = field}})
 		if not result then
 			result = {begin = 1,offset = id_section}
 		else
@@ -84,7 +83,7 @@ function init(self,dist_id)
 
 		local updator = {}
 		updator["$set"] = result
-		db_channel:update("id_builder",{id = dist_id,key = field},updator,true)
+		db_channel:update("common","id_builder",{id = dist_id,key = field},updator,true)
 
 		local cursor = result.begin
 		local max = result.begin + result.offset
@@ -97,10 +96,9 @@ function init(self,dist_id)
 				max = result.begin + result.offset
 
 				local db_channel = model.get_db_channel()
-				db_channel:set_db("common")
 				local updator = {}
 				updator["$set"] = result
-				db_channel:update("id_builder",{id = dist_id,key = field},updator,true)
+				db_channel:update("common","id_builder",{id = dist_id,key = field},updator,true)
 			end
 			return uid
 		end
