@@ -135,7 +135,7 @@ function cls_base:instance_from(object)
 	local class = class_ctx[object_type]
 	object.__dirty = {}
 	object.__name = self.__name
-	object. __alive = true
+	object.__alive = true
 	object.__event = {}
 	new_object(class,object)
 	return object
