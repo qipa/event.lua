@@ -130,17 +130,14 @@ function cls_base:new(...)
 	return object
 end
 
-function cls_base:instance_from(data)
+function cls_base:instance_from(object)
 	local object_type = self:get_type()
 	local class = class_ctx[object_type]
-	local object = { __dirty = {},
-				 	 __name = self.__name,
-				 	 __alive = true,
-				 	 __event = {}}
+	object.__dirty = {}
+	object.__name = self.__name
+	object. __alive = true
+	object.__event = {}
 	new_object(class,object)
-	for k,v in pairs(data) do
-		object[k] = v
-	end
 	return object
 end
 
@@ -191,11 +188,6 @@ function cls_base:pack()
 		end
 	end
 	return result
-end
-
-function cls_base:unpack(...)
-	local inst = table.decode(...)
-	return class.instance_from(self.__name,inst)
 end
 
 function cls_base:save_field(field)
