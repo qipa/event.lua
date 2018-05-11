@@ -161,22 +161,6 @@ function cls_base:destroy()
 
 end
 
-local function clone_table(data)
-	local result = {}
-	for k,v in pairs(data) do
-		if type(v) == "table" then
-			if v.__name then
-				result[k] = v:pack(true)
-			else
-				result[k] = clone_table(v)
-			end
-		else
-			result[k] = v
-		end
-	end
-	return result
-end
-
 function cls_base:pack()
 	local cls = class.get(self:get_type())
 	local pack_fields = cls.__pack_fields
@@ -240,13 +224,13 @@ function class.new(name,...)
 	return cls:new(...)
 end
 
-local function foreach_instance(inst)
+local function instance_subobject(inst)
 	for k,v in pairs(inst) do
 		if type(v) == "table" then
 			if v.__name then
 				inst[k] = class.instance_from(v.__name,v)
 			else
-				foreach_instance(v)
+				instance_subobject(v)
 			end
 		end
 	end
@@ -256,7 +240,7 @@ function class.instance_from(name,data)
 	local cls = class.get(name)
 	assert(cls ~= nil,name)
 	local inst = cls:instance_from(data)
-	foreach_instance(inst)
+	instance_subobject(inst)
 	return inst
 end
 

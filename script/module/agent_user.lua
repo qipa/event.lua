@@ -5,6 +5,7 @@ local model = require "model"
 local util = require "util"
 local protocol = require "protocol"
 
+local agent_server = import "module.agent_server"
 local database_object = import "module.database_object"
 local module_item_mgr = import "module.item_manager"
 local task_manager = import "module.task_manager"

@@ -65,7 +65,7 @@ function get_scene(self,scene_uid)
 end
 
 function enter_scene(self,fighter_data,user_agent,scene_uid,pos)
-	local fighter = scene_user.cls_scene_user:unpack(fighter_data)
+	local fighter = class.instance_from("scene_user",table.decode(fighter_data))
 	fighter:init()
 	fighter.user_agent = user_agent
 

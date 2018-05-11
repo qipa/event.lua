@@ -240,7 +240,7 @@ function get_all_enter_user(self)
 	return result
 end
 
-function connect_scene_server(scene_server,scene_addr)
+function connect_scene_server(self,scene_server,scene_addr)
 	local scene_channel = _scene_channel_ctx[scene_server]
 	if scene_channel then
 		return true
