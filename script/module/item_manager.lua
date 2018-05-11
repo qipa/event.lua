@@ -3,11 +3,13 @@ local cjson = require "cjson"
 local model = require "model"
 local util = require "util"
 
+local common = import "common.common"
 local database_collection = import "module.database_collection"
 local module_item = import "module.item.item"
 local module_material = import "module.item.material"
 local module_equipment = import "module.item.equipment"
 local module_currency = import "module.item.currency"
+
 
 
 cls_item_mgr = database_collection.cls_collection:inherit("item_mgr")
@@ -67,7 +69,7 @@ function cls_item_mgr:leave_game(user)
 end
 
 function cls_item_mgr:insert_item_by_cid(cid,amount)
-	local cfg = config.item_cfg[cid]
+	local cfg = config.item[cid]
 	local overlap = cfg.overlap
 
 	local update_info = {}

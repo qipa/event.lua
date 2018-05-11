@@ -51,6 +51,11 @@ function _M.reload(file)
 	end
 
 	ctx.change = loadfile(file,ctx.fullfile,ctx.env)
+
+	if ctx.env["__init__"] then
+		ctx.env["__init__"](ctx.env)
+	end
+
 	if ctx.env["__reload__"] then
 		ctx.env["__reload__"](ctx.env)
 	end

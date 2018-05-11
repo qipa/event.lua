@@ -45,10 +45,10 @@ function cls_database:save()
 				if type(data) == "table" then
 					if data.save_data then
 						local set,unset = data:save_data(1)
-						if next(set) ~= nil then
+						if set then
 							updater["$set"] = set
 						end
-						if next(unset) ~= nil then
+						if unset then
 							updater["$unset"] = unset
 						end
 					else

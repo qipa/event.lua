@@ -61,8 +61,6 @@ end
 function agent_server_down(self,agent_server_id)
 	local agent_info = _agent_server_manager[agent_server_id]
 	_agent_server_manager[agent_server_id] = nil
-
-
 	_event_listener:fire_event("AGENT_DOWN",agent_server_id)
 end
 

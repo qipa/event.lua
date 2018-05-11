@@ -49,7 +49,6 @@ if not func then
 	error(err)
 end
 
-
 env.name = name
 env.tid = util.thread_id()
 

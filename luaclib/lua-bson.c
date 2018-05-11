@@ -539,6 +539,24 @@ append_table(struct bson *bs, lua_State *L, const char *key, size_t sz, int dept
 		append_key(bs, L, BSON_ARRAY, key, sz);
 		pack_array(L, bs, depth, lua_rawlen(L, -1));
 	} else {
+		lua_pushstring(L, "__name");
+		lua_rawget(L, -2);
+		if (lua_type(L, -1) != LUA_TNIL) {
+			lua_pop(L, 1);
+			lua_getfield(L, -1, "save_data");
+			if (lua_type(L, -1) == LUA_TFUNCTION) {
+				lua_rotate(L, -2 , 1);
+				if (lua_pcall(L, 1, 1, 0) != LUA_OK) {
+					luaL_error(L, "bson pack object error:%s",lua_tostring(L, -1));
+					lua_pop(L, 1);
+				}
+			} else {
+				lua_pop(L, 1);
+			}
+		} else {
+			lua_pop(L, 1);
+		}
+
 		append_key(bs, L, BSON_DOCUMENT, key, sz);
 		pack_simple_dict(L, bs, depth);
 	}
