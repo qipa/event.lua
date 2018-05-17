@@ -68,9 +68,7 @@ word_add(struct word_tree* root_tree, const char* word,size_t size) {
 				next_tree->hash = kh_init(word);
 				next_tree->index = index;
 				kh_value(tree->hash, k) = next_tree;
-			} else if (result == 0) {
-				next_tree = kh_value(tree->hash, k);
-			} else {
+			}else {
 				assert(0);
 			}
 			
