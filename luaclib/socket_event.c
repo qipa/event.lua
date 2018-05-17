@@ -229,6 +229,7 @@ loop_ctx_release(ev_loop_ctx_t* loop_ctx) {
 		loop_ctx->freelist = loop_ctx->freelist->next;
 		free(tmp);
 	}
+	free(loop_ctx);
 }
 
 struct ev_loop*
