@@ -192,7 +192,7 @@ word_add(struct word_map* map, const char* word,size_t size) {
 		k = kh_put(word, map->hash, strdup(last), &result);
 		if (result == 1 || result == 2) {
 			kh_value(map->hash, k) = list;
-		}else {
+		} else {
 			assert(0);
 		}
 

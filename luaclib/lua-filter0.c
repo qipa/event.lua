@@ -244,12 +244,16 @@ lfilter(lua_State* L) {
 }
 
 void
-dump(const char* word,struct word_tree* tree) {
+dump(const char* word,struct word_tree* tree,int depth) {
+	int i;
+	for(i=0;i<depth;i++)
+		printf("  ");
 	printf("%s\n",word);
+	depth++;
 	if (tree->hash) {
 		struct word_tree* child = NULL;
 		const char* word = NULL;
-		kh_foreach(tree->hash, word, child, dump((char*)word, child));
+		kh_foreach(tree->hash, word, child, dump((char*)word, child,depth));
 	}
 }
 
@@ -258,7 +262,8 @@ ldump(lua_State* L) {
 	struct word_tree* tree = lua_touserdata(L,1);
 	struct word_tree* child = NULL;
 	const char* word = NULL;
-	kh_foreach(tree->hash, word, child, dump((char*)word, child));
+	int depth = 0;
+	kh_foreach(tree->hash, word, child, dump((char*)word, child, depth));
 	return 0;
 }
 

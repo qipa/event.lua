@@ -7,7 +7,7 @@ local event = require "event"
 local helper = require "helper"
 
 
-local count = 1024 * 100
+local count = 100
 
 local FILE = assert(io.open("./config/filter.lua","r"))
 local content = FILE:read("*a")
@@ -24,6 +24,8 @@ local filter_inst0 = filter0.create()
 for word in pairs(forbidden_word) do
 	filter_inst0:add(word)
 end
+-- filter_inst0:dump()
+
 local lua_mem = collectgarbage("count")
 event.error(string.format("lua mem:%fkb,c mem:%fkb",lua_mem,helper.allocated()/1024))
 
@@ -40,7 +42,7 @@ for word in pairs(forbidden_word) do
 end
 local lua_mem = collectgarbage("count")
 event.error(string.format("lua mem:%fkb,c mem:%fkb",lua_mem,helper.allocated()/1024))
--- filter_inst1:dump()
+filter_inst1:dump()
 
 util.time_diff("filter1",function ()
 	for i = 1,count do
