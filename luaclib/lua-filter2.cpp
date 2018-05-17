@@ -31,7 +31,7 @@ int add_keyword(lua_State* L)
 	return 0;
 }
 
-int word_filter(lua_State* L)
+int filter(lua_State* L)
 {
 	WordFilterUtil* filter = (WordFilterUtil*)lua_touserdata(L,1);
 	size_t size;
@@ -41,7 +41,8 @@ int word_filter(lua_State* L)
 	std::string str = filter->filter(word,replaceCount);
 
 	lua_pushlstring(L, str.c_str(),str.size());
-	return 1;
+	lua_pushinteger(L, replaceCount);
+	return 2;
 }
 
 extern "C" int 
@@ -51,7 +52,7 @@ luaopen_filter2_core(lua_State *L) {
 	const luaL_Reg l[] = {
 		{ "create", create },
 		{ "add", add_keyword },
-		{ "filter", word_filter },
+		{ "filter", filter },
 		{ NULL, NULL },
 	};
 	luaL_newlib(L, l);
