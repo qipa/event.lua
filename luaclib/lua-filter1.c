@@ -364,6 +364,7 @@ lfilter(lua_State* L) {
 
 	int ok = word_filter(map, word,size,&result);
 	if (ok) {
+		string_release(&result);
 		lua_pushboolean(L, 1);
 		return 1;
 	}
