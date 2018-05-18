@@ -355,7 +355,7 @@ ldelete(lua_State* L) {
 	const char* word = luaL_checklstring(L,2,&size);
 	if (size == 0)
 		luaL_error(L,"error word length == 0");
-	
+
 	khint_t k = kh_get(word_set, map->set, word);
 	if (k == kh_end(map->set)) {
 		lua_pushboolean(L, 0);
@@ -433,7 +433,6 @@ lcreate(lua_State* L) {
 	map->set = kh_init(word_set);
 
 	if (luaL_newmetatable(L,"meta_filterex")) {
-		luaL_newmetatable(L, "meta_filterex");
 		const luaL_Reg meta[] = {
 			{ "add", ladd },
 			{ "delete", ldelete },
