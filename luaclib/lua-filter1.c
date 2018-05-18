@@ -144,9 +144,9 @@ utf8_append(utf8_t* utf8,uint32_t val) {
 	utf8->ptr[utf8->offset++] = val;
 }
 
-static inline void
+static inline int
 utf8_split(utf8_t* utf8,const char* word,size_t size) {
-	int i;
+	size_t i;
 	for(i = 0;i < size;) {
 		char ch = word[i];
 		if((ch & 0x80) == 0) {  
@@ -168,9 +168,10 @@ utf8_split(utf8_t* utf8,const char* word,size_t size) {
         	utf8_append(utf8,val);
         	i += 2; 
         } else {
-        	assert(0);
+        	return -1;
         }
 	}
+	return 0;
 }
 
 static inline int
@@ -182,16 +183,9 @@ length_sort(const void * left, const void * right) {
 
 
 void
-word_add(struct word_map* map, const char* word,size_t size) {
-	if (!word || size == 0)
-		return;
-
-	utf8_t utf8;
-	utf8_init(&utf8);
-	utf8_split(&utf8,word,size);
-
+word_add(struct word_map* map, utf8_t* utf8) {
 	char last[5] = {0};
-	memcpy(last,&utf8.ptr[utf8.offset-1],4);
+	memcpy(last,&utf8->ptr[utf8->offset-1],4);
 
 	khiter_t k = kh_get(word, map->hash, last);
 	struct length_list* list = NULL;
@@ -219,34 +213,25 @@ word_add(struct word_map* map, const char* word,size_t size) {
 	}
 	struct length_info* slot = &list->slots[list->offset++];
 
-	slot->length = utf8.offset;
-	slot->first = utf8.ptr[0];
-
-	utf8_release(&utf8);
+	slot->length = utf8->offset;
+	slot->first = utf8->ptr[0];
 
 	qsort(list->slots,list->offset,sizeof(struct length_info),length_sort);
 }
 
 int
-word_filter(struct word_map* map, const char* word,size_t size,struct string* result) {
-	if (!word || size == 0)
-		return -1;
+word_filter(struct word_map* map, utf8_t* utf8,const char* word,size_t size,struct string* result) {
+	size_t tIndex = 0;
 
-	utf8_t utf8;
-	utf8_init(&utf8);
-	utf8_split(&utf8,word,size);
+	size_t index;
+	for (index = 0; index < utf8->offset; index++) {
 
-	int tIndex = 0;
-
-	int index;
-	for (index = 0; index < utf8.offset; index++) {
-
-		khiter_t k = kh_get(word, map->hash, (char*)&utf8.ptr[index]);
+		khiter_t k = kh_get(word, map->hash, (char*)&utf8->ptr[index]);
 		if (k == kh_end(map->hash))
 			continue;
 
 		struct length_list* list = kh_value(map->hash, k);
-		int i;
+		size_t i;
 		for (i = 0; i < list->offset; ++i) {
 			struct length_info* info = &list->slots[i];
 
@@ -254,13 +239,13 @@ word_filter(struct word_map* map, const char* word,size_t size,struct string* re
 			if (info->length > (index + 1))
 				continue;
 
-			if (utf8.ptr[start] == info->first) {
+			if (utf8->ptr[start] == info->first) {
 				if (info->length > 2) {
 					struct string keyword;
 					string_init(&keyword);
-					int p;
+					size_t p;
 					for (p = 0; p < info->length; p++)
-						string_append_utf8(&keyword,utf8.ptr[start+p]);
+						string_append_utf8(&keyword,utf8->ptr[start+p]);
 
 					k = kh_get(word_set, map->set, keyword.data);
 					string_release(&keyword);
@@ -272,12 +257,12 @@ word_filter(struct word_map* map, const char* word,size_t size,struct string* re
 				if (!result)
 					return -1;
 
-				int j;
+				size_t j;
 				for (j = tIndex; j <= index; j++) {
 					if (j >= start) {
 						string_append_one(result,'*');
 					} else {
-						string_append_utf8(result,utf8.ptr[j]);
+						string_append_utf8(result,utf8->ptr[j]);
 					}
 				}
 
@@ -288,19 +273,17 @@ word_filter(struct word_map* map, const char* word,size_t size,struct string* re
 	}
 
 	if (tIndex != 0) {
-		if (tIndex < utf8.offset) {
+		if (tIndex < utf8->offset) {
 			if (result) {
-				int p;
-				for (p = tIndex; p < utf8.offset; p++)
-					string_append_utf8(result,utf8.ptr[p]);
+				size_t p;
+				for (p = tIndex; p < utf8->offset; p++)
+					string_append_utf8(result,utf8->ptr[p]);
 			}
 		}
 	} else {
 		if (result)
 			string_append_str(result,(char*)word,size);
 	}
-
-	utf8_release(&utf8);
 
 	if (tIndex == 0)
 		return 0;
@@ -336,15 +319,26 @@ lrelease(lua_State* L) {
 static int
 ladd(lua_State* L) {
 	struct word_map* map = lua_touserdata(L,1);
+
 	size_t size;
 	const char* word = luaL_checklstring(L,2,&size);
 	if (size == 0)
 		luaL_error(L,"error word length == 0");
 
+	utf8_t utf8;
+	utf8_init(&utf8);
+	if (utf8_split(&utf8,word,size) < 0) {
+		utf8_release(&utf8);
+		luaL_error(L,"filter add error word:%s",word);
+	}
+
 	int result;
 	kh_put(word_set, map->set, strdup(word), &result);
 	
-	word_add(map,word,size);
+	word_add(map,&utf8);
+
+	utf8_release(&utf8);
+
 	return 0;
 }
 
@@ -381,29 +375,37 @@ lfilter(lua_State* L) {
 
 	int replace = luaL_optinteger(L,3,1);
 
+	utf8_t utf8;
+	utf8_init(&utf8);
+	if (utf8_split(&utf8,word,size) < 0) {
+		utf8_release(&utf8);
+		luaL_error(L,"filter filter error word:%s",word);
+	}
+
 	if (!replace) {
-		int ok = word_filter(map, word, size, NULL);
-		if (ok == 0) {
+		int ok = word_filter(map, &utf8, word, size, NULL);
+		if (ok == 0)
 			lua_pushboolean(L, 1);
-		} else {
+		else
 			lua_pushboolean(L, 0);
-		}
+		utf8_release(&utf8);
 		return 1;
 	}
 
 	struct string result;
 	string_init(&result);
 
-	int ok = word_filter(map, word,size,&result);
+	int ok = word_filter(map, &utf8, word, size, &result);
 	if (ok == 0) {
-		string_release(&result);
 		lua_pushboolean(L, 1);
-		return 1;
+		lua_pushvalue(L, 2);
+	} else {
+		lua_pushboolean(L, 0);
+		lua_pushstring(L, result.data);
 	}
-	lua_pushboolean(L, 0);
-	lua_pushstring(L, result.data);
-	string_release(&result);
 
+	string_release(&result);
+	utf8_release(&utf8);
 	return 2;
 }
 
@@ -417,7 +419,7 @@ ldump(lua_State* L) {
 		struct length_list* list = kh_val(map->hash,i);
 		printf("%s\n",word);
 
-		int j;
+		size_t j;
 		for(j=0;j<list->offset;j++) {
 			struct length_info* slot = &list->slots[j];
 			printf("\t%s,%d\n",(char*)&slot->first,slot->length);
@@ -445,7 +447,6 @@ lcreate(lua_State* L) {
 
 		lua_pushcfunction(L,lrelease);
 		lua_setfield(L, -2, "__gc");
-		lua_pop(L,1);
 	}
 
  	lua_setmetatable(L, -2);
