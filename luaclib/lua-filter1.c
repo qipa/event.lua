@@ -49,18 +49,10 @@ struct word_map {
 };
 
 static inline void
-string_init(struct string* str,size_t size) {
-	if (size <= 64)
-		size = STACK_SIZE;
-
-	str->size = size;
+string_init(struct string* str) {
+	str->size = STACK_SIZE;
 	str->offset = 0;
-
-	if (size <= STACK_SIZE) {
-		str->data = str->init;
-	} else {
-		str->data = malloc(size);
-	}
+	str->data = str->init;
 	memset(str->data,0,str->size);
 }
 
@@ -265,7 +257,7 @@ word_filter(struct word_map* map, const char* word,size_t size,struct string* re
 			if (utf8.ptr[start] == info->first) {
 				if (info->length > 1) {
 					struct string keyword;
-					string_init(&keyword,64);
+					string_init(&keyword);
 					int p;
 					for (p = 0; p < info->length; p++)
 						string_append_utf8(&keyword,utf8.ptr[start+p]);
@@ -384,7 +376,7 @@ lfilter(lua_State* L) {
 	}
 
 	struct string result;
-	string_init(&result,64);
+	string_init(&result);
 
 	int ok = word_filter(map, word,size,&result);
 	if (ok == 0) {
