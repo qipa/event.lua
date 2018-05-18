@@ -308,16 +308,6 @@ word_filter(struct word_map* map, const char* word,size_t size,struct string* re
 }
 
 static int
-lcreate(lua_State* L) {
-	struct word_map* map = lua_newuserdata(L,sizeof(*map));
-	map->hash = kh_init(word);
-	map->set = kh_init(word_set);
-	luaL_newmetatable(L,"meta_filterex");
- 	lua_setmetatable(L, -2);
-	return 1;
-}
-
-static int
 lrelease(lua_State* L) {
 	struct word_map* map = lua_touserdata(L,1);
 
@@ -430,25 +420,36 @@ ldump(lua_State* L) {
 	return 0;
 }
 
+static int
+lcreate(lua_State* L) {
+	struct word_map* map = lua_newuserdata(L,sizeof(*map));
+	map->hash = kh_init(word);
+	map->set = kh_init(word_set);
+
+	if (luaL_newmetatable(L,"meta_filterex")) {
+		luaL_newmetatable(L, "meta_filterex");
+		const luaL_Reg meta[] = {
+			{ "add", ladd },
+			{ "delete", ldelete },
+			{ "filter", lfilter },
+			{ "dump", ldump },
+			{ NULL, NULL },
+		};
+		luaL_newlib(L,meta);
+		lua_setfield(L, -2, "__index");
+
+		lua_pushcfunction(L,lrelease);
+		lua_setfield(L, -2, "__gc");
+		lua_pop(L,1);
+	}
+
+ 	lua_setmetatable(L, -2);
+	return 1;
+}
+
 int 
 luaopen_filter1_core(lua_State *L) {
 	luaL_checkversion(L);
-
-	luaL_newmetatable(L, "meta_filterex");
-	const luaL_Reg meta[] = {
-		{ "add", ladd },
-		{ "delete", ldelete },
-		{ "filter", lfilter },
-		{ "dump", ldump },
-		{ NULL, NULL },
-	};
-	luaL_newlib(L,meta);
-	lua_setfield(L, -2, "__index");
-
-	lua_pushcfunction(L,lrelease);
-	lua_setfield(L, -2, "__gc");
-	lua_pop(L,1);
-
 
 	const luaL_Reg l[] = {
 		{ "create", lcreate },
