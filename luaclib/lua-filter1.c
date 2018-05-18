@@ -357,6 +357,26 @@ ladd(lua_State* L) {
 }
 
 static int
+ldelete(lua_State* L) {
+	struct word_map* map = lua_touserdata(L,1);
+	size_t size;
+	const char* word = lua_tolstring(L,2,&size);
+
+	khint_t k = kh_get(word_set, map->set, word);
+	if (k == kh_end(map->set)) {
+		lua_pushboolean(L, 0);
+		return 1;
+	}
+
+	char* tmp = (char*)kh_key(map->set, k);
+	free(tmp);
+	kh_del(word_set,map->set,k);
+
+	lua_pushboolean(L, 1);
+	return 1;
+}
+
+static int
 lfilter(lua_State* L) {
 	struct word_map* map = lua_touserdata(L,1);
 
@@ -417,6 +437,7 @@ luaopen_filter1_core(lua_State *L) {
 	luaL_newmetatable(L, "meta_filterex");
 	const luaL_Reg meta[] = {
 		{ "add", ladd },
+		{ "delete", ldelete },
 		{ "filter", lfilter },
 		{ "dump", ldump },
 		{ NULL, NULL },
