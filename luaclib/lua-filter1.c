@@ -255,7 +255,7 @@ word_filter(struct word_map* map, const char* word,size_t size,struct string* re
 				continue;
 
 			if (utf8.ptr[start] == info->first) {
-				if (info->length > 1) {
+				if (info->length > 2) {
 					struct string keyword;
 					string_init(&keyword);
 					int p;
