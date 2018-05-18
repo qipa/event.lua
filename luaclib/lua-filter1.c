@@ -25,9 +25,16 @@ struct string {
 	size_t offset;
 };
 
+typedef struct utf8 {
+	uint32_t* ptr;
+	uint32_t size;
+	uint32_t offset;
+	uint32_t init[STACK_SIZE];
+} utf8_t;
+
 struct length_info {
 	uint8_t length;
-	uint32_t utf8;
+	uint32_t first;
 };
 
 struct length_list {
@@ -49,7 +56,7 @@ string_init(struct string* str,size_t size) {
 	str->size = size;
 	str->offset = 0;
 
-	if (size < STACK_SIZE) {
+	if (size <= STACK_SIZE) {
 		str->data = str->init;
 	} else {
 		str->data = malloc(size);
@@ -117,6 +124,63 @@ string_append_one(struct string* str,const char ch) {
 	string_push(str,(char*)&ch,1);
 }
 
+static inline void
+utf8_init(utf8_t* utf8) {
+	utf8->ptr = utf8->init;
+	utf8->size = STACK_SIZE;
+	utf8->offset = 0;
+}
+
+static inline void
+utf8_release(utf8_t* utf8) {
+	if (utf8->ptr != utf8->init) {
+		free(utf8->ptr);
+	}
+}
+
+static inline void
+utf8_append(utf8_t* utf8,uint32_t val) {
+	if (utf8->offset >= utf8->size) {
+		utf8->size = utf8->size * 2;
+		uint32_t* optr = utf8->ptr;
+		utf8->ptr = malloc(utf8->size * sizeof(uint32_t));
+		memset(utf8->ptr,0,utf8->size * sizeof(uint32_t));
+		memcpy(utf8->ptr,optr,utf8->offset * sizeof(uint32_t));
+		if (utf8->init != optr)
+			free(optr);
+	}
+	utf8->ptr[utf8->offset++] = val;
+}
+
+static inline void
+utf8_split(utf8_t* utf8,const char* word,size_t size) {
+	int i;
+	for(i = 0;i < size;) {
+		char ch = word[i];
+		if((ch & 0x80) == 0) {  
+			utf8_append(utf8,ch);
+			i += 1;
+        } else if((ch & 0xF0) == 0xF0) { 
+    		uint32_t val = 0;
+        	memcpy(&val,&word[i],4);
+        	utf8_append(utf8,val);
+        	i += 4;
+        } else if((ch & 0xE0) == 0xE0) {  
+        	uint32_t val = 0;
+        	memcpy(&val,&word[i],3);
+        	utf8_append(utf8,val);
+        	i += 3;
+        } else if((ch & 0xC0) == 0xC0) {  
+        	uint32_t val = 0;
+        	memcpy(&val,&word[i],2);
+        	utf8_append(utf8,val);
+        	i += 2; 
+        } else {
+        	assert(0);
+        }
+	}
+}
+
 static inline int
 length_sort(const void * left, const void * right) {
 	const struct length_info* l = left;
@@ -124,61 +188,18 @@ length_sort(const void * left, const void * right) {
 	return l->length < r->length;
 }
 
-static inline size_t
-split_utf8(const char* word,size_t size,uint32_t* utf8) {
-	size_t count = 0;
-	int i;
-	for(i = 0;i < size;) {
-		char ch = word[i];
-		if((ch & 0x80) == 0) {  
-			if (utf8)
-				utf8[count] = ch;
-			count++;
-			i += 1;
-        } else if((ch & 0xF0) == 0xF0) { 
-        	if (utf8) {
-        		uint32_t val = 0;
-	        	memcpy(&val,&word[i],4);
-	        	utf8[count] = val; 
-        	}
-        	count++;
-        	i += 4;
-        } else if((ch & 0xE0) == 0xE0) {  
-        	if (utf8) {
-        		uint32_t val = 0;
-	        	memcpy(&val,&word[i],3);
-	        	utf8[count] = val; 
-        	}
-            count++;
-        	i += 3;
-        } else if((ch & 0xC0) == 0xC0) {  
-        	if (utf8) {
-        		uint32_t val = 0;
-	        	memcpy(&val,&word[i],2);
-	        	utf8[count] = val; 
-        	}
-           	count++;
-        	i += 2; 
-        } else {
-        	assert(0);
-        }
-	}
-	return count;
-}
 
 void
 word_add(struct word_map* map, const char* word,size_t size) {
-	size_t count = split_utf8(word,size,NULL);
+	if (!word || size == 0)
+		return;
 
-	uint32_t utf8_stack[STACK_SIZE] = {0};
-	uint32_t* utf8 = utf8_stack;
-	if (count > STACK_SIZE)
-		utf8 = malloc(sizeof(uint32_t) * count);
-
-	split_utf8(word,size,utf8);
+	utf8_t utf8;
+	utf8_init(&utf8);
+	utf8_split(&utf8,word,size);
 
 	char last[5] = {0};
-	memcpy(last,&utf8[count-1],4);
+	memcpy(last,&utf8.ptr[utf8.offset-1],4);
 
 	khiter_t k = kh_get(word, map->hash, last);
 	struct length_list* list = NULL;
@@ -206,30 +227,29 @@ word_add(struct word_map* map, const char* word,size_t size) {
 	}
 	struct length_info* slot = &list->slots[list->offset++];
 
-	slot->length = count;
-	slot->utf8 = utf8[0];
+	slot->length = utf8.offset;
+	slot->first = utf8.ptr[0];
 
-	if (utf8 != utf8_stack)
-		free(utf8);
+	utf8_release(&utf8);
 
 	qsort(list->slots,list->offset,sizeof(struct length_info),length_sort);
 }
 
 int
 word_filter(struct word_map* map, const char* word,size_t size,struct string* result) {
-	size_t count = split_utf8(word,size,NULL);
-	uint32_t utf8_stack[STACK_SIZE] = {0};
-	uint32_t* utf8 = utf8_stack;
-	if (count > STACK_SIZE)
-		utf8 = malloc(sizeof(uint32_t) * count);
-	split_utf8(word,size,utf8);
+	if (!word || size == 0)
+		return -1;
+
+	utf8_t utf8;
+	utf8_init(&utf8);
+	utf8_split(&utf8,word,size);
 
 	int tIndex = 0;
 
 	int index;
-	for (index = 0; index < count; index++) {
+	for (index = 0; index < utf8.offset; index++) {
 
-		khiter_t k = kh_get(word, map->hash, (char*)&utf8[index]);
+		khiter_t k = kh_get(word, map->hash, (char*)&utf8.ptr[index]);
 		if (k == kh_end(map->hash))
 			continue;
 
@@ -237,30 +257,35 @@ word_filter(struct word_map* map, const char* word,size_t size,struct string* re
 		int i;
 		for (i = 0; i < list->offset; ++i) {
 			struct length_info* info = &list->slots[i];
+
 			int start = index - (info->length - 1);
-			if (info->length <= (index + 1) && utf8[start] == info->utf8)
-			{
-				struct string keyword;
-				string_init(&keyword,64);
-				int p;
-				for (p = 0; p < info->length; p++)
-					string_append_utf8(&keyword,utf8[start+p]);
+			if (info->length > (index + 1))
+				continue;
 
-				k = kh_get(word_set, map->set, keyword.data);
-				string_release(&keyword);
+			if (utf8.ptr[start] == info->first) {
+				if (info->length > 1) {
+					struct string keyword;
+					string_init(&keyword,64);
+					int p;
+					for (p = 0; p < info->length; p++)
+						string_append_utf8(&keyword,utf8.ptr[start+p]);
 
-				if (k == kh_end(map->set))
-					continue;
+					k = kh_get(word_set, map->set, keyword.data);
+					string_release(&keyword);
 
+					if (k == kh_end(map->set))
+						continue;
+				}
+			
 				if (!result)
 					return -1;
 
-				int k;
-				for (k = tIndex; k <= index; k++) {
-					if (k >= start) {
+				int j;
+				for (j = tIndex; j <= index; j++) {
+					if (j >= start) {
 						string_append_one(result,'*');
 					} else {
-						string_append_utf8(result,utf8[k]);
+						string_append_utf8(result,utf8.ptr[j]);
 					}
 				}
 
@@ -271,11 +296,11 @@ word_filter(struct word_map* map, const char* word,size_t size,struct string* re
 	}
 
 	if (tIndex != 0) {
-		if (tIndex < count) {
+		if (tIndex < utf8.offset) {
 			if (result) {
 				int p;
-				for (p = tIndex; p < count; p++)
-					string_append_utf8(result,utf8[p]);
+				for (p = tIndex; p < utf8.offset; p++)
+					string_append_utf8(result,utf8.ptr[p]);
 			}
 		}
 	} else {
@@ -283,8 +308,7 @@ word_filter(struct word_map* map, const char* word,size_t size,struct string* re
 			string_append_str(result,(char*)word,size);
 	}
 
-	if (utf8 != utf8_stack)
-		free(utf8);
+	utf8_release(&utf8);
 
 	if (tIndex == 0)
 		return 0;
@@ -363,7 +387,7 @@ lfilter(lua_State* L) {
 	string_init(&result,64);
 
 	int ok = word_filter(map, word,size,&result);
-	if (ok) {
+	if (ok == 0) {
 		string_release(&result);
 		lua_pushboolean(L, 1);
 		return 1;
@@ -388,7 +412,7 @@ ldump(lua_State* L) {
 		int j;
 		for(j=0;j<list->offset;j++) {
 			struct length_info* slot = &list->slots[j];
-			printf("\t%s,%d\n",(char*)&slot->utf8,slot->length);
+			printf("\t%s,%d\n",(char*)&slot->first,slot->length);
 		}
 	}
 	return 0;

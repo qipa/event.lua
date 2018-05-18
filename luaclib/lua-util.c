@@ -592,6 +592,26 @@ lauthcode(lua_State* L) {
     return 1;
 }
 
+// static uint32_t partition (lua_State *L, uint32_t lo, uint32_t up) {
+    
+// }
+
+// static int
+// ltopN(lua_State* L) {
+//     luaL_checktype(L, 1, LUA_TTABLE);
+//     size_t narr = lua_rawlen(L, 1);
+//     if (narr < 2) {
+//         luaL_error(L, "table array size < 2");
+//     }
+
+//     size_t N = luaL_checkinteger(L, 2);
+//     if (N >= narr) {
+//         luaL_error(L, "top N more than table array size");
+//     }
+
+//     luaL_checktype(L, 3, LUA_TFUNCTION);
+
+// }
 
 int
 luaopen_util_core(lua_State* L){
