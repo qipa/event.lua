@@ -337,7 +337,9 @@ static int
 ladd(lua_State* L) {
 	struct word_map* map = lua_touserdata(L,1);
 	size_t size;
-	const char* word = lua_tolstring(L,2,&size);
+	const char* word = luaL_checklstring(L,2,&size);
+	if (size == 0)
+		luaL_error(L,"error word length == 0");
 
 	int result;
 	kh_put(word_set, map->set, strdup(word), &result);
@@ -350,8 +352,10 @@ static int
 ldelete(lua_State* L) {
 	struct word_map* map = lua_touserdata(L,1);
 	size_t size;
-	const char* word = lua_tolstring(L,2,&size);
-
+	const char* word = luaL_checklstring(L,2,&size);
+	if (size == 0)
+		luaL_error(L,"error word length == 0");
+	
 	khint_t k = kh_get(word_set, map->set, word);
 	if (k == kh_end(map->set)) {
 		lua_pushboolean(L, 0);
@@ -371,7 +375,9 @@ lfilter(lua_State* L) {
 	struct word_map* map = lua_touserdata(L,1);
 
 	size_t size;
-	const char* word = lua_tolstring(L,2,&size);
+	const char* word = luaL_checklstring(L,2,&size);
+	if (size == 0)
+		luaL_error(L,"error word length == 0");
 
 	int replace = luaL_optinteger(L,3,1);
 
