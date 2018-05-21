@@ -4,6 +4,7 @@
 #include <assert.h>
 #include <ctype.h>
 #include <stdint.h>
+#include <iconv.h>  
 
 #include "lua.h"
 #include "lualib.h"
@@ -30,6 +31,8 @@ split_utf8(const char* word,size_t size,int offset) {
 		char ch = word[i];
 		if((ch & 0x80) == 0) {  
             return 1;
+        } else if((ch & 0xFC) == 0xFC) {  
+        	return 6;
         } else if((ch & 0xF8) == 0xF8) {  
             return 5;  
         } else if((ch & 0xF0) == 0xF0) {  
@@ -223,6 +226,15 @@ ladd(lua_State* L) {
 }
 
 static int
+ldelete(lua_State* L) {
+	struct word_tree* tree = lua_touserdata(L,1);
+	size_t size;
+	const char* word = lua_tolstring(L,2,&size);
+
+	return 0;
+}
+
+static int
 lfilter(lua_State* L) {
 	struct word_tree* tree = lua_touserdata(L,1);
 	size_t size;
@@ -240,6 +252,62 @@ lfilter(lua_State* L) {
 	}
 	lua_pushlstring(L,dest,replace_offset);
 	free(dest);
+	return 1;
+}
+
+static int
+lconvert(lua_State* L) {
+	size_t size;
+	const char* word = lua_tolstring(L,1,&size);
+
+	const char* from_charset = lua_tostring(L, 2);
+	const char* to_charset = lua_tostring(L, 3);
+
+	iconv_t conv = iconv_open(to_charset, from_charset);
+	if (conv == -1) {
+		lua_pushboolean(L, 0);
+		lua_pushstring(L, strerror(errno));
+        return 2; 
+	}
+
+	char* from = strdup(word);
+	size_t out_size = size * 4;
+	char* out = malloc(out_size);
+	memset(out, 0, out_size);
+	
+	if (iconv(conv, &from, &size, &out, &out_size) == -1)   {
+		iconv_close(conv);
+		lua_pushboolean(L, 0);
+		lua_pushstring(L, strerror(errno));
+        return 2; 
+	}
+	iconv_close(conv);
+	lua_pushboolean(L, 1);
+    lua_pushlstring(L, out, out_size);
+    return 2;
+}
+
+static int
+lsplit(lua_State* L) {
+	size_t size;
+	const char* word = lua_tolstring(L,1,&size);
+
+	lua_newtable(L);
+
+	int index = 1;
+	int i;
+	for(i = 0;i < size;) {
+		char ch[8] = {0};
+
+		int length = split_utf8(word,size,i);
+		memcpy(ch,&word[i],length);
+
+		lua_pushlstring(L, ch, length);
+		lua_seti(L, -2, index++);
+
+		i += length;
+	}
+
 	return 1;
 }
 
@@ -274,6 +342,7 @@ luaopen_filter0_core(lua_State *L) {
 	luaL_newmetatable(L, "meta_filter");
 	const luaL_Reg meta[] = {
 		{ "add", ladd },
+		{ "delete", ldelete },
 		{ "filter", lfilter },
 		{ "dump", ldump },
 		{ NULL, NULL },
@@ -288,6 +357,8 @@ luaopen_filter0_core(lua_State *L) {
 
 	const luaL_Reg l[] = {
 		{ "create", lcreate },
+		{ "split", lsplit },
+		{ "convert", lconvert },
 		{ NULL, NULL },
 	};
 	luaL_newlib(L, l);
