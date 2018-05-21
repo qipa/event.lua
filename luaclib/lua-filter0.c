@@ -21,7 +21,6 @@ KHASH_MAP_INIT_STR(word,struct word_tree*);
 struct word_tree {
 	khash_t(word)* hash;
 	int tail;
-	int index;
 };
 
 static inline int
@@ -48,10 +47,8 @@ void
 word_add(struct word_tree* root_tree, const char* word,size_t size) {
 	struct word_tree* tree = root_tree;
 	int i;
-	int index = 0;
 	for(i = 0;i < size;) {
 		char ch[8] = {0};
-		index++;
 		int length = split_utf8(word,size,i);
 		memcpy(ch,&word[i],length);
 		i += length;
@@ -66,7 +63,6 @@ word_add(struct word_tree* root_tree, const char* word,size_t size) {
 				next_tree = malloc(sizeof(*next_tree));
 				next_tree->tail = 0;
 				next_tree->hash = kh_init(word);
-				next_tree->index = index;
 				kh_value(tree->hash, k) = next_tree;
 			}else {
 				assert(0);
@@ -93,8 +89,9 @@ word_filter(struct word_tree* root_tree,const char* source,size_t size,int repla
 
 	struct word_tree* tree = root_tree;
 
-	int start = 0;
-	int len = -1;
+	int filter_start = 0;
+	int filter_len = -1;
+	int founded = 0;
 
 	int phase = PHASE_SEARCH;
 
@@ -108,14 +105,15 @@ word_filter(struct word_tree* root_tree,const char* source,size_t size,int repla
 
 		switch(phase) {
 			case PHASE_SEARCH: {
-				khiter_t k = kh_get(source, tree->hash, word);
+				khiter_t k = kh_get(word, tree->hash, word);
 				if (k != kh_end(tree->hash)) {
 					tree = kh_value(tree->hash, k);
 					phase = PHASE_MATCH;
-					start = i - length;
-					len = 0;
+					filter_start = i - length;
+					filter_len = 1;
+					founded = 0;
 					if (tree->tail) {
-						len = tree->index;
+						founded = 1;
 					}
 				} else {
 					if (replace) {
@@ -126,34 +124,40 @@ word_filter(struct word_tree* root_tree,const char* source,size_t size,int repla
 				break;
 			}
 			case PHASE_MATCH: {
-				khiter_t k = kh_get(source, tree->hash, word);
+				if (length == 1) {
+					if (isspace(word[0]) || iscntrl(word[0]) || ispunct(word[0])) {
+						++filter_len;
+						continue;
+					}
+				}
+				khiter_t k = kh_get(word, tree->hash, word);
 				if (k != kh_end(tree->hash)) {
 					tree = kh_value(tree->hash, k);
+					++filter_len;
 					if (tree->tail) {
-						len = tree->index;
+						founded = 1;
 					}
 				} else {
 					//回滚一个word
 					i -= length;
-					if (len > 0) {
+					if (founded == 1) {
 						if (replace) {
 							//匹配成功
-							memset(dest + dest_offset, '*', len);
-							dest_offset += len;
+							memset(dest + dest_offset, '*', filter_len);
+							dest_offset += filter_len;
 						} else {
 							return NULL;
 						}
 					} else {
 						//匹配失败
 						if (replace) {
-							memcpy(dest + dest_offset, source + start, i - start);
-							dest_offset += i - start;
+							memcpy(dest + dest_offset, source + filter_start, i - filter_start);
+							dest_offset += i - filter_start;
 						}
 					}
 					
 					tree = root_tree;
 					phase = PHASE_SEARCH;
-					len = 0;
 				}
 				break;
 			}
@@ -163,12 +167,12 @@ word_filter(struct word_tree* root_tree,const char* source,size_t size,int repla
 	if (!replace)
 		return (char*)source;
 
-	if (len > 0) {
-		memset(dest + dest_offset, '*', len);
-		dest_offset += len;
+	if (founded == 1) {
+		memset(dest + dest_offset, '*', filter_len);
+		dest_offset += filter_len;
 	} else {
-		memcpy(dest + dest_offset, source + start, i - start);
-		dest_offset += i - start;
+		memcpy(dest + dest_offset, source + filter_start, i - filter_start);
+		dest_offset += i - filter_start;
 	}
 
 	*replace_offset = dest_offset;
