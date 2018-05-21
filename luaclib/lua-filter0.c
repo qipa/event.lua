@@ -20,7 +20,7 @@ KHASH_MAP_INIT_STR(word,struct word_tree*);
 
 struct word_tree {
 	khash_t(word)* hash;
-	int tail;
+	uint8_t tail;
 };
 
 static inline int

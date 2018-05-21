@@ -32,7 +32,7 @@ event.error(string.format("lua mem:%fkb,c mem:%fkb",lua_mem,helper.allocated()/1
 util.time_diff("filter0",function ()
 	for i = 1,1 do
 		print(filter_inst0:filter("mrq fuck fu k u 若Y=0且地图内有地煞星，则下次刷新时不增加该星级的地煞星数量，不回收当前未被挑战西藏獨立成功的地煞星。 法轮功 西藏獨立  孩子 地煞星刷新数量=Y/2（Y为同一星级功的地煞星。 法轮功 西藏獨立  孩子 地煞星刷新数量=Y/2（Y为同一星级的地煞星收到的有效挑战数量的总和，每次刷新操你妈操你妈操你妈操你 妈地煞星后，重置Y=0）  功哈哈 mrq 风骚欲女 阿扁 1"))
-		local result = filter_inst0:filter("操哈哈fuck 作,毛,主.‘席 哈")
+		local result = filter_inst0:filter("操哈哈fuck 作,毛,主席 ")
 		print(result)
 		print(filter_inst0:filter(result))
 	end
