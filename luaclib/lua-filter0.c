@@ -264,7 +264,7 @@ lconvert(lua_State* L) {
 	const char* to_charset = lua_tostring(L, 3);
 
 	iconv_t conv = iconv_open(to_charset, from_charset);
-	if (conv == -1) {
+	if (conv == (iconv_t)-1) {
 		lua_pushboolean(L, 0);
 		lua_pushstring(L, strerror(errno));
         return 2; 
@@ -274,8 +274,10 @@ lconvert(lua_State* L) {
 	size_t out_size = size * 4;
 	char* out = malloc(out_size);
 	memset(out, 0, out_size);
+
+	char* tmp = out;
 	
-	if (iconv(conv, &from, &size, &out, &out_size) == -1)   {
+	if (iconv(conv, &from, &size, &tmp, &out_size) == -1)   {
 		iconv_close(conv);
 		lua_pushboolean(L, 0);
 		lua_pushstring(L, strerror(errno));
@@ -283,7 +285,7 @@ lconvert(lua_State* L) {
 	}
 	iconv_close(conv);
 	lua_pushboolean(L, 1);
-    lua_pushlstring(L, out, out_size);
+    lua_pushstring(L, out);
     return 2;
 }
 

@@ -37,7 +37,7 @@ event.error(string.format("lua mem:%fkb,c mem:%fkb",lua_mem,helper.allocated()/1
 -- end)
 
 -- table.print(filter0.split("1.3。‘几个简单的命令5"))
-print(filter0.convert("蔡","utf-8","gb2312//TRANSLIT"))
+print(filter0.convert(".","utf-8","gb2312"))
 -- collectgarbage("collect")
 
 -- local filter_inst1 = filter1.create()
