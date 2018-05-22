@@ -22,7 +22,7 @@ EFENCE_STATIC_LIB ?= ./3rd/electric-fence/libefence.a
 
 LUA_CLIB_PATH ?= ./.libs
 LUA_CLIB_SRC ?= ./luaclib
-LUA_CLIB = ev worker profiler dump serialize redis bson mongo util lfs cjson http ikcp fastaoi toweraoi pathfinder nav mysql protocolparser protocolcore filter0 filter1 filter2 co snapshot
+LUA_CLIB = ev worker profiler dump serialize redis bson mongo util lfs cjson http ikcp fastaoi toweraoi pathfinder nav mysql protocolparser protocolcore filter0 filter1 co snapshot
 
 CONVERT_PATH ?= ./luaclib/convert
 CONVERT_SRC ?= $(wildcard $(CONVERT_PATH)/*.cpp)
@@ -151,14 +151,10 @@ $(LUA_CLIB_PATH)/protocolcore.so : $(LUA_CLIB_SRC)/lua-protocol.c | $(LUA_CLIB_P
 	$(CC) $(CFLAGS) $(SHARED) $^ -o $@ -I$(LUA_INC)
 	
 $(LUA_CLIB_PATH)/filter0.so : $(LUA_CLIB_SRC)/lua-filter0.c | $(LUA_CLIB_PATH)
-	$(CC) $(CFLAGS) $(SHARED) $^ -o $@ -I$(LUA_INC)	-I./3rd/klib
+	$(CC) $(CFLAGS) $(SHARED) $^ -o $@ -I$(LUA_INC)	-I./3rd/klib -liconv
 
 $(LUA_CLIB_PATH)/filter1.so : $(LUA_CLIB_SRC)/lua-filter1.c | $(LUA_CLIB_PATH)
 	$(CC) $(CFLAGS) $(SHARED) $^ -o $@ -I$(LUA_INC)	-I./3rd/klib
-
-$(LUA_CLIB_PATH)/filter2.so : $(LUA_CLIB_SRC)/lua-filter2.cpp  $(LUA_CLIB_SRC)/WordFilterUtil.cpp $(LUA_CLIB_SRC)/String.cpp | $(LUA_CLIB_PATH)
-	$(CC) $(CFLAGS) $(SHARED) $^ -o $@ -I$(LUA_INC)	-I./3rd/klib
-
 
 $(LUA_CLIB_PATH)/co.so : $(LUA_CLIB_SRC)/lua-co.c | $(LUA_CLIB_PATH)
 	$(CC) $(CFLAGS) $(SHARED) $^ -o $@ -I$(LUA_INC)
