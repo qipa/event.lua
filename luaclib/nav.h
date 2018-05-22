@@ -6,13 +6,9 @@
 #include <string.h>
 #include "minheap.h"
 #include "list.h"
-
-#ifndef _MSC_VER
 #include <stdbool.h>
-#else
+#ifdef _MSC_VER
 #define inline __inline
-#define false 0
-#define NULL 0
 #endif
 
 #define USE_NAV_TILE
@@ -20,11 +16,9 @@
 #define GRATE 1
 #define HRATE 2
 
+#define get_border(ctx,id) ((id < 0 || id > ctx->border_offset)?NULL:&ctx->borders[id])
 
-
-#define get_border(ctx,id) ((id < 0 || id > ctx->border_ctx.border_offset)?NULL:&ctx->border_ctx.borders[id])
-
-#define get_node(ctx,id) ((id < 0 || id >= ctx->size) ?NULL:&ctx->node[id])
+#define get_node(ctx,id) ((id < 0 || id >= ctx->node_size) ?NULL:&ctx->node[id])
 
 #define get_mask(ctx,index) (ctx.mask[index])
 
@@ -92,42 +86,44 @@ struct nav_border
 	struct vector3 center;
 };
 
-
-struct nav_border_context
-{
-	struct nav_border* borders;
-	int border_cap;
-	int border_offset;
-};
-
 struct nav_tile
 {
 	int* node;
 	int offset;
 	int size;
+	int center_node;
 	struct vector3 center;
+#ifdef _WIN32
+	struct vector3 pos[4];
+#endif
 };
 
 struct nav_mesh_context
 {
 	//顶点
 	struct vector3 * vertices;
-	int len;
+	int vertices_size;
 
 	//所有边(同一条边有ab和ba两条)
-	struct nav_border_context border_ctx;
+	struct nav_border* borders;
+	int border_size;
+	int border_offset;
 
 	//多边形节点
 	struct nav_node* node;
-	int size;
+	int node_size;
 
 	//格子信息
 	struct nav_tile* tile;
+	uint32_t tile_unit;
+	uint32_t tile_width;
+	uint32_t tile_heigh;
 	
 	struct vector3 lt;
 	struct vector3 br;
-	int width;
-	int heigh;
+
+	uint32_t width;
+	uint32_t heigh;
 
 	//多边形节点的mask
 	struct nav_mesh_mask mask_ctx;
@@ -145,7 +141,7 @@ struct nav_mesh_context
 typedef void(*search_dumper)(void* ud, int index);
 
 struct nav_mesh_context* load_mesh(double** v,int v_cnt,int** p,int p_cnt);
-void load_mesh_done(struct nav_mesh_context* ctx);
+void init_mesh(struct nav_mesh_context* ctx);
 void release_mesh(struct nav_mesh_context* ctx);
 
 struct nav_node* get_node_with_pos(struct nav_mesh_context* mesh_ctx,double x,double y,double z);
@@ -154,7 +150,7 @@ bool raycast(struct nav_mesh_context* ctx, struct vector3* pt_start, struct vect
 
 void set_mask(struct nav_mesh_mask* ctx,int mask,int enable);
 
-struct vector3* around_movable(struct nav_mesh_context*, double x, double z, int range, search_dumper, void*);
+struct vector3* around_movable(struct nav_mesh_context*, double x, double z, int range, int* center_node, search_dumper, void*);
 bool point_movable(struct nav_mesh_context* ctx, double x, double z);
 
 bool intersect(struct vector3* a,struct vector3* b,struct vector3* c,struct vector3* d);
@@ -164,7 +160,7 @@ void cross_point(struct vector3* a,struct vector3* b,struct vector3* c,struct ve
 void vector3_copy(struct vector3* dst,struct vector3* src);
 void vector3_sub(struct vector3* a,struct vector3* b,struct vector3* result);
 
-struct nav_tile* create_tile(struct nav_mesh_context* ctx);
+struct nav_tile* create_tile(struct nav_mesh_context* ctx,uint32_t unit);
 void release_tile(struct nav_mesh_context* ctx,struct nav_tile* navtile);
 
 #endif

@@ -57,8 +57,7 @@ word_add(struct word_tree* root_tree, const char* word,size_t size) {
 		i += length;
 
 		khiter_t k = kh_get(word, tree->hash, ch);
-		int miss = (k == kh_end(tree->hash));
-		if (miss) {
+		if (k == kh_end(tree->hash)) {
 			struct word_tree* next_tree = NULL;
 			int result;
 			khiter_t k = kh_put(word, tree->hash, strdup(ch), &result);
@@ -80,6 +79,26 @@ word_add(struct word_tree* root_tree, const char* word,size_t size) {
 				tree->tail = 1;
 		}
 	}
+}
+
+void
+word_delete(struct word_tree* root_tree, const char* word,size_t size) {
+	struct word_tree* tree = root_tree;
+	int i;
+	for(i = 0;i < size;) {
+		char ch[8] = {0};
+		int length = split_utf8(word,size,i);
+		memcpy(ch,&word[i],length);
+		i += length;
+
+		khiter_t k = kh_get(word, tree->hash, ch);
+		if (k != kh_end(tree->hash)) {
+			tree = kh_value(tree->hash, k);
+		} else {
+			return;
+		}
+	}
+	tree->tail = 0;
 }
 
 char*
@@ -230,7 +249,7 @@ ldelete(lua_State* L) {
 	struct word_tree* tree = lua_touserdata(L,1);
 	size_t size;
 	const char* word = lua_tolstring(L,2,&size);
-
+	word_delete(tree,word,size);
 	return 0;
 }
 
