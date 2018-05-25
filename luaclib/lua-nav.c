@@ -243,8 +243,8 @@ meta_load_tile(struct lua_State* L) {
 	fclose(fp);
 
 	ctx->tile_unit = tile_unit;
-	ctx->tile_width = ctx->width / tile_unit;
-	ctx->tile_heigh = ctx->heigh / tile_unit;
+	ctx->tile_width = ctx->width / tile_unit + 1;
+	ctx->tile_heigh = ctx->heigh / tile_unit + 1;
 	return 0;
 }
 
@@ -369,9 +369,36 @@ meta_movable(struct lua_State* L) {
 	double x = lua_tonumber(L, 2);
 	double z = lua_tonumber(L, 3);
 
-	int val = point_movable(ctx, x, z);
+	bool val = point_movable(ctx, x, z);
 	lua_pushboolean(L, val);
 	return 1;
+}
+
+static int
+meta_random_point(struct lua_State* L) {
+	struct scene_context* scene_ctx = ( struct scene_context* )lua_touserdata(L, 1);
+	struct nav_mesh_context* ctx = scene_ctx->ctx;
+
+	double x_rate = lua_tonumber(L, 2);
+	double z_rate = lua_tonumber(L, 3);
+
+	double x_random = x_rate * ctx->width;
+	double z_random = z_rate * ctx->heigh;
+
+	struct vector3 pt;
+	pt.x = ctx->lt.x + x_random;
+	pt.z = ctx->lt.z + z_random;
+
+	if ( point_movable(ctx, pt.x, pt.z) ) {
+		lua_pushboolean(L, 1);
+	}
+	else {
+		lua_pushboolean(L, 0);
+	}
+
+	lua_pushinteger(L, pt.x);
+	lua_pushinteger(L, pt.z);
+	return 3;
 }
 
 int
@@ -395,6 +422,7 @@ init_meta(struct lua_State* L, int scene, struct nav_mesh_context* ctx) {
 		{ "set_mask", meta_set_mask },
 		{ "get_mask", meta_get_mask },
 		{ "movable", meta_movable },
+		{ "random_point", meta_random_point },
 		{ "around_movable", meta_around_movable },
 		{ NULL, NULL },
 	};
@@ -461,166 +489,6 @@ _create_nav(struct lua_State* L) {
 	free(pptr);
 
 	return init_meta(L, 0, ctx);
-}
-
-int
-_load_nav(struct lua_State* L) {
-	int scene = luaL_checkinteger(L, 1);
-	luaL_checktype(L, 2, LUA_TTABLE);
-
-	struct nav_mesh_context* ctx = malloc(sizeof( *ctx ));
-	init_mesh(ctx);
-
-	lua_getfield(L, 2, "lt");
-	lua_getfield(L, -1, "x");
-	ctx->lt.x = lua_tonumber(L, -1);
-	lua_pop(L, 1);
-	lua_getfield(L, -1, "z");
-	ctx->lt.z = lua_tonumber(L, -1);
-	lua_pop(L, 1);
-	lua_pop(L, 1);
-
-	lua_getfield(L, 2, "br");
-	lua_getfield(L, -1, "x");
-	ctx->br.x = lua_tonumber(L, -1);
-	lua_pop(L, 1);
-	lua_getfield(L, -1, "z");
-	ctx->br.z = lua_tonumber(L, -1);
-	lua_pop(L, 1);
-	lua_pop(L, 1);
-
-	lua_getfield(L, 2, "width");
-	ctx->width = lua_tointeger(L, -1);
-	lua_pop(L, 1);
-
-	lua_getfield(L, 2, "heigh");
-	ctx->heigh = lua_tointeger(L, -1);
-	lua_pop(L, 1);
-
-	lua_getfield(L, 2, "vertices");
-	size_t vertices_size = lua_rawlen(L, -1);
-	ctx->vertices_size = vertices_size;
-	ctx->vertices = malloc(sizeof( struct vector3 ) * vertices_size);
-
-	uint32_t i;
-	for ( i = 0; i < vertices_size; i++ ) {
-		lua_rawgeti(L, -1, i + 1);
-		lua_getfield(L, -1, "x");
-		ctx->vertices[i].x = lua_tonumber(L, -1);
-		lua_pop(L, 1);
-		lua_getfield(L, -1, "z");
-		ctx->vertices[i].z = lua_tonumber(L, -1);
-		lua_pop(L, 1);
-
-		lua_pop(L, 1);
-	}
-	lua_pop(L, 1);
-
-	lua_getfield(L, 2, "border");
-	size_t border_size = lua_rawlen(L, -1);
-
-	ctx->border_size = ctx->border_offset = border_size;
-	ctx->borders = malloc(sizeof( struct nav_border )*border_size);
-	memset(ctx->borders, 0, sizeof( struct nav_border )*border_size);
-	for ( i = 0; i < border_size; i++ ) {
-		lua_rawgeti(L, -1, i + 1);
-
-		struct nav_border* border = &ctx->borders[i];
-
-		lua_getfield(L, -1, "id");
-		border->id = lua_tointeger(L, -1);
-		lua_pop(L, 1);
-
-		lua_getfield(L, -1, "opposite");
-		border->opposite = lua_tointeger(L, -1);
-		lua_pop(L, 1);
-
-		lua_getfield(L, -1, "a");
-		border->a = lua_tointeger(L, -1);
-		lua_pop(L, 1);
-
-		lua_getfield(L, -1, "b");
-		border->b = lua_tointeger(L, -1);
-		lua_pop(L, 1);
-
-		lua_getfield(L, -1, "node");
-		lua_rawgeti(L, -1, 1);
-		border->node[0] = lua_tointeger(L, -1);
-		lua_pop(L, 1);
-		lua_rawgeti(L, -1, 2);
-		border->node[1] = lua_tointeger(L, -1);
-		lua_pop(L, 1);
-		lua_pop(L, 1);
-
-		lua_getfield(L, -1, "center");
-		lua_getfield(L, -1, "x");
-		border->center.x = lua_tonumber(L, -1);
-		lua_pop(L, 1);
-		lua_getfield(L, -1, "z");
-		border->center.z = lua_tonumber(L, -1);
-		lua_pop(L, 1);
-		lua_pop(L, 1);
-
-		lua_pop(L, 1);
-	}
-	lua_pop(L, 1);
-
-
-	lua_getfield(L, 2, "node");
-	size_t node_size = lua_rawlen(L, -1);
-	ctx->node_size = node_size;
-	ctx->node = malloc(sizeof( struct nav_node )*ctx->node_size);
-	memset(ctx->node, 0, sizeof( struct nav_node )*ctx->node_size);
-	for ( i = 0; i < node_size; i++ ) {
-		lua_rawgeti(L, -1, i + 1);
-		struct nav_node* node = &ctx->node[i];
-		node->id = i;
-		node->link_border = -1;
-		node->link_parent = NULL;
-
-		lua_getfield(L, -1, "mask");
-		node->mask = lua_tointeger(L, -1);
-		lua_pop(L, 1);
-
-		lua_getfield(L, -1, "center");
-		lua_getfield(L, -1, "x");
-		node->center.x = lua_tonumber(L, -1);
-		lua_pop(L, 1);
-		lua_getfield(L, -1, "z");
-		node->center.z = lua_tonumber(L, -1);
-		lua_pop(L, 1);
-		lua_pop(L, 1);
-
-		lua_getfield(L, -1, "poly");
-		size_t size = lua_rawlen(L, -1);
-
-		node->poly = malloc(sizeof(int)*size);
-		node->border = malloc(sizeof(int)*size);
-		node->size = size;
-
-		uint32_t j;
-		for ( j = 0; j < size; j++ ) {
-			lua_rawgeti(L, -1, j + 1);
-			node->poly[j] = lua_tointeger(L, -1);
-			lua_pop(L, 1);
-		}
-		lua_pop(L, 1);
-
-		lua_getfield(L, -1, "border");
-		for ( j = 0; j < size; j++ ) {
-			lua_rawgeti(L, -1, j + 1);
-			node->border[j] = lua_tointeger(L, -1);
-			lua_pop(L, 1);
-		}
-		lua_pop(L, 1);
-
-		lua_pop(L, 1);
-	}
-	lua_pop(L, 1);
-
-	ctx->tile = NULL;
-
-	return init_meta(L, scene, ctx);
 }
 
 static int
@@ -803,7 +671,6 @@ int
 luaopen_nav_core(lua_State *L) {
 	luaL_Reg l[] = {
 		{ "create", _create_nav },
-		{ "load", _load_nav },
 		{ "read_nav", _read_nav },
 		{ "write_nav", _write_nav },
 		{ "write_tile", _write_tile },

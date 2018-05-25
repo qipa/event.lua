@@ -144,7 +144,7 @@ struct nav_mesh_context* load_mesh(double** v,int v_cnt,int** p,int p_cnt);
 void init_mesh(struct nav_mesh_context* ctx);
 void release_mesh(struct nav_mesh_context* ctx);
 
-struct nav_node* get_node_with_pos(struct nav_mesh_context* mesh_ctx,double x,double y,double z);
+struct nav_node* search_node(struct nav_mesh_context* mesh_ctx,double x,double y,double z);
 struct nav_path* astar_find(struct nav_mesh_context* mesh_ctx, struct vector3* pt_start, struct vector3* pt_over, search_dumper dumper, void* args);
 bool raycast(struct nav_mesh_context* ctx, struct vector3* pt_start, struct vector3* pt_over, struct vector3* result, search_dumper dumper, void* userdata);
 
@@ -155,7 +155,7 @@ bool point_movable(struct nav_mesh_context* ctx, double x, double z);
 
 bool intersect(struct vector3* a,struct vector3* b,struct vector3* c,struct vector3* d);
 bool inside_node(struct nav_mesh_context* mesh_ctx,int polyId,double x,double y,double z);
-double cross(struct vector3* vt1,struct vector3* vt2);
+double cross_product(struct vector3* vt1,struct vector3* vt2);
 void cross_point(struct vector3* a,struct vector3* b,struct vector3* c,struct vector3* d,struct vector3* result);
 void vector3_copy(struct vector3* dst,struct vector3* src);
 void vector3_sub(struct vector3* a,struct vector3* b,struct vector3* result);

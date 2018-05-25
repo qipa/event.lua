@@ -35,8 +35,8 @@ intersect(struct vector3* a, struct vector3* b, struct vector3* c, struct vector
 		vector3_sub(b, a, &ba);
 		vector3_sub(d, a, &da);
 
-		if ( cross(&ac, &dc) * cross(&dc, &bc) >= 0 ) {
-			if ( cross(&ca, &ba) * cross(&ba, &da) >= 0 )
+		if ( cross_product(&ac, &dc) * cross_product(&dc, &bc) >= 0 ) {
+			if ( cross_product(&ca, &ba) * cross_product(&ba, &da) >= 0 )
 				return true;
 		}
 	}
@@ -47,8 +47,8 @@ intersect(struct vector3* a, struct vector3* b, struct vector3* c, struct vector
 struct nav_tile*
 	create_tile(struct nav_mesh_context* ctx, uint32_t unit) {
 		ctx->tile_unit = unit;
-		ctx->tile_width = ctx->width / unit;
-		ctx->tile_heigh = ctx->heigh / unit;
+		ctx->tile_width = ctx->width / unit + 1;
+		ctx->tile_heigh = ctx->heigh / unit + 1;
 
 		uint32_t count = ctx->tile_width * ctx->tile_heigh;
 		struct nav_tile* navtile = ( struct nav_tile* )malloc(sizeof( struct nav_tile )*count);
