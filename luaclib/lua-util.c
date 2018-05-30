@@ -592,26 +592,97 @@ lauthcode(lua_State* L) {
     return 1;
 }
 
-// static uint32_t partition (lua_State *L, uint32_t lo, uint32_t up) {
+static void swap(lua_State* L, int from, int to) {
+    lua_geti(L, 1, from);
+    lua_geti(L, 1, to);
+    lua_seti(L, 1, from);
+    lua_seti(L, 1, to);
+}
+
+static int sort_comp(lua_State *L, int a, int b) {
+    if ( lua_isnil(L, 2) )
+        return lua_compare(L, a, b, LUA_OPLT);
+    else {
+        int res;
+        lua_pushvalue(L, 3);
+        lua_pushvalue(L, a - 1);
+        lua_pushvalue(L, b - 2);
+        lua_call(L, 2, 1);
+        res = lua_toboolean(L, -1);
+        lua_pop(L, 1);
+        return res;
+    }
+}
+
+static int partition(lua_State *L, int lo, int up) {
+    lua_geti(L, 1, lo - 1);
+
+    int i = lo;
+    int j = up;
+
+    while ( i != j ) {
+        while ( i < j ) {
+            lua_geti(L, 1, j);
+            if ( sort_comp(L, -1, -2) ) {
+                lua_pop(L, 1);
+                break;
+            }
+            j--;
+            lua_pop(L, 1);
+        }
     
-// }
+        while ( i < j ) {
+            lua_geti(L, 1, i);
+            if ( !sort_comp(L, -1, -2) ) {
+                lua_pop(L, 1);
+                break;
+            }
+            i++;
+            lua_pop(L, 1);
+        }
 
-// static int
-// ltopN(lua_State* L) {
-//     luaL_checktype(L, 1, LUA_TTABLE);
-//     size_t narr = lua_rawlen(L, 1);
-//     if (narr < 2) {
-//         luaL_error(L, "table array size < 2");
-//     }
+        if (i < j)
+            swap(L, i, j);
+    }
 
-//     size_t N = luaL_checkinteger(L, 2);
-//     if (N >= narr) {
-//         luaL_error(L, "top N more than table array size");
-//     }
+    lua_geti(L, 1, i);
+    if ( sort_comp(L, -1, -2) ) {
+        swap(L, i, lo - 1);
+    }
+    lua_pop(L, 1);
+    return i;
+}
 
-//     luaL_checktype(L, 3, LUA_TFUNCTION);
 
-// }
+static int topK(lua_State* L) {
+    luaL_checktype(L, 1, LUA_TTABLE);
+    size_t narr = lua_rawlen(L, 1);
+    if ( narr < 2 )
+        luaL_error(L, "table array size < 2");
+
+    size_t K = luaL_checkinteger(L, 2);
+    if ( K >= narr )
+        luaL_error(L, "top K more than table array size");
+
+    K++;
+    luaL_checktype(L, 3, LUA_TFUNCTION);
+
+    int low = 2;
+    int high = narr;
+
+    int j = partition(L, low, high);
+    while (j != K)
+    {
+        if (K > j) {
+            low = j + 1;
+        }
+        else {
+            high = j - 1;
+        }
+        j = partition(L, low, high);
+    }
+    return 0;
+}
 
 int
 luaopen_util_core(lua_State* L){
@@ -637,6 +708,7 @@ luaopen_util_core(lua_State* L){
         { "clone_string", lclone_string },
         { "packet_new", lpacket_new },
         { "rpc_pack", lrpc_pack },
+        { "topK", topK },
         { NULL, NULL },
     };
     luaL_newlib(L,l);
