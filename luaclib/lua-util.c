@@ -671,14 +671,12 @@ static int topK(lua_State* L) {
     int high = narr;
 
     int j = partition(L, low, high);
-    while (j != K)
-    {
-        if (K > j) {
+    while (j != K) {
+        if (K > j)
             low = j + 1;
-        }
-        else {
+        else 
             high = j - 1;
-        }
+
         j = partition(L, low, high);
     }
     return 0;
