@@ -650,6 +650,7 @@ static int partition(lua_State *L, int lo, int up) {
         swap(L, i, lo - 1);
     }
     lua_pop(L, 1);
+    // printf("j:%d,lo:%d,up:%d\n",i,lo,up);
     return i;
 }
 
