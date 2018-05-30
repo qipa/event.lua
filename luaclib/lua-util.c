@@ -658,14 +658,23 @@ static int topK(lua_State* L) {
     luaL_checktype(L, 1, LUA_TTABLE);
     size_t narr = lua_rawlen(L, 1);
     if ( narr < 2 )
-        luaL_error(L, "table array size < 2");
+        return 0;
 
     size_t K = luaL_checkinteger(L, 2);
-    if ( K >= narr )
-        luaL_error(L, "top K more than table array size");
+
+    luaL_checktype(L, 3, LUA_TFUNCTION);
+    if ( K >= narr ) {
+        lua_getglobal(L, "table");
+        lua_getfield(L, -1, "sort");
+        lua_pushvalue(L, 1);
+        lua_pushvalue(L, 3);
+        if (lua_pcall(L, 2, 0, 0) != LUA_OK) {
+            luaL_error(L,lua_tostring(L, -1));
+        }
+        return 0;
+    }
 
     K++;
-    luaL_checktype(L, 3, LUA_TFUNCTION);
 
     int low = 2;
     int high = narr;
@@ -676,7 +685,6 @@ static int topK(lua_State* L) {
             low = j + 1;
         else 
             high = j - 1;
-
         j = partition(L, low, high);
     }
     return 0;
