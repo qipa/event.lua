@@ -1,5 +1,5 @@
 local util = require "util"
-
+print(util,"@@")
 
 local arrary = {}
 for i = 1,100 do
@@ -7,7 +7,7 @@ for i = 1,100 do
 end
 
 util.time_diff("topK",function ()
-	util.topK(arrary,10,function (l,r)
+	util.topK(arrary,5,function (l,r)
 		return l < r
 	end)
 end)

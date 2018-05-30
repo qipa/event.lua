@@ -665,8 +665,7 @@ static int topK(lua_State* L) {
 
     luaL_checktype(L, 3, LUA_TFUNCTION);
     if ( K >= narr ) {
-        lua_getglobal(L, "table");
-        lua_getfield(L, -1, "sort");
+        lua_pushvalue(L, lua_upvalueindex(1));
         lua_pushvalue(L, 1);
         lua_pushvalue(L, 3);
         if (lua_pcall(L, 2, 0, 0) != LUA_OK) {
@@ -715,9 +714,17 @@ luaopen_util_core(lua_State* L){
         { "clone_string", lclone_string },
         { "packet_new", lpacket_new },
         { "rpc_pack", lrpc_pack },
-        { "topK", topK },
         { NULL, NULL },
     };
     luaL_newlib(L,l);
+
+    lua_getglobal(L, "table");
+    lua_getfield(L, -1, "sort");
+
+    lua_pushcclosure(L, topK, 1);
+    
+    lua_setfield(L, -3, "topK");
+    lua_pop(L, 1);
+
     return 1;
 }
