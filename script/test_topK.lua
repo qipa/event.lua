@@ -1,15 +1,20 @@
 local util = require "util"
-print(util,"@@")
 
 local arrary = {}
-for i = 1,100 do
+for i = 1,100000 do
 	table.insert(arrary,math.random(1,10000))
 end
 
 util.time_diff("topK",function ()
-	util.topK(arrary,5,function (l,r)
+	util.topK(arrary,100,function (l,r)
 		return l < r
 	end)
 end)
 
-table.print(arrary)
+util.time_diff("sort",function ()
+	table.sort(arrary,function (l,r)
+		return l < r
+	end)
+end)
+
+

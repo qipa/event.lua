@@ -592,14 +592,16 @@ lauthcode(lua_State* L) {
     return 1;
 }
 
-static void swap(lua_State* L, int from, int to) {
+static inline void 
+swap(lua_State* L, int from, int to) {
     lua_geti(L, 1, from);
     lua_geti(L, 1, to);
     lua_seti(L, 1, from);
     lua_seti(L, 1, to);
 }
 
-static int sort_comp(lua_State *L, int a, int b) {
+static inline int 
+sort_comp(lua_State *L, int a, int b) {
     if ( lua_isnil(L, 2) )
         return lua_compare(L, a, b, LUA_OPLT);
     else {
@@ -614,7 +616,8 @@ static int sort_comp(lua_State *L, int a, int b) {
     }
 }
 
-static int partition(lua_State *L, int lo, int up) {
+static int 
+partition(lua_State *L, int lo, int up) {
     lua_geti(L, 1, lo - 1);
 
     int i = lo;
