@@ -375,6 +375,21 @@ meta_movable(struct lua_State* L) {
 }
 
 static int
+meta_nav_height(struct lua_State* L) {
+	struct scene_context* scene_ctx = ( struct scene_context* )lua_touserdata(L, 1);
+	struct nav_mesh_context* ctx = scene_ctx->ctx;
+	double x = lua_tonumber(L, 2);
+	double z = lua_tonumber(L, 3);
+
+	double height;
+	if ( point_height(ctx, x, z, &height) ) {
+		lua_pushnumber(L, height);
+		return 1;
+	}
+	return 0;
+}
+
+static int
 meta_random_point(struct lua_State* L) {
 	struct scene_context* scene_ctx = ( struct scene_context* )lua_touserdata(L, 1);
 	struct nav_mesh_context* ctx = scene_ctx->ctx;
@@ -422,6 +437,7 @@ init_meta(struct lua_State* L, int scene, struct nav_mesh_context* ctx) {
 		{ "set_mask", meta_set_mask },
 		{ "get_mask", meta_get_mask },
 		{ "movable", meta_movable },
+		{ "nav_height", meta_nav_height },
 		{ "random_point", meta_random_point },
 		{ "around_movable", meta_around_movable },
 		{ NULL, NULL },

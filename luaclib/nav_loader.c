@@ -47,27 +47,27 @@ angle_cmp(const void * left, const void * right) {
 }
 
 struct nav_border*
-	add_border(struct nav_mesh_context* mesh_ctx, int a, int b) {
-		if ( mesh_ctx->border_offset + 1 >= mesh_ctx->border_size ) {
-			mesh_ctx->border_size *= 2;
-			mesh_ctx->borders = ( struct nav_border* )realloc(mesh_ctx->borders, sizeof( struct nav_border ) * mesh_ctx->border_size);
-		}
-
-		struct nav_border * border = &mesh_ctx->borders[mesh_ctx->border_offset];
-		border->id = mesh_ctx->border_offset;
-		border->a = a;
-		border->b = b;
-		border->node[0] = -1;
-		border->node[1] = -1;
-		border->opposite = -1;
-		border->center.x = ( mesh_ctx->vertices[a].x + mesh_ctx->vertices[b].x );
-		border->center.y = ( mesh_ctx->vertices[a].y + mesh_ctx->vertices[b].y );
-		border->center.z = ( mesh_ctx->vertices[a].z + mesh_ctx->vertices[b].z );
-
-		mesh_ctx->border_offset++;
-
-		return border;
+add_border(struct nav_mesh_context* mesh_ctx, int a, int b) {
+	if ( mesh_ctx->border_offset + 1 >= mesh_ctx->border_size ) {
+		mesh_ctx->border_size *= 2;
+		mesh_ctx->borders = ( struct nav_border* )realloc(mesh_ctx->borders, sizeof( struct nav_border ) * mesh_ctx->border_size);
 	}
+
+	struct nav_border * border = &mesh_ctx->borders[mesh_ctx->border_offset];
+	border->id = mesh_ctx->border_offset;
+	border->a = a;
+	border->b = b;
+	border->node[0] = -1;
+	border->node[1] = -1;
+	border->opposite = -1;
+	border->center.x = ( mesh_ctx->vertices[a].x + mesh_ctx->vertices[b].x );
+	border->center.y = ( mesh_ctx->vertices[a].y + mesh_ctx->vertices[b].y );
+	border->center.z = ( mesh_ctx->vertices[a].z + mesh_ctx->vertices[b].z );
+
+	mesh_ctx->border_offset++;
+
+	return border;
+}
 
 struct nav_border*
 	search_border(struct nav_mesh_context* ctx, struct nav_border_searcher** searcher, int begin, int end) {

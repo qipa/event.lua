@@ -152,6 +152,7 @@ void set_mask(struct nav_mesh_mask* ctx,int mask,int enable);
 
 struct vector3* around_movable(struct nav_mesh_context*, double x, double z, int range, int* center_node, search_dumper, void*);
 bool point_movable(struct nav_mesh_context* ctx, double x, double z);
+bool point_height(struct nav_mesh_context* ctx, double x, double z, double* height);
 
 bool intersect(struct vector3* a,struct vector3* b,struct vector3* c,struct vector3* d);
 bool inside_node(struct nav_mesh_context* mesh_ctx,int polyId,double x,double y,double z);

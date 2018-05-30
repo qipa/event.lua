@@ -224,7 +224,6 @@ get_link(struct nav_mesh_context* mesh_ctx, struct nav_node* node) {
 static inline double
 G_COST(struct nav_node* from, struct nav_node* to) {
 	double dx = from->pos.x - to->pos.x;
-	//double dy = from->center.y - to->center.y;
 	double dy = 0;
 	double dz = from->pos.z - to->pos.z;
 	return sqrt(dx*dx + dy* dy + dz* dz) * GRATE;
@@ -233,13 +232,11 @@ G_COST(struct nav_node* from, struct nav_node* to) {
 static inline double
 H_COST(struct nav_node* from, struct vector3* to) {
 	double dx = from->center.x - to->x;
-	//double dy = from->center.y - to->y;
 	double dy = 0;
 	double dz = from->center.z - to->z;
 	return sqrt(dx*dx + dy* dy + dz* dz) * HRATE;
 }
 
-//FIXME:共线问题
 bool
 raycast(struct nav_mesh_context* ctx, struct vector3* pt0, struct vector3* pt1, struct vector3* result, search_dumper dumper, void* userdata) {
 	struct nav_node* curr_node = search_node(ctx, pt0->x, pt0->y, pt0->z);
@@ -769,4 +766,82 @@ point_movable(struct nav_mesh_context* ctx, double x, double z) {
 		}
 	}
 	return false;
+}
+
+bool
+point_height(struct nav_mesh_context* ctx, double x, double z, double* height) {
+	struct nav_node* node = search_node(ctx,x, 0, z);
+	if ( !node ) {
+		return false;
+	}
+
+	struct vector3 start;
+	start.x = node->center.x;
+	start.z = node->center.z;
+
+	struct vector3 over;
+	over.x = x;
+	over.z = z;
+
+	struct vector3 vt10;
+	vector3_sub(&over, &start, &vt10);
+
+	struct vector3 result;
+	struct nav_border* cross_border = NULL;
+
+	int i;
+	for ( i = 0; i < node->size; i++ ) {
+		struct nav_border* border = get_border(ctx, node->border[i]);
+
+		struct vector3* pt3 = &ctx->vertices[border->a];
+		struct vector3* pt4 = &ctx->vertices[border->b];
+
+		struct vector3 vt30, vt40;
+		vector3_sub(pt3, &start, &vt30);
+		vector3_sub(pt4, &start, &vt40);
+
+		double sign_a = cross_product(&vt30, &vt10);
+		double sign_b = cross_product(&vt40, &vt10);
+
+		if ( ( sign_a < 0 && sign_b > 0 ) || ( sign_a == 0 && sign_b > 0 ) || ( sign_a < 0 && sign_b == 0 ) ) {
+			cross_point(pt3, pt4, &over, &start, &result);
+			cross_border = border;
+			break;
+		}
+	}
+
+	if ( !cross_border ) {
+		return false;
+	}
+
+	struct vector3* pt_border0 = &ctx->vertices[cross_border->a];
+	struct vector3* pt_border1 = &ctx->vertices[cross_border->b];
+
+	double dt_border = dot2dot(pt_border0, pt_border1);
+	double dt_cross = dot2dot(pt_border0, &result);
+
+	double border_height;
+	if (dt_border < 0.0001) {
+		border_height = pt_border1->y;
+	}
+	else {
+		border_height  = pt_border0->y + ( pt_border1->y - pt_border0->y ) * ( dt_cross / dt_border );
+	}
+	
+	double center_height = node->center.y;
+
+	double dt_center = dot2dot(&node->center, &result);
+	double dt_point = dot2dot(&over, &result);
+
+	double pt_height;
+	if (dt_center < 0.0001) {
+		pt_height = node->center.y;
+	}
+	else {
+		pt_height = border_height + ( center_height - border_height ) * ( dt_point / dt_center );
+	}
+
+	*height = pt_height;
+
+	return true;
 }
