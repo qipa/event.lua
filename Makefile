@@ -25,8 +25,12 @@ LUA_CLIB_SRC ?= ./luaclib
 LUA_CLIB = ev worker profiler dump serialize redis bson mongo util lfs cjson http ikcp fastaoi toweraoi pathfinder nav mysql protocolparser protocolcore filter0 filter1 co snapshot
 
 CONVERT_PATH ?= ./luaclib/convert
-CONVERT_SRC ?= $(wildcard $(CONVERT_PATH)/*.cpp)
+
+CONVERT_SRC ?= $(wildcard $(CONVERT_PATH)/milo/*.cpp)
 CONVERT_OBJ = $(patsubst %.c,%.o,$(patsubst %.cpp,%.o,$(CONVERT_SRC)))
+
+DOUBLE_CONVERSION_SRC ?= $(wildcard $(CONVERT_PATH)/double-conversion/*.cc)
+DOUBLE_CONVERSION_OBJ = $(patsubst %.cc,%.o,$(DOUBLE_CONVERSION_SRC)) 
 
 MAIN_PATH ?= ./src
 MAIN_SRC ?= $(wildcard $(MAIN_PATH)/*.c)
@@ -66,8 +70,11 @@ $(LIBEV_SHARE_LIB) :
 $(LUA_CLIB_PATH):
 	mkdir $(LUA_CLIB_PATH)
 
-$(CONVERT_PATH)/%.o:$(CONVERT_PATH)/%.cpp
+$(CONVERT_PATH)/milo/%.o:$(CONVERT_PATH)/milo/%.cpp
 	$(CC) $(CFLAGS) -fPIC -o $@ -c $<
+
+$(CONVERT_PATH)/double-conversion/%.o:$(CONVERT_PATH)/double-conversion/%.cc
+	$(CC) $(CFLAGS) -fPIC -o $@ -c $< -I$(CONVERT_PATH)
 
 $(MAIN_PATH)/%.o:$(MAIN_PATH)/%.c
 	$(CC) $(CFLAGS) -o $@ -c $< -I$(LUA_INC) -I$(TC_INC) 
@@ -114,8 +121,8 @@ $(LUA_CLIB_PATH)/bson.so : $(LUA_CLIB_SRC)/lua-bson.c | $(LUA_CLIB_PATH)
 $(LUA_CLIB_PATH)/mongo.so : $(LUA_CLIB_SRC)/lua-mongo.c | $(LUA_CLIB_PATH)
 	$(CC) $(CFLAGS) $(SHARED) $^ -o $@ -I$(LUA_INC)
 
-$(LUA_CLIB_PATH)/util.so : $(LUA_CLIB_SRC)/lua-util.c $(LUA_CLIB_SRC)/common.c $(CONVERT_OBJ) ./3rd/linenoise/linenoise.c  | $(LUA_CLIB_PATH)
-	$(CC) $(CFLAGS) -Wno-unused-value $(SHARED) $^ -o $@ -I$(LUA_INC) -I$(CONVERT_PATH) -I./3rd/linenoise
+$(LUA_CLIB_PATH)/util.so : $(LUA_CLIB_SRC)/lua-util.c $(LUA_CLIB_SRC)/common.c $(CONVERT_OBJ) $(DOUBLE_CONVERSION_OBJ) ./3rd/linenoise/linenoise.c  | $(LUA_CLIB_PATH)
+	$(CC) $(CFLAGS) -Wno-unused-value $(SHARED) $^ -o $@ -I$(LUA_INC) -I$(CONVERT_PATH) -I$(CONVERT_PATH)/ -I./3rd/linenoise
 
 $(LUA_CLIB_PATH)/lfs.so : ./3rd/luafilesystem/src/lfs.c | $(LUA_CLIB_PATH)
 	$(CC) $(CFLAGS) $(SHARED) $^ -o $@ -I$(LUA_INC)
@@ -166,7 +173,8 @@ clean :
 	rm -rf $(TARGET) $(TARGET).raw
 	rm -rf $(LUA_CLIB_PATH)
 	rm -rf src/*.o
-	rm -rf luaclib/convert/*.o
+	rm -rf luaclib/convert/milo/*.o
+	rm -rf luaclib/convert/double-conversion/*.o
 
 cleanall :
 	make clean
