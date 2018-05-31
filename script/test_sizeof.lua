@@ -13,27 +13,16 @@ local aoi = aoi_core.new(256,256,2,5,200)
 -- print(util.size_of(filter_inst0))
 -- print(util.size_of(aoi))
 
--- local tbl = {}
--- for i = 1,1024 * 1024 do
--- 	table.insert(tbl,"a111")
--- end
--- print(collectgarbage("count"))
+local tbl = {a = 1,b = "str111111",c = {d = 1,e = 1,f = 1 ,s = 1,str = "str111111"},fuc = util.topK}
 
--- print(util.size_of(tbl))
+tbl.tbl = tbl
 
--- local function test()
--- 	tbl = {}
--- end
+print(util.size_of(tbl))
+
+local function test()
+	tbl = {}
+end
 
 
 -- print(util.size_of(test))
 
-local proto = [[
-	function sp()
-
-	end
-]]
-
-local func,err = load(proto)
-
-print(util.size_of(func))

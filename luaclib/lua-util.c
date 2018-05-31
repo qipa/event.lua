@@ -682,6 +682,7 @@ static int
 size_of(lua_State* L) {
     TValue* value = index2addr(L, 1);
     int type = lua_type(L,1);
+
     switch(type) {
         case LUA_TNIL: {
             lua_pushinteger(L, sizeof(TValue));
@@ -754,6 +755,28 @@ size_of(lua_State* L) {
             GCObject* o = gcvalue(value);
             Table *h = gco2t(o);
             size_t size = sizeof(Table) + sizeof(TValue) * h->sizearray + sizeof(Node) * cast(size_t, allocsizenode(h));
+
+            lua_pushnil(L);
+            while (lua_next(L, 1) != 0) {
+                lua_pushcfunction(L, size_of);
+                lua_pushvalue(L, -2);
+                 if (lua_pcall(L, 1, 1, 0) != LUA_OK) {
+                    luaL_error(L,lua_tostring(L, -1));
+                }
+                size += lua_tointeger(L, -1);
+                lua_pop(L, 1);
+
+                lua_pushcfunction(L, size_of);
+                lua_pushvalue(L, -3);
+                 if (lua_pcall(L, 1, 1, 0) != LUA_OK) {
+                    luaL_error(L,lua_tostring(L, -1));
+                }
+                size += lua_tointeger(L, -1);
+                lua_pop(L, 1);
+
+                lua_pop(L, 1);
+            }
+
             lua_pushinteger(L ,size);
             break;
         }
