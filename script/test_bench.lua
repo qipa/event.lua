@@ -3,6 +3,7 @@ local event = require "event"
 local cjson = require "cjson"
 local util = require "util"
 local bson = require "bson"
+local dump = require "dump.core"
 
 local count = 1024 * 1024
 
@@ -32,13 +33,13 @@ end)
 
 util.time_diff("tonumber 1",function ()
 	for i = 1,count do
-		tonumber("1234567.89")
+		util.tonumber("1234567")
 	end
 end)
 
 util.time_diff("tonumber 2",function ()
 	for i = 1,count do
-		tonumber("123456789")
+		tonumber("1234567")
 	end
 end)
 
@@ -57,7 +58,21 @@ util.time_diff("table.decode",function ()
 	end
 end)
 
+util.time_diff("dump.tostring",function ()
+	for i = 1,count do
+		str = dump.tostring(tbl)
+	end
+	print("str.len",str:len())
+end)
+
+util.time_diff("dump.unpack",function ()
+	for i = 1,count do
+		tbl = dump.unpack(str)
+	end
+end)
+
 str = "return"..str
+
 util.time_diff("lua.load",function ()
 	for i = 1,count do
 		tbl = load(str)()
