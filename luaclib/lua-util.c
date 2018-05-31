@@ -240,40 +240,6 @@ lprint(lua_State* L) {
     return 0;
 }
 
-int ltonumber(lua_State* L) {
-    if (lua_isnoneornil(L, 2)) {
-        luaL_checkany(L, 1);
-        if (lua_type(L, 1) == LUA_TNUMBER) { 
-            lua_settop(L, 1);
-            return 1;
-        }
-        else {
-            size_t l;
-            const char *s = lua_tolstring(L, 1, &l);
-            int result;
-            double d = strtod_fast(s, l, &result);
-            if (l != result) {
-                return 0;
-            }
-            int64_t i64 = (int64_t)d;
-            if ((double)i64 != d) {
-                lua_pushnumber(L, d);
-            } else {
-                lua_pushinteger(L, i64);
-            }
-            return 1; 
-        }
-    }
-
-    lua_pushvalue(L, lua_upvalueindex(1));
-    lua_pushvalue(L, 1);
-    lua_pushvalue(L, 2);
-    if (lua_pcall(L, 2, 1, 0) != LUA_OK) {
-        luaL_error(L,lua_tostring(L, -1));
-    }
-    return 1;
-}
-
 int
 ltostring(lua_State* L) {
     if (lua_type(L, 1) != LUA_TNUMBER) {
@@ -733,10 +699,6 @@ luaopen_util_core(lua_State* L){
     lua_getglobal(L, "tostring");
     lua_pushcclosure(L, ltostring, 1);
     lua_setfield(L, -2, "tostring");
-
-    lua_getglobal(L, "tonumber");
-    lua_pushcclosure(L, ltonumber, 1);
-    lua_setfield(L, -2, "tonumber");
 
     return 1;
 }

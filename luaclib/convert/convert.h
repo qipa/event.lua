@@ -18,7 +18,7 @@ extern "C" {
 char* i64toa_fast(int64_t value, char* buffer);
 char* i32toa_fast(int32_t value, char* buffer);
 void dtoa_fast(double value, char* buffer);
-double strtod_fast(const char *str, int length,int* result);
+
 #ifdef __cplusplus
 };
 #endif
