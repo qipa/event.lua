@@ -240,64 +240,49 @@ lprint(lua_State* L) {
     return 0;
 }
 
+int ltonumber(lua_State* L) {
+    return 0;
+}
+
 int
 ltostring(lua_State* L) {
-    luaL_checkany(L, 1);
-    if (luaL_callmeta(L, 1, "__tostring")) {  /* metafield? */
-        if (!lua_isstring(L, -1))
-        luaL_error(L, "'__tostring' must return a string");
-    } else {
-        switch (lua_type(L, 1)) {
-            case LUA_TNUMBER: {
-                if (lua_isinteger(L, 1)) {
-                    LUAI_UACINT integer = (LUAI_UACINT)lua_tointeger(L, 1);
-                    int32_t i32 = (int32_t)integer;
-                    int64_t i64 = (int64_t)integer;
-                    char buff[64] = {0};
-                    size_t len;
-                    if ((LUAI_UACINT)i32 == integer) {
-                        char* end = i32toa_fast(i32, buff);
-                        *end = 0;
-                        len = end - buff;
-                        lua_pushlstring(L,buff,len);
-                    } else if ((LUAI_UACINT)i64 == integer) {
-                        char* end = i64toa_fast(i64, buff);
-                        *end = 0;
-                        len = end - buff;
-                        lua_pushlstring(L,buff,len);
-                    } else {
-                        lua_pushfstring(L, "%I", integer);
-                    }
-                }  else {
-                    LUAI_UACNUMBER number = (LUAI_UACNUMBER)lua_tonumber(L, 1);
-                    double d = (double)number;
-                    if (!isnan(d) && !isinf(d) && (LUAI_UACNUMBER)d == number) {
-                        char buff[64] = {0};
-                        dtoa_fast(d, buff);
-                        lua_pushstring(L,buff);
-                    } else {
-                        lua_pushfstring(L, "%f", number);
-                    }
-                }
-                break;
-            }
-            case LUA_TSTRING:
-                lua_pushvalue(L, 1);
-                break;
-            case LUA_TBOOLEAN:
-                lua_pushstring(L, (lua_toboolean(L, 1) ? "true" : "false"));
-                break;
-            case LUA_TNIL:
-                lua_pushliteral(L, "nil");
-                break;
-            default: {
-                int tt = luaL_getmetafield(L, 1, "__name");  /* try name */
-                const char *kind = (tt == LUA_TSTRING) ? lua_tostring(L, -1) : luaL_typename(L, 1);
-                lua_pushfstring(L, "%s: %p", kind, lua_topointer(L, 1));
-                if (tt != LUA_TNIL)
-                    lua_remove(L, -2);  /* remove '__name' */
-                break;
-            }
+    if (lua_type(L, 1) != LUA_TNUMBER) {
+        lua_pushvalue(L, lua_upvalueindex(1));
+        lua_pushvalue(L, 1);
+        if (lua_pcall(L, 1, 1, 0) != LUA_OK) {
+            luaL_error(L,lua_tostring(L, -1));
+        }
+        return 1;
+    }
+
+   if (lua_isinteger(L, 1)) {
+        LUAI_UACINT integer = (LUAI_UACINT)lua_tointeger(L, 1);
+        int32_t i32 = (int32_t)integer;
+        int64_t i64 = (int64_t)integer;
+        char buff[64] = {0};
+        size_t len;
+        if ((LUAI_UACINT)i32 == integer) {
+            char* end = i32toa_fast(i32, buff);
+            *end = 0;
+            len = end - buff;
+            lua_pushlstring(L,buff,len);
+        } else if ((LUAI_UACINT)i64 == integer) {
+            char* end = i64toa_fast(i64, buff);
+            *end = 0;
+            len = end - buff;
+            lua_pushlstring(L,buff,len);
+        } else {
+            lua_pushfstring(L, "%I", integer);
+        }
+    }  else {
+        LUAI_UACNUMBER number = (LUAI_UACNUMBER)lua_tonumber(L, 1);
+        double d = (double)number;
+        if (!isnan(d) && !isinf(d) && (LUAI_UACNUMBER)d == number) {
+            char buff[64] = {0};
+            dtoa_fast(d, buff);
+            lua_pushstring(L,buff);
+        } else {
+            lua_pushfstring(L, "%f", number);
         }
     }
     return 1;
@@ -668,12 +653,6 @@ static int topK(lua_State* L) {
 
     luaL_checktype(L, 3, LUA_TFUNCTION);
     if ( K >= narr ) {
-        lua_pushvalue(L, lua_upvalueindex(1));
-        lua_pushvalue(L, 1);
-        lua_pushvalue(L, 3);
-        if (lua_pcall(L, 2, 0, 0) != LUA_OK) {
-            luaL_error(L,lua_tostring(L, -1));
-        }
         return 0;
     }
 
@@ -709,7 +688,6 @@ luaopen_util_core(lua_State* L){
         { "thread_id", lthread_id },
         { "time", ltime },
         { "print", lprint },
-        { "tostring", ltostring },
         { "type", ltype },
         { "readline", lreadline },
         { "getaddrinfo", lgetaddrinfo },
@@ -717,17 +695,18 @@ luaopen_util_core(lua_State* L){
         { "clone_string", lclone_string },
         { "packet_new", lpacket_new },
         { "rpc_pack", lrpc_pack },
+        { "topK", topK },
         { NULL, NULL },
     };
     luaL_newlib(L,l);
 
-    lua_getglobal(L, "table");
-    lua_getfield(L, -1, "sort");
+    lua_getglobal(L, "tostring");
+    lua_pushcclosure(L, ltostring, 1);
+    lua_setfield(L, -2, "tostring");
 
-    lua_pushcclosure(L, topK, 1);
-    
-    lua_setfield(L, -3, "topK");
-    lua_pop(L, 1);
+    lua_getglobal(L, "tonumber");
+    lua_pushcclosure(L, ltonumber, 1);
+    lua_setfield(L, -2, "tonumber");
 
     return 1;
 }
