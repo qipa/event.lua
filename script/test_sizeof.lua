@@ -13,16 +13,14 @@ local aoi = aoi_core.new(256,256,2,5,200)
 -- print(util.size_of(filter_inst0))
 -- print(util.size_of(aoi))
 
-local tbl = {a = 1,b = "str111111",c = {d = 1,e = 1,f = 1 ,s = 1,str = "str111111"},fuc = util.topK}
-
-tbl.tbl = tbl
-
+local tbl = {a = "str112111",b = "str1111211",c = {d = 1,e = 1,f = 1 ,s = 1,str = "str111111"},fuc = util.topK}
+tbl.d = tbl
 print(util.size_of(tbl))
 
 local function test()
-	tbl = {}
+	tbl.mrq = "hx"
+	local a = util.topK
 end
 
-
--- print(util.size_of(test))
+print(util.size_of(test))
 
