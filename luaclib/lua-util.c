@@ -694,9 +694,8 @@ size_of(lua_State* L) {
     TValue* value = index2addr(L, 1);
     int type = lua_type(L,1);
 
-    if (lua_isnoneornil(L, 2)) {
+    if (lua_isnoneornil(L, 2))
         lua_newtable(L);
-    }
 
     switch(type) {
         case LUA_TNIL: {
@@ -791,15 +790,20 @@ size_of(lua_State* L) {
         }
         case LUA_TPROTO: {
             GCObject* o = gcvalue(value);
-            Proto *f = gco2p(o);
-            size_t size = sizeof(Proto) + sizeof(Instruction) * f->sizecode +
-                         sizeof(Proto *) * f->sizep +
-                         sizeof(TValue) * f->sizek +
-                         sizeof(int) * f->sizelineinfo +
-                         sizeof(LocVar) * f->sizelocvars +
-                         sizeof(Upvaldesc) * f->sizeupvalues;
+            if (need_sizeof(L) < 0) {
+                lua_pushinteger(L, 0);
+            } else {
+               Proto *f = gco2p(o);
+                size_t size = sizeof(Proto) + sizeof(Instruction) * f->sizecode +
+                             sizeof(Proto *) * f->sizep +
+                             sizeof(TValue) * f->sizek +
+                             sizeof(int) * f->sizelineinfo +
+                             sizeof(LocVar) * f->sizelocvars +
+                             sizeof(Upvaldesc) * f->sizeupvalues;
 
-            lua_pushinteger(L ,size);
+                lua_pushinteger(L ,size); 
+            }
+            
             break;
         }
 
@@ -813,24 +817,31 @@ size_of(lua_State* L) {
 
                 lua_pushnil(L);
                 while (lua_next(L, 1) != 0) {
-                    lua_pushcfunction(L, size_of);
-                    lua_pushvalue(L, -2);
-                    lua_pushvalue(L, 2);
-                    if (lua_pcall(L, 2, 1, 0) != LUA_OK) {
-                        luaL_error(L,lua_tostring(L, -1));
-                    }
-                    size += lua_tointeger(L, -1);
-                    lua_pop(L, 1);
 
-                    lua_pushcfunction(L, size_of);
-                    lua_pushvalue(L, -3);
-                    lua_pushvalue(L, 2);
-                     if (lua_pcall(L, 2, 1, 0) != LUA_OK) {
-                        luaL_error(L,lua_tostring(L, -1));
+                    int vtype = lua_type(L, -1);
+                    if (vtype == LUA_TTABLE || vtype == LUA_TSTRING || vtype == LUA_TUSERDATA || vtype == LUA_TFUNCTION || vtype == LUA_TPROTO) {
+                        lua_pushcfunction(L, size_of);
+                        lua_pushvalue(L, -2);
+                        lua_pushvalue(L, 2);
+                        if (lua_pcall(L, 2, 1, 0) != LUA_OK) {
+                            luaL_error(L,lua_tostring(L, -1));
+                        }
+                        size += lua_tointeger(L, -1);
+                        lua_pop(L, 1); 
                     }
-                    size += lua_tointeger(L, -1);
-                    lua_pop(L, 1);
-
+                    
+                    int ktype = lua_type(L, -2);
+                    if (ktype == LUA_TTABLE || ktype == LUA_TSTRING || ktype == LUA_TUSERDATA || ktype == LUA_TFUNCTION || ktype == LUA_TPROTO) {
+                        lua_pushcfunction(L, size_of);
+                        lua_pushvalue(L, -3);
+                        lua_pushvalue(L, 2);
+                         if (lua_pcall(L, 2, 1, 0) != LUA_OK) {
+                            luaL_error(L,lua_tostring(L, -1));
+                        }
+                        size += lua_tointeger(L, -1);
+                        lua_pop(L, 1);
+                    }
+                    
                     lua_pop(L, 1);
                 }
 
