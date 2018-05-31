@@ -3,6 +3,9 @@
 #include <luaconf.h>
 #include <lobject.h>
 #include <lstate.h>
+#include <lstring.h>
+#include <ltable.h>
+#include <lfunc.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -668,6 +671,98 @@ static int topK(lua_State* L) {
     return 0;
 }
 
+static int
+size_of_table(lua_State* L) {
+    return 0;
+}
+
+extern TValue *index2addr (lua_State *L, int idx);
+
+static int
+size_of(lua_State* L) {
+    TValue* value = index2addr(L, 1);
+    int type = lua_type(L,1);
+    switch(type) {
+        case LUA_TNIL: {
+            lua_pushinteger(L, sizeof(TValue));
+            break;
+        }
+           
+        case LUA_TNUMBER: {
+            lua_pushinteger(L, sizeof(TValue));
+            break;
+        }
+
+        case LUA_TBOOLEAN: {
+            lua_pushinteger(L, sizeof(TValue));
+            break;
+        }
+        case LUA_TSTRING: {
+            GCObject* o = gcvalue(value);
+            switch (o->tt) {
+                case LUA_TSHRSTR: {
+                    lua_pushinteger(L, sizelstring(gco2ts(o)->shrlen));
+                    break;
+                }
+                case LUA_TLNGSTR: {
+                    lua_pushinteger(L, sizelstring(gco2ts(o)->u.lnglen));
+                    break;
+                }
+                default:
+                    break;
+            }
+            break;
+        }
+        case LUA_TUSERDATA: {
+            GCObject* o = gcvalue(value);
+            lua_pushinteger(L, sizeudata(gco2u(o)));
+            break;
+        }
+        case LUA_TFUNCTION: {
+            GCObject* o = gcvalue(value);
+            switch (o->tt) {
+                case LUA_TLCL: {
+                    LClosure *cl = gco2lcl(o);
+                    lua_pushinteger(L, sizeLclosure(cl->nupvalues));
+                    break;
+                }
+                case LUA_TCCL: {
+                    CClosure *cl = gco2ccl(o);
+                    lua_pushinteger(L, sizeCclosure(cl->nupvalues));
+                    break;
+                }
+                default:
+                    break;
+            }
+            break;
+        }
+        case LUA_TPROTO: {
+            GCObject* o = gcvalue(value);
+            Proto *f = gco2p(o);
+            size_t size = sizeof(Proto) + sizeof(Instruction) * f->sizecode +
+                         sizeof(Proto *) * f->sizep +
+                         sizeof(TValue) * f->sizek +
+                         sizeof(int) * f->sizelineinfo +
+                         sizeof(LocVar) * f->sizelocvars +
+                         sizeof(Upvaldesc) * f->sizeupvalues;
+
+            lua_pushinteger(L ,size);
+            break;
+        }
+
+        case LUA_TTABLE: {
+            GCObject* o = gcvalue(value);
+            Table *h = gco2t(o);
+            size_t size = sizeof(Table) + sizeof(TValue) * h->sizearray + sizeof(Node) * cast(size_t, allocsizenode(h));
+            lua_pushinteger(L ,size);
+            break;
+        }
+        default:
+            luaL_error(L, "unsupport type %s to sizeof", lua_typename(L, type));
+    }
+    return 1;
+}
+
 int
 luaopen_util_core(lua_State* L){
     luaL_Reg l[] = {
@@ -692,6 +787,7 @@ luaopen_util_core(lua_State* L){
         { "packet_new", lpacket_new },
         { "rpc_pack", lrpc_pack },
         { "topK", topK },
+        { "size_of", size_of },
         { NULL, NULL },
     };
     luaL_newlib(L,l);
