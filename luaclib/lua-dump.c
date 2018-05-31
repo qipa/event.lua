@@ -669,6 +669,7 @@ eat_number(lua_State* L, struct parser_context *parser) {
 	}
 
 	parser->ptr = end;
+	
 	if ((lua_Number)integer == number) {
 		lua_pushinteger(L, integer);
 	}
