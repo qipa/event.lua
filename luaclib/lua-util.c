@@ -271,7 +271,7 @@ int ltonumber(lua_State* L) {
     if (lua_pcall(L, 2, 1, 0) != LUA_OK) {
         luaL_error(L,lua_tostring(L, -1));
     }
-    return 2;
+    return 1;
 }
 
 int
