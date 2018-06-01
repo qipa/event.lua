@@ -73,24 +73,26 @@ function object:leave(other)
 	print(string.format("leave:%d:[%f,%f],%d:[%f:%f],%f",self.id,self.x,self.z,other.id,other.x,other.z,vector2.distance(self.x,self.z,other.x,other.z)))
 end
 
-for i = 1,100 do
+for i = 1,500 do
 	local obj = object:new(i,math.random(0,999),math.random(0,999),math.random(1,5))
 end
 
-local move_obj = object_ctx[math.random(1,100)]
+local move_set = {}
 
-
-event.fork(function ()
-	while true do
-		local x,z = math.random(0,999),math.random(0,999)
+for i = 1,200 do
+	event.fork(function ()
+		local move_obj = object_ctx[i]
 		while true do
-			event.sleep(0.1)
-			local rx,rz = vector2.move_forward(move_obj.x,move_obj.z,x,z,10)
-			local ox,oz = move_obj.x,move_obj.z
-			move_obj:move(rx,rz)
-			if vector2.distance(ox,oz,rx,rz) <= 1 then
-				break
+			local x,z = math.random(0,999),math.random(0,999)
+			while true do
+				event.sleep(0.1)
+				local rx,rz = vector2.move_forward(move_obj.x,move_obj.z,x,z,10)
+				local ox,oz = move_obj.x,move_obj.z
+				move_obj:move(rx,rz)
+				if vector2.distance(ox,oz,rx,rz) <= 1 then
+					break
+				end
 			end
 		end
-	end
-end)
+	end)
+end
