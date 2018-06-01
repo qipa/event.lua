@@ -220,10 +220,6 @@ _remove_object(lua_State* L) {
 
 	unlink_object(tower,self);
 
-	int self_uid = self->uid;
-
-	free_object(aoi,self);
-
 	lua_newtable(L);
 	int i = 1;
 
@@ -231,12 +227,14 @@ _remove_object(lua_State* L) {
 	for(k = kh_begin(tower->hash);k != kh_end(tower->hash);++k) {
 		if (kh_exist(tower->hash,k)) {
 			object_t* other = kh_value(tower->hash,k);
-			if (other->uid != self_uid)
+			if (other->uid == self->uid)
 				continue;
 			lua_pushinteger(L,other->uid);
 			lua_rawseti(L,-2,i++);
 		}
 	}
+
+	free_object(aoi,self);
 
 	return 1;
 }
@@ -529,9 +527,9 @@ _get_viewers(lua_State* L) {
 	khiter_t k;
 	for(k = kh_begin(tower->hash);k != kh_end(tower->hash);++k) {
 		if (kh_exist(tower->hash,k)) {
-			object_t* obj = kh_value(tower->hash,k);
-			if (self->uid != obj->uid) {
-				lua_pushinteger(L,obj->uid);
+			object_t* other = kh_value(tower->hash,k);
+			if (self->uid != other->uid) {
+				lua_pushinteger(L,other->uid);
 				lua_rawseti(L,-2,i++);
 			}
 
