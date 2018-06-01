@@ -175,25 +175,27 @@ _add_object(lua_State* L) {
 		luaL_error(L,"add object error:invalid local:[%f,%f]",x,z);
 	}
 
-	object_t* obj = new_object(L,aoi,uid,TYPE_OBJECT,x,z);
-	obj->param.link_node.link_prev = obj->param.link_node.link_next = NULL;
+	object_t* self = new_object(L,aoi,uid,TYPE_OBJECT,x,z);
+	self->param.link_node.link_prev = self->param.link_node.link_next = NULL;
 
 	location_t out;
-	translate(aoi,&obj->local,&out);
+	translate(aoi,&self->local,&out);
 
 	tower_t* tower = &aoi->towers[(uint32_t)out.x][(uint32_t)out.z];
 
-	link_object(tower,obj);
+	link_object(tower,self);
 
-	lua_pushinteger(L,obj->id);
+	lua_pushinteger(L,self->id);
 	lua_newtable(L);
 	int i = 1;
 
 	khiter_t k;
 	for(k = kh_begin(tower->hash);k != kh_end(tower->hash);++k) {
 		if (kh_exist(tower->hash,k)) {
-			object_t* obj = kh_value(tower->hash,k);
-			lua_pushinteger(L,obj->uid);
+			object_t* other = kh_value(tower->hash,k);
+			if (other->uid == self->uid)
+				continue;
+			lua_pushinteger(L,other->uid);
 			lua_rawseti(L,-2,i++);
 		}
 	}
@@ -208,17 +210,19 @@ _remove_object(lua_State* L) {
 	if (id >= aoi->max) {
 		luaL_error(L,"error id:%d",id);
 	}
-	object_t* obj = &aoi->objs[id];
-	assert(obj->type == TYPE_OBJECT);
+	object_t* self = &aoi->objs[id];
+	assert(self->type == TYPE_OBJECT);
 
 	location_t out;
-	translate(aoi,&obj->local,&out);
+	translate(aoi,&self->local,&out);
 
 	tower_t* tower = &aoi->towers[(uint32_t)out.x][(uint32_t)out.z];
 
-	unlink_object(tower,obj);
+	unlink_object(tower,self);
 
-	free_object(aoi,obj);
+	int self_uid = self->uid;
+
+	free_object(aoi,self);
 
 	lua_newtable(L);
 	int i = 1;
@@ -226,8 +230,10 @@ _remove_object(lua_State* L) {
 	khiter_t k;
 	for(k = kh_begin(tower->hash);k != kh_end(tower->hash);++k) {
 		if (kh_exist(tower->hash,k)) {
-			object_t* obj = kh_value(tower->hash,k);
-			lua_pushinteger(L,obj->uid);
+			object_t* other = kh_value(tower->hash,k);
+			if (other->uid != self_uid)
+				continue;
+			lua_pushinteger(L,other->uid);
 			lua_rawseti(L,-2,i++);
 		}
 	}
@@ -246,69 +252,74 @@ _update_object(lua_State* L) {
 		luaL_error(L,"update object error:invalid local:[%f,%f]",nx,nz);
 	}
 
-	object_t* obj = &aoi->objs[id];
-	assert(obj->type == TYPE_OBJECT);
+	object_t* self = &aoi->objs[id];
+	assert(self->type == TYPE_OBJECT);
 
 	location_t out;
-	translate(aoi,&obj->local,&out);
+	translate(aoi,&self->local,&out);
 	tower_t* otower = &aoi->towers[(uint32_t)out.x][(uint32_t)out.z];
 
-	obj->local.x = nx;
-	obj->local.z = nz;
-	translate(aoi,&obj->local,&out);
+	self->local.x = nx;
+	self->local.z = nz;
+	translate(aoi,&self->local,&out);
 	tower_t* ntower = &aoi->towers[(uint32_t)out.x][(uint32_t)out.z];
 
 	if (ntower == otower) {
 		return 0;
 	}
 
-	unlink_object(otower,obj);
+	unlink_object(otower,self);
 
-	link_object(ntower,obj);
+	link_object(ntower,self);
 
 	object_t* leave = NULL;
 	object_t* enter = NULL;
 	khiter_t k;
 	for(k = kh_begin(otower->hash);k != kh_end(otower->hash);++k) {
 		if (kh_exist(otower->hash,k)) {
-			object_t* obj = kh_value(otower->hash,k);
+			object_t* other = kh_value(otower->hash,k);
+			if (other->uid == self->uid)
+				continue;
 			if (leave == NULL) {
-				leave = obj;
-				obj->next = NULL;
-				obj->prev = NULL;
+				leave = other;
+				other->next = NULL;
+				other->prev = NULL;
 			} else {
-				obj->prev = NULL;
-				obj->next = leave;
-				leave = obj;
+				other->prev = NULL;
+				other->next = leave;
+				leave = other;
 			}
 		}
 	}
 
 	for(k = kh_begin(ntower->hash);k != kh_end(ntower->hash);++k) {
 		if (kh_exist(ntower->hash,k)) {
-			object_t* obj = kh_value(ntower->hash,k);
-			if (obj->next != NULL || obj->prev != NULL || obj == leave) {
-				if (obj->prev != NULL) {
-					obj->prev->next = obj->next;
+			object_t* other = kh_value(ntower->hash,k);
+			if (other->uid == self->uid)
+				continue;
+
+			if (other->next != NULL || other->prev != NULL || other == leave) {
+				if (other->prev != NULL) {
+					other->prev->next = other->next;
 				}
-				if (obj->next != NULL) {
-					obj->next->prev = obj->prev;
+				if (other->next != NULL) {
+					other->next->prev = other->prev;
 				}
-				if (obj == leave) {
-					leave = obj->next;
+				if (other == leave) {
+					leave = other->next;
 				}
-				obj->next = obj->prev = NULL;
+				other->next = other->prev = NULL;
 				
 			} else {
 				if (enter == NULL) {
-					enter = obj;
-					obj->next = NULL;
-					obj->prev = NULL;
+					enter = other;
+					other->next = NULL;
+					other->prev = NULL;
 				} else {
 					enter->next = enter;
-					obj->prev = enter;
-					obj->next = NULL;
-					enter = obj;
+					other->prev = enter;
+					other->next = NULL;
+					enter = other;
 				}
 			}
 		}
@@ -347,16 +358,16 @@ _add_watcher(lua_State* L) {
 	float z = lua_tonumber(L,4);
 	int range = lua_tointeger(L,5);
 
-	object_t* obj = new_object(L,aoi,uid,TYPE_WATCHER,x,z);
-	obj->param.range = range;
+	object_t* self = new_object(L,aoi,uid,TYPE_WATCHER,x,z);
+	self->param.range = range;
 
 	location_t out;
-	translate(aoi,&obj->local,&out);
+	translate(aoi,&self->local,&out);
 
 	region_t region;
 	get_region(aoi,&out,&region,range);
 
-	lua_pushinteger(L,obj->id);
+	lua_pushinteger(L,self->id);
 	lua_newtable(L);
 	int i = 1;
 
@@ -366,14 +377,16 @@ _add_watcher(lua_State* L) {
 		for(z_index = region.begin_z;z_index <= region.end_z;z_index++) {
 			tower_t* tower = &aoi->towers[x_index][z_index];
 			int ok;
-			khiter_t k = kh_put(watcher, tower->hash, obj->uid, &ok);
+			khiter_t k = kh_put(watcher, tower->hash, self->uid, &ok);
 			assert(ok == 1 || ok == 2);
-			kh_value(tower->hash, k) = obj;
+			kh_value(tower->hash, k) = self;
 
 			struct object* cursor = tower->head;
 			while(cursor) {
-				lua_pushinteger(L,cursor->uid);
-				lua_rawseti(L,-2,i++);
+				if (cursor->uid != self->uid) {
+					lua_pushinteger(L,cursor->uid);
+					lua_rawseti(L,-2,i++);
+				}
 				cursor = cursor->param.link_node.link_next;
 			}
 		}
@@ -386,14 +399,14 @@ _remove_watcher(lua_State* L) {
 	aoi_t* aoi = (aoi_t*)lua_touserdata(L, 1);
 	int uid = lua_tointeger(L,2);
 
-	object_t* obj = &aoi->objs[uid];
-	assert(obj->type == TYPE_WATCHER);
+	object_t* self = &aoi->objs[uid];
+	assert(self->type == TYPE_WATCHER);
 
 	location_t out;
-	translate(aoi,&obj->local,&out);
+	translate(aoi,&self->local,&out);
 
 	region_t region;
-	get_region(aoi,&out,&region,obj->param.range);
+	get_region(aoi,&out,&region,self->param.range);
 
 	uint32_t x_index;
 	for(x_index = region.begin_x;x_index <= region.end_x;x_index++) {
@@ -401,13 +414,13 @@ _remove_watcher(lua_State* L) {
 		for(z_index = region.begin_z;z_index <= region.end_z;z_index++) {
 			tower_t* tower = &aoi->towers[x_index][z_index];
 
-			khiter_t k = kh_get(watcher, tower->hash, obj->uid);
+			khiter_t k = kh_get(watcher, tower->hash, self->uid);
 			assert(k != kh_end(tower->hash));
 			kh_del(watcher,tower->hash,k);
 		}
 	}
 
-	free_object(aoi,obj);
+	free_object(aoi,self);
 	return 0;
 }
 
@@ -418,26 +431,26 @@ _update_watcher(lua_State* L) {
 	float nx = lua_tonumber(L,3);
 	float nz = lua_tonumber(L,4);
 
-	object_t* obj = &aoi->objs[id];
-	assert(obj->type == TYPE_WATCHER);
+	object_t* self = &aoi->objs[id];
+	assert(self->type == TYPE_WATCHER);
 
 	location_t oout;
-	translate(aoi,&obj->local,&oout);
+	translate(aoi,&self->local,&oout);
 
 	location_t nout;
-	obj->local.x = nx;
-	obj->local.z = nz;
-	translate(aoi,&obj->local,&nout);
+	self->local.x = nx;
+	self->local.z = nz;
+	translate(aoi,&self->local,&nout);
 
 	if (oout.x == nout.x && oout.z == nout.z) {
 		return 0;
 	}
 
 	region_t oregion;
-	get_region(aoi,&oout,&oregion,obj->param.range);
+	get_region(aoi,&oout,&oregion,self->param.range);
 
 	region_t nregion;
-	get_region(aoi,&nout,&nregion,obj->param.range);
+	get_region(aoi,&nout,&nregion,self->param.range);
 
 	lua_newtable(L);
 	int i = 1;
@@ -450,14 +463,17 @@ _update_watcher(lua_State* L) {
 				continue;
 			}
 			tower_t* tower = &aoi->towers[x_index][z_index];
-			khiter_t k = kh_get(watcher, tower->hash, obj->uid);
+			khiter_t k = kh_get(watcher, tower->hash, self->uid);
 			assert(k != kh_end(tower->hash));
 			kh_del(watcher,tower->hash,k);
 
 			struct object* cursor = tower->head;
 			while(cursor) {
-				lua_pushinteger(L,cursor->uid);
-				lua_rawseti(L,-2,i++);
+				if (cursor->uid != self->uid) {
+					lua_pushinteger(L,cursor->uid);
+					lua_rawseti(L,-2,i++);
+				}
+				
 				cursor = cursor->param.link_node.link_next;
 			}
 		}
@@ -474,14 +490,16 @@ _update_watcher(lua_State* L) {
 			tower_t* tower = &aoi->towers[x_index][z_index];
 
 			int ok;
-			khiter_t k = kh_put(watcher, tower->hash, obj->uid, &ok);
+			khiter_t k = kh_put(watcher, tower->hash, self->uid, &ok);
 			assert(k != kh_end(tower->hash));
-			kh_value(tower->hash, k) = obj;
+			kh_value(tower->hash, k) = self;
 
 			struct object* cursor = tower->head;
 			while(cursor) {
-				lua_pushinteger(L,cursor->uid);
-				lua_rawseti(L,-2,i++);
+				if (cursor->uid != self->uid) {
+					lua_pushinteger(L,cursor->uid);
+					lua_rawseti(L,-2,i++);
+				}
 				cursor = cursor->param.link_node.link_next;
 			}
 		}
@@ -494,18 +512,17 @@ static int
 _get_viewers(lua_State* L) {
 	aoi_t* aoi = (aoi_t*)lua_touserdata(L, 1);
 	int id = lua_tointeger(L,2);
-	object_t* obj = &aoi->objs[id];
+	object_t* self = &aoi->objs[id];
 
-	if (obj->type != TYPE_OBJECT) {
+	if (self->type != TYPE_OBJECT) {
 		luaL_error(L,"get viewers error,object type must be object");
 	}
 
 	location_t out;
-	translate(aoi,&obj->local,&out);
+	translate(aoi,&self->local,&out);
 
 	tower_t* tower = &aoi->towers[(uint32_t)out.x][(uint32_t)out.z];
 
-	lua_pushinteger(L,obj->id);
 	lua_newtable(L);
 	int i = 1;
 
@@ -513,8 +530,11 @@ _get_viewers(lua_State* L) {
 	for(k = kh_begin(tower->hash);k != kh_end(tower->hash);++k) {
 		if (kh_exist(tower->hash,k)) {
 			object_t* obj = kh_value(tower->hash,k);
-			lua_pushinteger(L,obj->uid);
-			lua_rawseti(L,-2,i++);
+			if (self->uid != obj->uid) {
+				lua_pushinteger(L,obj->uid);
+				lua_rawseti(L,-2,i++);
+			}
+
 		}
 	}
 
@@ -525,17 +545,17 @@ static int
 _get_visible(lua_State* L) {
 	aoi_t* aoi = (aoi_t*)lua_touserdata(L, 1);
 	int id = lua_tointeger(L,2);
-	object_t* obj = &aoi->objs[id];
+	object_t* self = &aoi->objs[id];
 
-	if (obj->type != TYPE_WATCHER) {
+	if (self->type != TYPE_WATCHER) {
 		luaL_error(L,"get visiable error,object type must be watcher");
 	}
 
 	location_t out;
-	translate(aoi,&obj->local,&out);
+	translate(aoi,&self->local,&out);
 
 	region_t region;
-	get_region(aoi,&out,&region,obj->param.range);
+	get_region(aoi,&out,&region,self->param.range);
 
 	lua_newtable(L);
 	int i = 1;
@@ -547,8 +567,10 @@ _get_visible(lua_State* L) {
 			tower_t* tower = &aoi->towers[x_index][z_index];
 			struct object* cursor = tower->head;
 			while(cursor) {
-				lua_pushinteger(L,cursor->uid);
-				lua_rawseti(L,-2,i++);
+				if (self->uid != cursor->uid) {
+					lua_pushinteger(L,cursor->uid);
+					lua_rawseti(L,-2,i++);
+				}
 				cursor = cursor->param.link_node.link_next;
 			}
 		}
