@@ -122,6 +122,7 @@ new_object(lua_State* L,aoi_t* aoi,int uid,int type,float x,float z) {
 	object_t* obj = aoi->freelist;
 	aoi->freelist = obj->next;
 	obj->next = obj->prev = NULL;
+	obj->param.link_node.link_prev = obj->param.link_node.link_next = NULL;
 	obj->uid = uid;
 	obj->type = type;
 	obj->local.x = x;
@@ -151,16 +152,16 @@ static inline void
 unlink_object(tower_t* tower,object_t* object) {
 	if (object->param.link_node.link_prev != NULL) {
 		object->param.link_node.link_prev->next = object->param.link_node.link_next;
-		object->param.link_node.link_prev = NULL;
 	} else {
 		tower->head = object->param.link_node.link_next;
 	}
 	if (object->param.link_node.link_next != NULL) {
 		object->param.link_node.link_next->prev = object->param.link_node.link_prev;
-		object->param.link_node.link_next = NULL;
 	} else {
 		tower->tail = object->param.link_node.link_prev;
 	}
+	object->param.link_node.link_prev = NULL;
+	object->param.link_node.link_next = NULL;
 }
 
 static int
@@ -176,7 +177,6 @@ _add_object(lua_State* L) {
 	}
 
 	object_t* self = new_object(L,aoi,uid,TYPE_OBJECT,x,z);
-	self->param.link_node.link_prev = self->param.link_node.link_next = NULL;
 
 	location_t out;
 	translate(aoi,&self->local,&out);

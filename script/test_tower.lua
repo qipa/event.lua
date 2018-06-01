@@ -66,11 +66,11 @@ function object:move(x,z)
 end
 
 function object:enter(other)
-	print(string.format("enter:%d:[%f,%f],%d:[%f:%f],%f",self.id,self.x,self.z,other.id,other.x,other.z,vector2.distance(self.x,self.z,other.x,other.z)))
+	-- print(string.format("enter:%d:[%f,%f],%d:[%f:%f],%f",self.id,self.x,self.z,other.id,other.x,other.z,vector2.distance(self.x,self.z,other.x,other.z)))
 end
 
 function object:leave(other)
-	print(string.format("leave:%d:[%f,%f],%d:[%f:%f],%f",self.id,self.x,self.z,other.id,other.x,other.z,vector2.distance(self.x,self.z,other.x,other.z)))
+	-- print(string.format("leave:%d:[%f,%f],%d:[%f:%f],%f",self.id,self.x,self.z,other.id,other.x,other.z,vector2.distance(self.x,self.z,other.x,other.z)))
 end
 
 for i = 1,500 do
@@ -79,7 +79,7 @@ end
 
 local move_set = {}
 
-for i = 1,200 do
+for i = 1,500 do
 	event.fork(function ()
 		local move_obj = object_ctx[i]
 		while true do
