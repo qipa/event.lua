@@ -16,14 +16,14 @@
 #define TYPE_WATCHER  	1
 
 typedef struct location {
-	double x;
-	double z;
+	float x;
+	float z;
 } location_t;
 
 typedef struct object {
 	int uid;
 	int id;
-	int type;
+	uint8_t type;
 
 	union {
 		int range;
@@ -115,7 +115,7 @@ get_region(aoi_t* aoi,location_t* local,region_t* out,uint32_t range) {
 }
 
 static inline object_t* 
-new_object(lua_State* L,aoi_t* aoi,int uid,int type,double x,double z) {
+new_object(lua_State* L,aoi_t* aoi,int uid,int type,float x,float z) {
 	if (aoi->freelist == NULL) {
 		luaL_error(L,"new object error:object count limited:%d",aoi->max);
 	}
@@ -168,8 +168,8 @@ _add_object(lua_State* L) {
 	aoi_t* aoi = (aoi_t*)lua_touserdata(L, 1);
 
 	int uid = lua_tointeger(L,2);
-	double x = lua_tonumber(L,3);
-	double z = lua_tonumber(L,4);
+	float x = lua_tonumber(L,3);
+	float z = lua_tonumber(L,4);
 
 	if (x >= aoi->width || z >= aoi->height) {
 		luaL_error(L,"add object error:invalid local:[%f,%f]",x,z);
@@ -239,8 +239,8 @@ static int
 _update_object(lua_State* L) {
 	aoi_t* aoi = (aoi_t*)lua_touserdata(L, 1);
 	int id = lua_tointeger(L,2);
-	double nx = lua_tonumber(L,3);
-	double nz = lua_tonumber(L,4);
+	float nx = lua_tonumber(L,3);
+	float nz = lua_tonumber(L,4);
 
 	if (nx >= aoi->width || nz >= aoi->height) {
 		luaL_error(L,"update object error:invalid local:[%f,%f]",nx,nz);
@@ -343,8 +343,8 @@ static int
 _add_watcher(lua_State* L) {
 	aoi_t* aoi = (aoi_t*)lua_touserdata(L, 1);
 	int uid = lua_tointeger(L,2);
-	double x = lua_tonumber(L,3);
-	double z = lua_tonumber(L,4);
+	float x = lua_tonumber(L,3);
+	float z = lua_tonumber(L,4);
 	int range = lua_tointeger(L,5);
 
 	object_t* obj = new_object(L,aoi,uid,TYPE_WATCHER,x,z);
@@ -415,8 +415,8 @@ static int
 _update_watcher(lua_State* L) {
 	aoi_t* aoi = (aoi_t*)lua_touserdata(L, 1);
 	int id = lua_tointeger(L,2);
-	double nx = lua_tonumber(L,3);
-	double nz = lua_tonumber(L,4);
+	float nx = lua_tonumber(L,3);
+	float nz = lua_tonumber(L,4);
 
 	object_t* obj = &aoi->objs[id];
 	assert(obj->type == TYPE_WATCHER);
