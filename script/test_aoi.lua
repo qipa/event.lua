@@ -1,66 +1,89 @@
-local fastaoi = require "fastaoi.core"
-local util = require "util"
+local aoi_core = require "fastaoi.core"
 local event = require "event"
+local util = require "util"
+local vector2 = require "script.common.vector2"
+local helper = require "helper"
 
-local function distance(pos0,pos1)
-	return math.sqrt((pos0.x - pos1.x) * (pos0.x - pos1.x) + (pos0.z - pos1.z) * (pos0.z - pos1.z))
+local aoi = aoi_core.new(1000,1000,5,3,10000)
+
+local object_ctx = {}
+local aoi_ctx = {}
+
+local object = {}
+
+function object:new(id,x,z)
+	local ctx = setmetatable({},{__index = self})
+	ctx.x = x
+	ctx.z = z
+	ctx.id = id
+
+	local enter
+
+	ctx.aoi_id,enter = aoi:enter(id,x,z,0)
+
+	for _,other_id in pairs(enter) do
+		local other = object_ctx[other_id]
+		other:enter(ctx)
+	end
+
+	for _,other_id in pairs(enter) do
+		local other = object_ctx[other_id]
+		ctx:enter(other)
+	end
+
+	object_ctx[id] = ctx
+
+	return ctx
 end
 
+function object:move(x,z)
+	self.x = x
+	self.z = z
 
-local function test_simple_aoi()
-	local core = fastaoi.new(1000,1000,2,5,1000)
+	local enter,leave = aoi:update(self.aoi_id,x,z)
 
-	local objs = {}
-	for i = 2,1000 do
-		local x,z = math.random(1,999),math.random(1,999)
-		local id = core:enter(i,x,z,0)
-		objs[id] = {x = x,z = z,uid = i}
-	end
-	
-	local id,enter = core:enter(1,100,100,0)
-	local list = {}
 	for _,id in pairs(enter) do
-		list[id] = true
-		print("enter",id,distance({x = 100,z = 100},objs[id]))
+		local other = object_ctx[id]
+		other:enter(self)
+		self:enter(other)
 	end
 
-	
-	local now = util.time()
-	-- for i = 1,1024 do
-		for i = 1,849 do
-			local x ,z = 100+i,100+i
-			local enter,leave = core:update(0,x,z)
-			-- if #enter ~= 0 then
-			-- 	-- print("<=====")
-			-- 	for _,id in pairs(enter) do
-			-- 		assert(list[id] == nil)
-			-- 		list[id] = true
-			-- 		-- print("enter",id,distance({x = x,z = z},objs[id]))
-			-- 	end
-			-- end
-
-			-- if #leave ~= 0 then
-			-- 	-- print("=====>")
-			-- 	for _,id in pairs(leave) do
-			-- 		assert(list[id] ~= nil)
-			-- 		list[id] = nil
-			-- 		-- print("leave",id,distance({x = x,z = z},objs[id]))
-			-- 	end
-			-- end
-
-		end
-	-- end
-
-	for id in pairs(list) do
-		print(id,distance({x = 949,z = 949},objs[id]))
+	for _,id in pairs(leave) do
+		local other = object_ctx[id]
+		other:leave(self)
+		self:leave(other)
 	end
-
-	print('simple aoi time', (util.time() - now) / 100)
 
 end
 
-event.fork(function ()
-	test_simple_aoi()
-	event.sleep(1)
-	event.breakout()
-end)
+function object:enter(other)
+	-- print(string.format("enter:%d:[%f,%f],%d:[%f:%f],%f",self.id,self.x,self.z,other.id,other.x,other.z,vector2.distance(self.x,self.z,other.x,other.z)))
+end
+
+function object:leave(other)
+	-- print(string.format("leave:%d:[%f,%f],%d:[%f:%f],%f",self.id,self.x,self.z,other.id,other.x,other.z,vector2.distance(self.x,self.z,other.x,other.z)))
+end
+
+for i = 1,5000 do
+	local obj = object:new(i,math.random(0,999),math.random(0,999))
+end
+
+local move_set = {}
+
+for i = 1,5000 do
+	event.fork(function ()
+		local move_obj = object_ctx[i]
+		while true do
+			local x,z = math.random(0,999),math.random(0,999)
+			while true do
+				event.sleep(0.1)
+				local rx,rz = vector2.move_forward(move_obj.x,move_obj.z,x,z,5)
+				local ox,oz = move_obj.x,move_obj.z
+				move_obj:move(rx,rz)
+				if vector2.distance(ox,oz,rx,rz) <= 1 then
+					break
+				end
+			end
+		end
+	end)
+end

@@ -5,7 +5,7 @@ local aoi_core = require "toweraoi.core"
 local helper = require "helper"
 
 local aoi = aoi_core.create(10000,1000,1000,5)
-print(helper.allocated()/1024)
+
 local object_ctx = {}
 
 local object = {}
@@ -74,7 +74,7 @@ function object:leave(other)
 end
 
 for i = 1,5000 do
-	local obj = object:new(i,math.random(0,1000),math.random(0,1000),math.random(1,5))
+	local obj = object:new(i,math.random(0,1000),math.random(0,1000),3)
 end
 
 local move_set = {}
@@ -86,7 +86,7 @@ for i = 1,5000 do
 			local x,z = math.random(0,1000),math.random(0,1000)
 			while true do
 				event.sleep(0.1)
-				local rx,rz = vector2.move_forward(move_obj.x,move_obj.z,x,z,10)
+				local rx,rz = vector2.move_forward(move_obj.x,move_obj.z,x,z,5)
 				local ox,oz = move_obj.x,move_obj.z
 				move_obj:move(rx,rz)
 				if vector2.distance(ox,oz,rx,rz) <= 1 then
