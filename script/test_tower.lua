@@ -4,7 +4,7 @@ local vector2 = require "script.common.vector2"
 local aoi_core = require "toweraoi.core"
 local helper = require "helper"
 
-local aoi = aoi_core.create(1000,1000,1000,5)
+local aoi = aoi_core.create(10000,1000,1000,5)
 print(helper.allocated()/1024)
 local object_ctx = {}
 
@@ -73,17 +73,17 @@ function object:leave(other)
 	-- print(string.format("leave:%d:[%f,%f],%d:[%f:%f],%f",self.id,self.x,self.z,other.id,other.x,other.z,vector2.distance(self.x,self.z,other.x,other.z)))
 end
 
-for i = 1,500 do
-	local obj = object:new(i,math.random(0,999),math.random(0,999),math.random(1,5))
+for i = 1,5000 do
+	local obj = object:new(i,math.random(0,1000),math.random(0,1000),math.random(1,5))
 end
 
 local move_set = {}
 
-for i = 1,500 do
+for i = 1,5000 do
 	event.fork(function ()
 		local move_obj = object_ctx[i]
 		while true do
-			local x,z = math.random(0,999),math.random(0,999)
+			local x,z = math.random(0,1000),math.random(0,1000)
 			while true do
 				event.sleep(0.1)
 				local rx,rz = vector2.move_forward(move_obj.x,move_obj.z,x,z,10)
