@@ -2,15 +2,15 @@ local event = require "event"
 local util = require "util"
 local vector2 = require "script.common.vector2"
 local aoi_core = require "toweraoi.core"
-
+local helper = require "helper"
 
 local aoi = aoi_core.create(1000,1000,1000,5)
-
+print(helper.allocated()/1024)
 local object_ctx = {}
 
 local object = {}
 
-function object:new(id,x,z)
+function object:new(id,x,z,r)
 	local ctx = setmetatable({},{__index = self})
 	ctx.x = x
 	ctx.z = z
@@ -19,7 +19,7 @@ function object:new(id,x,z)
 	local enter_other,enter_self
 
 	ctx.aoi_object_id,enter_other = aoi:add_object(id,x,z)
-	ctx.aoi_watcher_id,enter_self = aoi:add_watcher(id,x,z,3)
+	ctx.aoi_watcher_id,enter_self = aoi:add_watcher(id,x,z,r)
 
 	for _,other_id in pairs(enter_other) do
 		local other = object_ctx[other_id]
@@ -70,11 +70,11 @@ function object:enter(other)
 end
 
 function object:leave(other)
-	print(string.format("leave:%d:[%f,%f],:%d:[%f:%f],%f",self.id,self.x,self.z,other.id,other.x,other.z,vector2.distance(self.x,self.z,other.x,other.z)))
+	print(string.format("leave:%d:[%f,%f],%d:[%f:%f],%f",self.id,self.x,self.z,other.id,other.x,other.z,vector2.distance(self.x,self.z,other.x,other.z)))
 end
 
 for i = 1,100 do
-	local obj = object:new(i,math.random(0,999),math.random(0,999))
+	local obj = object:new(i,math.random(0,999),math.random(0,999),math.random(1,5))
 end
 
 local move_obj = object_ctx[math.random(1,100)]
