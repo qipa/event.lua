@@ -21,8 +21,7 @@ struct location {
 
 struct object {
 	struct list_node node;
-	struct location cur;
-	struct location des;
+	struct location locat;
 	int id;
 	int uid;
 	int level;
@@ -142,14 +141,14 @@ make_table(lua_State *L,struct list *list,struct object *self,int index,int* arr
 
 int 
 aoi_enter(lua_State *L,struct aoi_context *ctx,struct object *obj) {
-	struct tile *tl = tile_withpos(ctx,&obj->cur);
+	struct tile *tl = tile_withpos(ctx,&obj->locat);
 	if (tl == NULL)
-		luaL_error(L,"[aoi_enter]invalid pos[%d:%d]",obj->cur.x,obj->cur.z);
+		luaL_error(L,"[aoi_enter]invalid pos[%d:%d]",obj->locat.x,obj->locat.z);
 
 	struct location bl = {0,0};
 	struct location tr = {0,0};
-	if (get_region(ctx,&obj->cur,ctx->range,&bl,&tr) < 0)
-		luaL_error(L,"[aoi_enter]invalid pos[%d:%d],range[%d]",obj->cur.x,obj->cur.z,ctx->range);
+	if (get_region(ctx,&obj->locat,ctx->range,&bl,&tr) < 0)
+		luaL_error(L,"[aoi_enter]invalid pos[%d:%d],range[%d]",obj->locat.x,obj->locat.z,ctx->range);
 
 	int array_index = 1;
 
@@ -175,15 +174,15 @@ aoi_enter(lua_State *L,struct aoi_context *ctx,struct object *obj) {
 
 int 
 aoi_leave(lua_State *L,struct aoi_context* ctx,struct object *obj) {
-	struct tile *tl = tile_withpos(ctx,&obj->cur);
+	struct tile *tl = tile_withpos(ctx,&obj->locat);
 	if (tl == NULL)
-		luaL_error(L,"[aoi_leave]invalid pos[%d:%d]",obj->cur.x,obj->cur.z);
+		luaL_error(L,"[aoi_leave]invalid pos[%d:%d]",obj->locat.x,obj->locat.z);
 
 
 	struct location bl = {0,0};
 	struct location tr = {0,0};
-	if (get_region(ctx,&obj->cur,ctx->range,&bl,&tr) < 0)
-		luaL_error(L,"[aoi_leave]invalid pos[%d:%d],range[%d]",obj->cur.x,obj->cur.z,ctx->range);
+	if (get_region(ctx,&obj->locat,ctx->range,&bl,&tr) < 0)
+		luaL_error(L,"[aoi_leave]invalid pos[%d:%d],range[%d]",obj->locat.x,obj->locat.z,ctx->range);
 
 	int array_index = 1;
 	int x,z;
@@ -209,11 +208,11 @@ aoi_leave(lua_State *L,struct aoi_context* ctx,struct object *obj) {
 
 int 
 aoi_update(lua_State *L,struct aoi_context* ctx,struct object *obj,struct location *np) {
-	struct location op = obj->cur;
-	obj->cur = *np;
+	struct location op = obj->locat;
+	obj->locat = *np;
 
 	struct tile *otl = tile_withpos(ctx,&op);
-	struct tile *ntl = tile_withpos(ctx,&obj->cur);
+	struct tile *ntl = tile_withpos(ctx,&obj->locat);
 	if (otl == ntl)
 		return 0;
 
@@ -225,7 +224,7 @@ aoi_update(lua_State *L,struct aoi_context* ctx,struct object *obj,struct locati
 		return -1;
 
 	struct location nbl, ntr;
-	if (get_region(ctx, &obj->cur, ctx->range, &nbl, &ntr) < 0)
+	if (get_region(ctx, &obj->locat, ctx->range, &nbl, &ntr) < 0)
 		return -1;
 
 	int array_index = 1;
@@ -339,7 +338,7 @@ laoi_enter(lua_State *L) {
 	int level = luaL_optinteger(L,5,0);
 
 	if (x < 0 || z < 0 || x >= aoi->width || z >= aoi->heigh)
-		luaL_error(L,"[laoi_enter]invalid cur pos[%f:%f]",x,z);
+		luaL_error(L,"[laoi_enter]invalid locat pos[%f:%f]",x,z);
 
 	if (level < 0 || level >= MAX_LEVEL)
 		luaL_error(L,"[laoi_enter]level error:%d",level);
@@ -355,8 +354,8 @@ laoi_enter(lua_State *L) {
 
 	obj->id = id;
 	obj->uid = uid;
-	obj->cur.x = x;
-	obj->cur.z = z;
+	obj->locat.x = x;
+	obj->locat.z = z;
 	obj->level = level;
 
 	lua_pushinteger(L,obj->id);
@@ -418,14 +417,14 @@ laoi_viewlist(lua_State *L) {
 
 	struct object* obj = container_get(aoi->container,id);
 
-	struct tile *tl = tile_withpos(aoi,&obj->cur);
+	struct tile *tl = tile_withpos(aoi,&obj->locat);
 	if (tl == NULL)
-		luaL_error(L,"[_aoi_viewlist]invalid pos[%d:%d]",obj->cur.x,obj->cur.z);
+		luaL_error(L,"[_aoi_viewlist]invalid pos[%d:%d]",obj->locat.x,obj->locat.z);
 
 	struct location bl = {0,0};
 	struct location tr = {0,0};
-	if (get_region(aoi,&obj->cur,aoi->range,&bl,&tr) < 0)
-		luaL_error(L,"[_aoi_viewlist]invalid pos[%d:%d],range[%d]",obj->cur.x,obj->cur.z,aoi->range);
+	if (get_region(aoi,&obj->locat,aoi->range,&bl,&tr) < 0)
+		luaL_error(L,"[_aoi_viewlist]invalid pos[%d:%d],range[%d]",obj->locat.x,obj->locat.z,aoi->range);
 
 	lua_newtable(L);
 	int array_index = 1;
