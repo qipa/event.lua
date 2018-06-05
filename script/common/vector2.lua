@@ -62,8 +62,29 @@ function _M.inside_sector(x,z,center_x,center_z,range,toward_angle,degree)
 end
 
 function _M.inside_rectangle(x,z,center_x,center_z,toward_angle,length,width)
+	local dx = x - center_x
+	local dz = z - center_z
 
+	local z_angle = math.deg(math.atan2(dx,dz)) - toward_angle
+	if z_angle >= 270 then
+		z_angle = z_angle - 360
+	elseif z_angle <= -270 then
+		z_angle = z_angle + 360
+	end
 
+	if z_angle < -90 or z_angle > 90 then
+		return false
+	end
+
+	local z_radian = math.rad(math.abs(z_angle))
+	local dt = math.sqrt(dx * dx + dz * dz)
+	local x_change = dt * math.cos(z_radian)
+	local z_change = dt * math.sin(z_radian)
+
+	if (x_change < 0 or x_change > length) or (z_change < 0 or z_change > width) then
+		return false
+	end
+	return true
 end
 
 return _M
