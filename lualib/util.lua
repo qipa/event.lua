@@ -252,4 +252,8 @@ function _M.decimal_sub(value,from,to)
     return l
 end
 
+function _M.utf8_length(str)
+    utf8.codepoint(str,2,3)
+end
+
 return _M

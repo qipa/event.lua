@@ -21,4 +21,49 @@ function _M.move_forward(from_x,from_z,to_x,to_z,pass)
 	return _M.lerp(from_x,from_z,to_x,to_z,ratio)
 end
 
+function _M.rotation(x,z,center_x,center_z,angle)
+	local radian = math.rad(angle)
+	local sin = math.sin(radian)
+	local cos = math.cos(radian)
+	local rx = (x - center_x) * cos - (z - center_z) * sin + center_x
+	local rz = (x - center_x) * sin - (z - center_z) * cos + center_z
+	return rx,rz
+end
+
+function _M.inside_circle(x,z,center_x,center_z,range)
+	local dx = center_x - x
+	local dz = center_z - z
+
+	if math.abs(dx) > range or math.abs(dz) > range then
+		return false
+	end
+	return dx * dx + dz * dz <= range * range
+end
+
+function _M.inside_sector(x,z,center_x,center_z,range,toward_angle,degree)
+	if not _M.inside_circle(x,z,center_x,center_z,range)
+		return false
+	end
+
+	local dx = x - center_x
+	local dz = z - center_z
+
+	local z_angle = math.deg(math.atan2(dx,dz)) - toward_angle + degree / 2
+
+	while z_angle > 360 do
+		z_angle = z_angle - 360
+	end
+
+	while z_angle < 0 do
+		z_angle = z_angle + 360
+	end
+
+	return z_angle <= degree
+end
+
+function _M.inside_rectangle(x,z,center_x,center_z,toward_angle,length,width)
+
+
+end
+
 return _M
