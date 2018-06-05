@@ -30,9 +30,9 @@ function _M.rotation(x,z,center_x,center_z,angle)
 	return rx,rz
 end
 
-function _M.inside_circle(x,z,center_x,center_z,range)
-	local dx = center_x - x
-	local dz = center_z - z
+function _M.inside_circle(src_x,src_z,range,x,z)
+	local dx = src_x - x
+	local dz = src_z - z
 
 	if math.abs(dx) > range or math.abs(dz) > range then
 		return false
@@ -40,13 +40,13 @@ function _M.inside_circle(x,z,center_x,center_z,range)
 	return dx * dx + dz * dz <= range * range
 end
 
-function _M.inside_sector(x,z,center_x,center_z,range,toward_angle,degree)
-	if not _M.inside_circle(x,z,center_x,center_z,range)
+function _M.inside_sector(src_x,src_z,range,toward_angle,degree,x,z)
+	if not _M.inside_circle(src_x,src_z,range,x,z)
 		return false
 	end
 
-	local dx = x - center_x
-	local dz = z - center_z
+	local dx = x - src_x
+	local dz = z - src_z
 
 	local z_angle = math.deg(math.atan2(dx,dz)) - toward_angle + degree / 2
 
@@ -61,9 +61,9 @@ function _M.inside_sector(x,z,center_x,center_z,range,toward_angle,degree)
 	return z_angle <= degree
 end
 
-function _M.inside_rectangle(x,z,center_x,center_z,toward_angle,length,width)
-	local dx = x - center_x
-	local dz = z - center_z
+function _M.inside_rectangle(src_x,src_z,toward_angle,length,width,x,z)
+	local dx = x - src_x
+	local dz = z - src_z
 
 	local z_angle = math.deg(math.atan2(dx,dz)) - toward_angle
 	if z_angle >= 270 then
