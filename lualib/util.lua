@@ -1,5 +1,4 @@
 require("lfs")
-local event = require "event"
 local util_core = require "util.core"
 local filter_core = require "filter0.core"
 
@@ -9,19 +8,21 @@ local os_date = os.date
 local os_time = os.time
 local math_modf = math.modf
 
-local _M = {}
+local _M = setmetatable({},{__index = util_core})
 
-for method,func in pairs(lfs) do
-    if type(func) == "function" then
-        _M[method] = func
-    end
-end
+_M.mkdir = lfs.mkdir
+_M.attributes = lfs.attributes
+_M.link = lfs.link
+_M.unlock = lfs.unlock
+_M.touch = lfs.touch
+_M.currentdir = lfs.currentdir
+_M.rmdir = lfs.rmdir
+_M.chdir = lfs.chdir
+_M.dir = lfs.dir
 
-for method,func in pairs(util_core) do
-    if type(func) == "function" then
-        _M[method] = func
-    end
-end
+_M.convert = filter_core.convert
+_M.split_utf8 = filter_core.split
+_M.word_filter_create = filter_core.create
 
 local function get_tag( t )
     local str = type(t)
@@ -130,18 +131,6 @@ end
 
 function _M.readline(prompt,func)
     return util_core.readline(prompt or ">>",func or completion)
-end
-
-function _M.convert(str,from,to)
-    return filter_core.convert(str,from,to)
-end
-
-function _M.split_utf8(str)
-    return filter_core.split(str)
-end
-
-function _M.word_filter_new()
-    return filter_core.create()
 end
 
 function _M.to_date(unix_time)
@@ -372,7 +361,7 @@ function vector2:new(x,z)
     return vt
 end
 
-function vector2:new(vt)
+function vector2:instance(vt)
     return setmetatable(vt,self)
 end
 
