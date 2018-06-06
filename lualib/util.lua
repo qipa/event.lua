@@ -417,6 +417,32 @@ function vector2:normalize()
     return vector2:new(self[1] / dt,self[2] / dt)
 end
 
+function vector2:distance(to)
+    return math.sqrt((self[1] - to[1])^2 + (self[2] - to[2])^2)
+end
+
+function vector2:lerp(to,t)
+    local x = self[1] + (to[1] - self[1]) * t
+    local z = self[2] + (to[1] - self[2]) * t
+    return vector2:new(x,z)
+end
+
+function vector2:move_forward(vt,pass)
+    local dt = self:distance(vt)
+    local t = pass / dt
+    if t > 1 then
+        t = 1
+    end
+    return self:lerp(vt,t)
+end
+
+function vector2:move_toward(dir,dt)
+    local radian = math.atan2(dir[2] / dir[1])
+    local x = math.cos(radian) * dt + self[1]
+    local z = math.sin(radian) * dt + self[2]
+    return vector2:new(x,z)
+end
+
 function vector2:dot(vt)
     return self[1] * vt[1] + self[2] * vt[2]
 end
@@ -427,7 +453,7 @@ end
 
 _M.vector2 = vector2
 
---intersect
+
 function _M.dot2segment(src_x,src_z,u_x,u_z,x,z)
     local pt_over = vector2:new(x,z)
     local pt_start = vector2:new(src_x,src_z)
@@ -448,33 +474,6 @@ function _M.dot2segment(src_x,src_z,u_x,u_z,x,z)
 
     local result = (pt_over - (pt_start + vt_u)):sqrmagnitude()
     return result
-end
-
-function _M.capsule_circle_intersect(src_x,src_z,u_x,u_z,capsule_r,c_x,c_z,circle_r)
-    return _M.dot2segment(src_x,src_z,u_x,u_z,c_x,c_z) <= (capsule_r + circle_r) * (capsule_r + circle_r)
-end
-
-local function aabb_circle_intersect(src_x,src_z,length,width,c_x,c_z,c_r)
-    local hx = src_x + length / 2
-    local hz = src_z + width / 2
-
-    local vt = vector2:new(c_x - src_x,c_z - src_z):abs()
-
-    local vt_h = vector2:new(hx - src_x,hz - src_z)
-
-    local vt_u = vt - vt_h
-    if vt_u[1] < 0 then
-        vt_u[1] = 0
-    end
-    if vt_u[2] < 0 then
-        vt_u[2] = 0
-    end
-    return vt_u:sqrmagnitude() <= c_r * c_r
-end
-
-function _M.rectangle_circle_intersect(src_x,src_z,length,width,angle,c_x,c_z,c_r)
-    c_x,cz = _M.rotation(c_x,cz,src_x,src_z,angle)
-    return aabb_circle_intersect(src_x,src_z,length,width,c_x,c_z,c_r)
 end
 
 return _M
