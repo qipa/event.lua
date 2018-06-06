@@ -348,4 +348,133 @@ function _M.inside_rectangle(src_x,src_z,toward_angle,length,width,x,z)
     return true
 end
 
+--vector2
+local vector2 = {}
+vector2.__index = vector2
+
+function vector2:new(x,z)
+    local vt = setmetatable({},self)
+    vt[1] = x
+    vt[2] = z
+    return vt
+end
+
+function vector2:instance(vt)
+   setmetatable(vt,self)
+   return vt
+end
+
+function vector2:__add(vt)
+    local x = self[1] + vt[1]
+    local z = self[2] + vt[2]
+    return vector2:new(x,z)
+end
+
+function vector2:__sub(vt)
+    local x = self[1] - vt[1]
+    local z = self[2] - vt[2]
+    return vector2:new(x,z)
+end
+
+function vector2:__mul(vt)
+    local x = self[1] * vt[1]
+    local z = self[2] * vt[2]
+    return vector2:new(x,z)
+end
+
+function vector2:__div(vt)
+    local x = self[1] / vt[1]
+    local z = self[2] / vt[2]
+    return vector2:new(x,z)
+end
+
+function vector2:__eq(vt)
+    return self[1] == vt[1] and self[2] == vt[2]
+end
+
+function vector2:abs()
+    local x = math.abs(self[1])
+    local z = math.abs(self[2])
+    return vector2:new(x,z)
+end
+
+function vector2:angle(vt)
+    local dot = self:dot(vt)
+    local cos = dot / (self:magnitude() * vt:magnitude())
+    return math.deg(math.acos(cos))
+end
+
+function vector2:magnitude()
+    return math.sqrt(self[1] * self[1] + self[2] * self[2])
+end
+
+function vector2:sqrmagnitude()
+    return self[1] * self[1] + self[2] * self[2]
+end
+
+function vector2:normalize()
+    local dt = math.sqrt(self[1] * self[1] + self[2] * self[2])
+    return vector2:new(self[1] / dt,self[2] / dt)
+end
+
+function vector2:dot(vt)
+    return self[1] * vt[1] + self[2] * vt[2]
+end
+
+function vector2:cross(vt)
+    return self[1] * vt[2] - self[2] * vt[1]
+end
+
+_M.vector2 = vector2
+
+--intersect
+function _M.dot2segment(src_x,src_z,u_x,u_z,x,z)
+    local pt_over = vector2:new(x,z)
+    local pt_start = vector2:new(src_x,src_z)
+    local vt_u = vector2:new(u_x,u_z)
+    
+    local vt_src = pt_over - pt_start
+
+    local t = vt_src:dot(vt_u) / vt_u:sqrmagnitude()
+
+    if t < 0 then
+        t = 0
+    elseif t > 1 then
+        t = 1
+    end
+
+    vt_u[1] = vt_u[1] * t
+    vt_u[2] = vt_u[2] * t
+
+    local result = (pt_over - (pt_start + vt_u)):sqrmagnitude()
+    return result
+end
+
+function _M.capsule_circle_intersect(src_x,src_z,u_x,u_z,capsule_r,c_x,c_z,circle_r)
+    return _M.dot2segment(src_x,src_z,u_x,u_z,c_x,c_z) <= (capsule_r + circle_r) * (capsule_r + circle_r)
+end
+
+local function aabb_circle_intersect(src_x,src_z,length,width,c_x,c_z,c_r)
+    local hx = src_x + length / 2
+    local hz = src_z + width / 2
+
+    local vt = vector2:new(c_x - src_x,c_z - src_z):abs()
+
+    local vt_h = vector2:new(hx - src_x,hz - src_z)
+
+    local vt_u = vt - vt_h
+    if vt_u[1] < 0 then
+        vt_u[1] = 0
+    end
+    if vt_u[2] < 0 then
+        vt_u[2] = 0
+    end
+    return vt_u:sqrmagnitude() <= c_r * c_r
+end
+
+function _M.rectangle_circle_intersect(src_x,src_z,length,width,angle,c_x,c_z,c_r)
+    c_x,cz = _M.rotation(c_x,cz,src_x,src_z,angle)
+    return aabb_circle_intersect(src_x,src_z,length,width,c_x,c_z,c_r)
+end
+
 return _M
