@@ -287,7 +287,7 @@ function _M.rotation(x,z,center_x,center_z,angle)
     local sin = math.sin(radian)
     local cos = math.cos(radian)
     local rx = (x - center_x) * cos - (z - center_z) * sin + center_x
-    local rz = (x - center_x) * sin - (z - center_z) * cos + center_z
+    local rz = (x - center_x) * sin + (z - center_z) * cos + center_z
     return rx,rz
 end
 
@@ -357,11 +357,6 @@ function vector2:new(x,z)
     vt[1] = x
     vt[2] = z
     return vt
-end
-
-function vector2:instance(vt)
-   setmetatable(vt,self)
-   return vt
 end
 
 function vector2:__add(vt)
@@ -443,6 +438,15 @@ function vector2:move_toward(dir,dt)
     return vector2:new(x,z)
 end
 
+function vector2:rotation(center,angle)
+    local radian = math.rad(angle)
+    local sin = math.sin(radian)
+    local cos = math.cos(radian)
+    local rx = (self[1] - center[1]) * cos - (self[2] - center[2]) * sin + center[1]
+    local rz = (self[1] - center[1]) * sin + (self[2] - center[2]) * cos + center[2]
+    return vector2:new(rx,rz)
+end
+
 function vector2:dot(vt)
     return self[1] * vt[1] + self[2] * vt[2]
 end
@@ -452,7 +456,6 @@ function vector2:cross(vt)
 end
 
 _M.vector2 = vector2
-
 
 function _M.dot2segment(src_x,src_z,u_x,u_z,x,z)
     local pt_over = vector2:new(x,z)
