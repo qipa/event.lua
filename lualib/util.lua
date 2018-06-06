@@ -1,6 +1,7 @@
 require("lfs")
 local event = require "event"
 local util_core = require "util.core"
+local filter_core = require "filter0.core"
 
 local type = type
 local assert = assert
@@ -129,6 +130,18 @@ end
 
 function _M.readline(prompt,func)
     return util_core.readline(prompt or ">>",func or completion)
+end
+
+function _M.convert(str,from,to)
+    return filter_core.convert(str,from,to)
+end
+
+function _M.split_utf8(str)
+    return filter_core.split(str)
+end
+
+function _M.word_filter_new()
+    return filter_core.create()
 end
 
 function _M.to_date(unix_time)
