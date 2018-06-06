@@ -359,6 +359,10 @@ function vector2:new(x,z)
     return vt
 end
 
+function vector2:new(vt)
+    return setmetatable(vt,self)
+end
+
 function vector2:__add(vt)
     local x = self[1] + vt[1]
     local z = self[2] + vt[2]
