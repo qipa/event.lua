@@ -171,7 +171,6 @@ lhook (lua_State *L, lua_Debug *ar) {
 	}
 	else {
 		assert(ar->event == LUA_HOOKRET);
-		printf("%x,", L);
 		pop_frame(co_ctx, ctx);
 	}
 }
@@ -263,6 +262,7 @@ lstop(lua_State* L) {
 	while (lua_next(L, -2) != 0)	{
 		lua_State* co = lua_tothread(L, -2);
 		co_t* co_ctx = lua_touserdata(L, -1);
+		free(co_ctx);
 		lua_sethook(co, NULL, 0, 0);
 		lua_pop(L, 1);
 	}
@@ -270,6 +270,7 @@ lstop(lua_State* L) {
 	lua_pushnil(L);
 	lua_setfield(L, LUA_REGISTRYINDEX, "profiler");
 
+	lua_close(ctx->pool);
 	free(ctx);
 	return 0;
 }
