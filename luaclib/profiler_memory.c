@@ -8,11 +8,17 @@
 #include <string.h>
 #include <assert.h>
 
+#ifdef _WIN32
+#define inline __inline
+#endif
+
 typedef struct context {
 	lua_Alloc alloc;
 	void* ud;
 	struct co* co_ctx;
 	lua_State* pool;
+	lua_State* main;
+	struct frame* freelist;
 } context_t;
 
 typedef struct frame {
@@ -25,6 +31,8 @@ typedef struct frame {
 	int alloc_count;
 	struct frame* next;
 	struct frame* prev;
+
+	struct frame* free_next;
 } frame_t;
 
 typedef struct co {
@@ -70,9 +78,29 @@ create_string(context_t* profiler, const char* str) {
 	return ptr;
 }
 
+static inline frame_t*
+create_frame(context_t* ctx) {
+	if ( ctx->freelist) {
+		frame_t* frame = ctx->freelist;
+		ctx->freelist = frame->free_next;
+		memset(frame, 0, sizeof( *frame ));
+		return frame;
+	}
+	frame_t* frame = malloc(sizeof( *frame ));
+	memset(frame, 0, sizeof( *frame ));
+	return frame;
+}
+
+static inline void
+delete_frame(context_t* ctx,frame_t* frame) {
+	frame->free_next = ctx->freelist;
+	ctx->freelist = frame;
+}
+
 void 
 push_frame(co_t* co_ctx, context_t* profiler, int tailcall, const char* name, const char* source, int linedefined, int currentline) {
-	frame_t* frame = malloc(sizeof( *frame ));
+	frame_t* frame = create_frame(profiler);
+
 	frame->name = create_string(profiler, name);
 	frame->source = create_string(profiler, source);
 	frame->linedefined = linedefined;
@@ -119,7 +147,40 @@ pop_frame(co_t* co_ctx, context_t* profiler) {
 	frame->alloc_count = co_ctx->alloc_count - frame->alloc_count;
 	frame->alloc_total = co_ctx->alloc_total - frame->alloc_total;
 
-	printf("%s,%s,%d:%d,%d\n", frame->name, frame->source, frame->linedefined, frame->alloc_count, frame->alloc_total);
+	//printf("%s,%s,%d,%d:%d,%d\n", frame->name, frame->source, frame->linedefined,frame->currentline, frame->alloc_count, frame->alloc_total);
+
+	lua_getfield(profiler->main, LUA_REGISTRYINDEX, "profiler_record");
+	const char* key = lua_pushfstring(profiler->main, "%s:%d:%s", frame->source, frame->linedefined, frame->name);
+	lua_pushvalue(profiler->main, -1);
+	lua_gettable(profiler->main, -3);
+	if ( lua_isnil(profiler->main, -1)) {
+		lua_pop(profiler->main, 1);
+		lua_newtable(profiler->main);
+		lua_pushinteger(profiler->main, frame->alloc_count);
+		lua_setfield(profiler->main, -2, "alloc_count");
+		lua_pushinteger(profiler->main, frame->alloc_total);
+		lua_setfield(profiler->main, -2, "alloc_total");
+		lua_setfield(profiler->main, -3, key);
+		lua_pop(profiler->main, 2);
+	}
+	else {
+		lua_getfield(profiler->main, -1, "alloc_count");
+		int count = lua_tointeger(profiler->main, -1);
+		lua_pop(profiler->main, 1);
+		lua_pushinteger(profiler->main, count + frame->alloc_count);
+		lua_setfield(profiler->main, -2, "alloc_count");
+
+		lua_getfield(profiler->main, -1, "alloc_total");
+		int total = lua_tointeger(profiler->main, -1);
+		lua_pop(profiler->main, 1);
+		lua_pushinteger(profiler->main, total + frame->alloc_total);
+		lua_setfield(profiler->main, -2, "alloc_total");
+
+		lua_pop(profiler->main, 3);
+	}
+
+
+	delete_frame(profiler, frame);
 }
 
 static void 
@@ -149,22 +210,6 @@ lhook (lua_State *L, lua_Debug *ar) {
 	}
 
 	lua_getinfo(L, "nS", ar);
-
-	//switch ( ar->event )
-	//{
-	//case LUA_HOOKCALL:
-	//printf("call,");
-	//break;
-	//case LUA_HOOKTAILCALL:
-	//printf("tailcall,");
-	//break;
-	//case LUA_HOOKRET:
-	//printf("return,");
-	//break;
-	//default:
-	//break;
-	//}
-	//printf("%s,%s,%d,%d,%d,%d\n", ar->name, ar->source, ar->linedefined, currentline,ctx->alloc_total,ctx->alloc_count);
 
 	if ( ar->event == LUA_HOOKCALL || ar->event == LUA_HOOKTAILCALL ) {
 		push_frame(co_ctx, ctx, ar->event == LUA_HOOKTAILCALL, ar->name, ar->source, ar->linedefined, currentline);
@@ -262,6 +307,14 @@ lstop(lua_State* L) {
 	while (lua_next(L, -2) != 0)	{
 		lua_State* co = lua_tothread(L, -2);
 		co_t* co_ctx = lua_touserdata(L, -1);
+
+		frame_t* cursor = co_ctx->head;
+		while ( cursor ) {
+			frame_t* tmp = cursor;
+			cursor = cursor->free_next;
+			free(tmp);
+		}
+
 		free(co_ctx);
 		lua_sethook(co, NULL, 0, 0);
 		lua_pop(L, 1);
@@ -270,13 +323,23 @@ lstop(lua_State* L) {
 	lua_pushnil(L);
 	lua_setfield(L, LUA_REGISTRYINDEX, "profiler");
 
+	frame_t* cursor = ctx->freelist;
+	while ( cursor ) {
+		frame_t* tmp = cursor;
+		cursor = cursor->free_next;
+		free(tmp);
+	}
 	lua_close(ctx->pool);
 	free(ctx);
-	return 0;
+
+	lua_getfield(L, LUA_REGISTRYINDEX, "profiler_record");
+	lua_pushnil(L);
+	lua_setfield(L, LUA_REGISTRYINDEX, "profiler_record");
+	return 1;
 }
 
 int
-lprofiler_start(lua_State* L) {
+lmem_profiler_start(lua_State* L) {
 	context_t* ctx = malloc(sizeof(*ctx));
 	memset(ctx, 0, sizeof(*ctx));
 
@@ -292,6 +355,11 @@ lprofiler_start(lua_State* L) {
 
 	ctx->co_ctx = co_ctx;
 	lua_setallocf(L, lalloc, ctx);
+
+	ctx->main = G(L)->mainthread;
+
+	lua_newtable(L);
+	lua_setfield(L, LUA_REGISTRYINDEX, "profiler_record");
 	
 	lua_newtable(L);
 	lua_pushthread(L);
