@@ -7,8 +7,8 @@ local util = require "util"
 local logger = require "logger"
 
 
--- local stop_func = util.profiler_stack_start("lua.prof")
-local stop_func = util.profiler_start()
+local stop_func = util.profiler_stack_start("lua.prof")
+-- local stop_func = util.profiler_start()
 
 local _M = {}
 
@@ -73,6 +73,6 @@ end)
 
 event.timer(10,function (timer)
 	timer:cancel()
-	-- stop_func("lua.prof")
-	table.print(stop_func())
+	stop_func("lua.prof")
+	-- table.print(stop_func())
 end)

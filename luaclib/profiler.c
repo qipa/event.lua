@@ -145,6 +145,7 @@ pop_frame(co_t* co_ctx, context_t* profiler) {
 
 	//printf("%s,%s,%d,%d:%d,%d\n", frame->name, frame->source, frame->linedefined,frame->currentline, frame->alloc_count, frame->alloc_total);
 
+	//FIXME:提交到context里，stop后一次性处理
 	lua_getfield(profiler->main, LUA_REGISTRYINDEX, "profiler_record");
 	const char* key = lua_pushfstring(profiler->main, "%s:%d:%s", frame->source, frame->linedefined, frame->name);
 	lua_pushvalue(profiler->main, -1);

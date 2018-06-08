@@ -114,6 +114,8 @@ static void
 hook_func (lua_State *L, lua_Debug *ar) {
 	lua_sethook(L, NULL, 0, 0);
 	context_t* ctx = pthread_getspecific(profiler_key);
+	if (ctx == NULL)
+		return;
 
 	lua_getglobal(ctx->report, "collect");
 	
@@ -193,6 +195,8 @@ lresume(lua_State *L) {
 static int
 lstop(lua_State *L) {
 	stop_profiler();
+
+	pthread_setspecific(profiler_key, 0);
 
 	lua_getglobal(L, "coroutine");
 	lua_pushvalue(L, lua_upvalueindex(2));
