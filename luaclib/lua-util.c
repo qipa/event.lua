@@ -885,6 +885,7 @@ luaopen_util_core(lua_State* L){
         { "topK", topK },
         { "size_of", size_of },
         { "profiler_start", lprofiler_start },
+        { "profiler_stack_start", lprofiler_stack_start },
         { NULL, NULL },
     };
     luaL_newlib(L,l);
