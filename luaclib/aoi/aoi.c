@@ -5,43 +5,51 @@
 #define AOI_HIGH_BOUND 	4
 
 typedef struct position {
-
+	int x;
+	int z;
 } position_t;
 
-
-typedef struct linknode {
-	struct linknode* prev;
-	struct linknode* next;
-	position_t pos;
-	uint8_t flag;
-	aoi_context_t* owner;
-} linknode_t;
 
 typedef struct linklist {
 	linknode_t* head;
 	linknode_t* tail;
 } linklist_t;
 
-
 struct aoi_entity;
 struct aoi_trigger;
 
 typedef struct aoi_object {
+	int uid;
 	struct aoi_entity* entity;
 	struct aoi_trigger* trigger;
+
+	struct aoi_object* enter_head;
+	struct aoi_object* enter_tail;
+
+	struct aoi_object* leave_head;
+	struct aoi_object* leave_tail;
+
+	struct aoi_object* next;
+	struct aoi_object* prev;
 } aoi_object_t;
+
+typedef struct linknode {
+	aoi_object_t* owner;
+	struct linknode* prev;
+	struct linknode* next;
+	position_t pos;
+	uint8_t flag;
+} linknode_t;
 
 typedef struct aoi_entity {
 	position_t center;
 	linknode_t node[2];
-	aoi_object_t* owner;
 } aoi_entity_t;
 
 typedef struct aoi_trigger {
 	position_t center;
 	linknode_t node[4];
 	int range;
-	aoi_object_t* owner;
 } aoi_trigger_t;
 
 typedef struct aoi_context {
@@ -78,26 +86,17 @@ shuffle_z(aoi_context_t* aoi_ctx,linknode_t* node,int z) {
 
 void
 shuffle_entity(aoi_context_t* aoi_ctx,aoi_entity_t* entity,int x,int z) {
-	if (!shuffle_x(aoi_ctx,&entity->node[0],x)) {
-		shuffle_z(aoi_ctx,&entity->node[1],z)
-	}
+	shuffle_x(aoi_ctx,&entity->node[0],x);
+	shuffle_z(aoi_ctx,&entity->node[1],z);
 }
 
 void
 shuffle_trigger(aoi_context_t* aoi_ctx,aoi_trigger_t* trigger,int x,int z) {
-	int change = 0;
-	if (shuffle_x(aoi_ctx,&trigger->node[0],x)) {
-		change = 1;
-	}
+	shuffle_x(aoi_ctx,&trigger->node[0],x);
+	shuffle_x(aoi_ctx,&trigger->node[2],x);
 
-	if (shuffle_x(aoi_ctx,&trigger->node[2],x)) {
-		change = 1;
-	}
-
-	if (change == 0) {
-		shuffle_z(aoi_ctx,&trigger->node[1],z);
-		shuffle_z(aoi_ctx,&trigger->node[3],z);
-	}
+	shuffle_z(aoi_ctx,&trigger->node[1],z);
+	shuffle_z(aoi_ctx,&trigger->node[3],z);
 }
 
 void
@@ -177,10 +176,10 @@ delete_trigger(aoi_context_t* aoi_ctx,aoi_object_t* aoi_object) {
 
 void
 move_entity(aoi_context_t* aoi_ctx,aoi_object_t* aoi_object,int x,int z) {
-
+	shuffle_entity(aoi_ctx,aoi_object->entity,x,z);
 }
 
 void
 move_trigger(aoi_context_t* aoi_ctx,aoi_object_t* aoi_object,int x,int z) {
-	
+	shuffle_trigger(aoi_ctx,aoi_object->trigger,x,z);
 }
