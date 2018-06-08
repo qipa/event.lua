@@ -26,7 +26,6 @@ typedef struct frame {
 	const char* source;
 	int linedefined;
 	int tailcall;
-	int currentline;
 	int alloc_total;
 	int alloc_count;
 	struct frame* next;
@@ -51,7 +50,7 @@ typedef struct co {
 static void *
 lalloc (void *ud, void *ptr, size_t osize, size_t nsize) {
 	context_t* ctx = ud;
-	if (nsize != 0) {
+	if (nsize != 0 && nsize > osize) {
 		ctx->co_ctx->alloc_count++;
 		ctx->co_ctx->alloc_total += nsize - osize;
 	}
@@ -98,13 +97,12 @@ delete_frame(context_t* ctx,frame_t* frame) {
 }
 
 void 
-push_frame(co_t* co_ctx, context_t* profiler, int tailcall, const char* name, const char* source, int linedefined, int currentline) {
+push_frame(co_t* co_ctx, context_t* profiler, int tailcall, const char* name, const char* source, int linedefined) {
 	frame_t* frame = create_frame(profiler);
 
 	frame->name = create_string(profiler, name);
 	frame->source = create_string(profiler, source);
 	frame->linedefined = linedefined;
-	frame->currentline = currentline;
 	frame->tailcall = tailcall;
 	frame->alloc_count = co_ctx->alloc_count;
 	frame->alloc_total = co_ctx->alloc_total;
@@ -196,21 +194,10 @@ lhook (lua_State *L, lua_Debug *ar) {
 	context_t* ctx;
 	lua_getallocf(L, (void**)&ctx);
 	
-	int currentline;
-	lua_Debug previous_ar;
-
-	if ( lua_getstack(L, 1, &previous_ar) == 0 ) {
-		currentline = -1;
-	}
-	else {
-		lua_getinfo(L, "l", &previous_ar);
-		currentline = previous_ar.currentline;
-	}
-
 	lua_getinfo(L, "nS", ar);
 
 	if ( ar->event == LUA_HOOKCALL || ar->event == LUA_HOOKTAILCALL ) {
-		push_frame(co_ctx, ctx, ar->event == LUA_HOOKTAILCALL, ar->name, ar->source, ar->linedefined, currentline);
+		push_frame(co_ctx, ctx, ar->event == LUA_HOOKTAILCALL, ar->name, ar->source, ar->linedefined);
 	}
 	else {
 		assert(ar->event == LUA_HOOKRET);

@@ -7,8 +7,8 @@ local util = require "util"
 local logger = require "logger"
 
 
-local stop_func = util.profiler_stack_start("lua.prof")
--- local stop_func = util.profiler_start()
+-- local stop_func = util.profiler_stack_start("lua.prof")
+local stop_func = util.profiler_start()
 
 local _M = {}
 
@@ -54,8 +54,9 @@ end
 event.timer(0.01,function ()
 
 	for i = 1,1024 * 10 do
-			test1()
-		end
+		t = {}
+		test1()
+	end
 
 end)
 
@@ -70,8 +71,8 @@ event.fork(function ()
 
 end)
 
-event.timer(10,function (timer)
+event.timer(5,function (timer)
 	timer:cancel()
-	stop_func("lua.prof")
-	-- table.print(stop_func())
+	-- stop_func("lua.prof")
+	table.print(stop_func())
 end)
