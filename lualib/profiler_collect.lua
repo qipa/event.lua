@@ -54,9 +54,9 @@ end
 
 function collect_over(file)
 	print("collect_over")
-	local report_str = dump.pack(report)
+	local report_str = dump.tostring(report)
 	local FILE = io.open(file,"w")
-	FILE:write(report_str);
+	FILE:write(report_str)
 	FILE:close()
 end
 

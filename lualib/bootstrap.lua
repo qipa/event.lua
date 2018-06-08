@@ -12,7 +12,6 @@ local model = require "model"
 local route = require "route"
 local debugger = require "debugger"
 local helper = require "helper"
-local profiler = require "profiler.core"
 local worker = require "worker"
 
 table.print = util.dump
@@ -61,13 +60,9 @@ if main then
 	local _G_protect = {}
 	function _G_protect.__newindex(self,k,v)
 		rawset(_G,k,v)
-		print(string.format("%s:%s add to _G",k,v))
+		-- print(string.format("%s:%s add to _G",k,v))
 	end
 	setmetatable(_G,_G_protect)
-
-	if env.lua_profiler ~= nil then
-		profiler.start()
-	end
 
 	if env.heap_profiler ~= nil then
 		helper.heap.start(string.format("%s.%d",env.heap_profiler,env.tid))
@@ -96,10 +91,6 @@ if main then
 	event.dispatch()
 
 	worker.join()
-
-	if env.lua_profiler ~= nil then
-		profiler.stop(env.lua_profiler)
-	end
 
 	if env.heap_profiler ~= nil then
 		helper.heap.dump("stop")

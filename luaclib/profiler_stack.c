@@ -114,10 +114,7 @@ static void
 hook_func (lua_State *L, lua_Debug *ar) {
 	lua_sethook(L, NULL, 0, 0);
 	context_t* ctx = pthread_getspecific(profiler_key);
-	if (!ctx->report) {
-		return;
-	}
-	
+
 	lua_getglobal(ctx->report, "collect");
 	
 	int argc = 0;
@@ -127,18 +124,17 @@ hook_func (lua_State *L, lua_Debug *ar) {
 		traceback(cursor->L,ctx->report,&argc);
 		cursor = cursor->prev;
 	}
-	printf("\033c");
+	// printf("\033c");
 	if (lua_pcall(ctx->report,argc,0,0) != LUA_OK)  {
 		fprintf(stderr,"%s\n",lua_tostring(ctx->report,-1));
 	}
+	start_profiler();
 }
 
 static void
 signal_profiler(int sig, siginfo_t* sinfo, void* ucontext) {
 	context_t* ctx = pthread_getspecific(profiler_key);
-	if (!ctx->report) {
-		return;
-	}
+	stop_profiler();
 	lua_sethook(ctx->tail->L,hook_func, LUA_MASKCOUNT, 1);
 }
 
@@ -240,7 +236,8 @@ lprofiler_stack_start(lua_State *L) {
 		luaL_error(L, "stack top only start in main coroutine");
 	}
 
-	const char* file = lua_tostring(L, 1);
+	size_t size;
+	const char* file = lua_tolstring(L, 1, &size);
 
 	pthread_once(&init_once,&profiler_key_init);
 
@@ -281,6 +278,8 @@ lprofiler_stack_start(lua_State *L) {
 	lua_pushlightuserdata(L, ctx);
 	lua_pushcfunction(L, co_resume);
 	lua_pushcclosure(L, lstop, 2);
+
+	link_co(ctx,L);
 
 	start_profiler();
 

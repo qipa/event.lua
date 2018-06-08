@@ -1,14 +1,14 @@
 
 local event = require "event"
 local channel = require "channel"
-local handler = import "handler.master_handler"
 local helper = require "helper"
 local redis = require "redis"
 local util = require "util"
 local logger = require "logger"
-local profiler = require "profiler.core"
 
-profiler.start()
+
+local stop_func = util.profiler_stack_start("lua.prof")
+-- local stop_func = util.profiler_start()
 
 local _M = {}
 
@@ -70,7 +70,8 @@ event.fork(function ()
 
 end)
 
-event.timer(300,function (timer)
+event.timer(10,function (timer)
 	timer:cancel()
-	profiler.stop("./lua.prof")
+	stop_func("lua.prof")
+	-- table.print(stop_func())
 end)

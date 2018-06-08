@@ -1,7 +1,5 @@
 local event_core = require "ev.core"
 local co_core = require "co.core"
-local profiler_core = require "profiler.core"
-
 
 local _event
 
