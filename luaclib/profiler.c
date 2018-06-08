@@ -141,9 +141,7 @@ pop_frame(co_t* co_ctx, context_t* profiler) {
 			break;
 		}
 	}
-	
-	int count = co_ctx->alloc_count;
-	int total = co_ctx->alloc_total;
+
 	frame->alloc_count = co_ctx->alloc_count - frame->alloc_count;
 	frame->alloc_total = co_ctx->alloc_total - frame->alloc_total;
 
@@ -196,7 +194,7 @@ lhook (lua_State *L, lua_Debug *ar) {
 	}
 
 	context_t* ctx;
-	lua_getallocf(L, &ctx);
+	lua_getallocf(L, (void**)&ctx);
 	
 	int currentline;
 	lua_Debug previous_ar;
@@ -259,7 +257,7 @@ lco_resume(lua_State* L) {
 	next_co_ctx->prev = current_co_ctx;
 
 	context_t* ctx;
-	lua_getallocf(L, &ctx);
+	lua_getallocf(L, (void**)&ctx);
 	ctx->co_ctx = next_co_ctx;
 
 	lua_CFunction co_resume = lua_tocfunction(L, lua_upvalueindex(1));
@@ -275,7 +273,7 @@ lco_yield(lua_State* L) {
 	lua_pop(L, 2);
 
 	context_t* ctx;
-	lua_getallocf(L, &ctx);
+	lua_getallocf(L, (void**)&ctx);
 
 	co_t* prev_co_ctx = co_ctx->prev;
 	co_ctx->prev = NULL;
@@ -339,7 +337,10 @@ lstop(lua_State* L) {
 }
 
 int
-lmem_profiler_start(lua_State* L) {
+lprofiler_start(lua_State* L) {
+	if (L != G(L)->mainthread) {
+		luaL_error(L, "profiler only start in main coroutine");
+	}
 	context_t* ctx = malloc(sizeof(*ctx));
 	memset(ctx, 0, sizeof(*ctx));
 

@@ -856,6 +856,9 @@ size_of(lua_State* L) {
     return 1;
 }
 
+extern int lprofiler_start(lua_State* L);
+extern int lprofiler_stack_start(lua_State *L);
+
 int
 luaopen_util_core(lua_State* L){
     luaL_Reg l[] = {
@@ -881,6 +884,7 @@ luaopen_util_core(lua_State* L){
         { "rpc_pack", lrpc_pack },
         { "topK", topK },
         { "size_of", size_of },
+        { "profiler_start", lprofiler_start },
         { NULL, NULL },
     };
     luaL_newlib(L,l);
