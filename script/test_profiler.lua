@@ -71,7 +71,7 @@ event.fork(function ()
 
 end)
 
-event.timer(5,function (timer)
+event.timer(10,function (timer)
 	timer:cancel()
 	-- stop_func("lua.prof")
 	table.print(stop_func())

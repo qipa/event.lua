@@ -60,7 +60,7 @@ if main then
 	local _G_protect = {}
 	function _G_protect.__newindex(self,k,v)
 		rawset(_G,k,v)
-		-- print(string.format("%s:%s add to _G",k,v))
+		print(string.format("%s:%s add to _G",k,v))
 	end
 	setmetatable(_G,_G_protect)
 

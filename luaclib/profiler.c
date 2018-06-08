@@ -181,18 +181,13 @@ pop_frame(co_t* co_ctx, context_t* profiler) {
 
 static void 
 lhook (lua_State *L, lua_Debug *ar) {
-	lua_getfield(L, LUA_REGISTRYINDEX, "profiler");
-	lua_pushthread(L);
-	lua_gettable(L, -2);
-	co_t* co_ctx = lua_touserdata(L, -1);
-	lua_pop(L, 2);
+	context_t* ctx;
+	lua_getallocf(L, (void**)&ctx);
+	co_t* co_ctx = ctx->co_ctx;
 	if ( co_ctx->head == NULL ) {
 		if ( ar->event == LUA_HOOKRET )
 			return;
 	}
-
-	context_t* ctx;
-	lua_getallocf(L, (void**)&ctx);
 	
 	lua_getinfo(L, "nS", ar);
 
