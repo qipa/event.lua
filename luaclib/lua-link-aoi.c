@@ -56,12 +56,16 @@ typedef struct linklist {
 typedef struct aoi_entity {
 	position_t center;
 	linknode_t node[2];
+	entity_func func;
+	void* ud;
 } aoi_entity_t;
 
 typedef struct aoi_trigger {
 	position_t center;
 	linknode_t node[4];
 	int range;
+	trigger_func func;
+	void* ud;
 } aoi_trigger_t;
 
 typedef struct aoi_context {
@@ -337,6 +341,27 @@ shuffle_entity(aoi_context_t* aoi_ctx, aoi_entity_t* entity, int x, int z) {
 		shuffle_z(aoi_ctx, &entity->node[1], z, 1);
 	}
 	entity->center.z = z;
+
+	aoi_object_t* owner = entity->node[0].owner;
+	aoi_object_t* cursor = owner->enter_head;
+	while (cursor)
+	{
+		owner->entity->func(owner->uid, cursor->uid, 1, owner->entity->ud);
+		aoi_object_t* tmp = cursor;
+		cursor = cursor->next;
+		tmp->next = tmp->prev = NULL;
+	}
+	owner->enter_head = owner->enter_tail = NULL;
+
+	cursor = owner->leave_head;
+	while ( cursor )
+	{
+		owner->entity->func(owner->uid, cursor->uid, 0, owner->entity->ud);
+		aoi_object_t* tmp = cursor;
+		cursor = cursor->next;
+		tmp->next = tmp->prev = NULL;
+	}
+	owner->leave_head = owner->leave_tail = NULL;
 }
 
 void
@@ -365,9 +390,12 @@ shuffle_trigger(aoi_context_t* aoi_ctx, aoi_trigger_t* trigger, int x, int z) {
 }
 
 void
-create_entity(aoi_context_t* aoi_ctx, aoi_object_t* aoi_object, int x, int z) {
+create_entity(aoi_context_t* aoi_ctx, aoi_object_t* aoi_object, int x, int z, entity_func func,void* ud) {
 	aoi_object->entity = malloc(sizeof( aoi_entity_t ));
 	memset(aoi_object->entity, 0, sizeof( aoi_entity_t ));
+
+	aoi_object->entity->func = func;
+	aoi_object->entity->ud = ud;
 
 	aoi_object->entity->center.x = -1000;
 	aoi_object->entity->center.z = -1000;
@@ -391,9 +419,12 @@ create_entity(aoi_context_t* aoi_ctx, aoi_object_t* aoi_object, int x, int z) {
 }
 
 void
-create_trigger(aoi_context_t* aoi_ctx, aoi_object_t* aoi_object, int x, int z, int range) {
+create_trigger(aoi_context_t* aoi_ctx, aoi_object_t* aoi_object, int x, int z, int range, trigger_func func,void* ud) {
 	aoi_object->trigger = malloc(sizeof( aoi_trigger_t ));
 	memset(aoi_object->trigger, 0, sizeof( aoi_trigger_t ));
+
+	aoi_object->trigger->func = func;
+	aoi_object->trigger->ud = ud;
 
 	aoi_object->trigger->range = range;
 
