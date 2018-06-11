@@ -74,45 +74,63 @@ insert_node(aoi_context_t* aoi_ctx,int xorz,linknode_t* linknode) {
 	}
 }
 
+static inline void
+exchange_x(linknode_t* node,linknode_t* node_next,int dir) {
+	node->next = node_next->next;
+	if (node_next->next) {
+		node_next->next->prev = node;
+	}
+
+	linknode_t* tmp_prev = node->prev;
+	node_next->prev = tmp_prev;
+	if (tmp_prev) {
+		tmp_prev->next = node_next;
+	}
+	node_next->next = node;
+	node->prev = node_next;
+
+	if (node->flag & AOI_ENTITY && node_next->flag & AOI_LOW_BOUND) {
+
+	} else if (node->flag & AOI_ENTITY && node_next->flag & AOI_HIGH_BOUND) {
+
+	} else if (node->flag & AOI_LOW_BOUND && node_next->flag & AOI_ENTITY) {
+
+	} else if (node->flag & AOI_HIGH_BOUND && node_next->flag & AOI_ENTITY) {
+
+	}
+}
+
+static inline void
+exchange_z(linknode_t* node,linknode_t* node_next,int dir) {
+
+}
+
 int
 shuffle_x(aoi_context_t* aoi_ctx,linknode_t* node,int x,int dir) {
 	linknode_t* first = &aoi_ctx->linklist[0];
 	node->pos.x = x;
 	while(node->next != NULL && node->pos.x > node->next->pos.x) {
-		linknode_t* tmp_next = node->next;
-
-		node->next = tmp_next->next;
-		if (tmp_next->next) {
-			tmp_next->next->prev = node;
-		}
-
-		linknode_t* tmp_prev = node->prev;
-		tmp_next->prev = tmp_prev;
-		if (tmp_prev) {
-			tmp_prev->next = tmp_next;
-		}
-		tmp_next->next = node;
-		node->prev = tmp_next;
-
-		if (node->flag & AOI_ENTITY && tmp_next->flag & AOI_LOW_BOUND) {
-
-		} else if (node->flag & AOI_ENTITY && tmp_next->flag & AOI_HIGH_BOUND) {
-
-		} else if (node->flag & AOI_LOW_BOUND && tmp_next->flag & AOI_ENTITY) {
-
-		} else if (node->flag & AOI_HIGH_BOUND && tmp_next->flag & AOI_ENTITY) {
-
-		}
+		linknode_t* node_next = node->next;
+		exchange_x(node,node_next);
 	}
 
 	while(node->prev != NULL && node->pos.x < node->prev->pos.x) {
-
+		exchange_x(node->prev,node);
 	}
 }
 
 int
 shuffle_z(aoi_context_t* aoi_ctx,linknode_t* node,int z,int dir) {
+	linknode_t* first = &aoi_ctx->linklist[1];
+	node->pos.z = z;
+	while(node->next != NULL && node->pos.z > node->next->pos.z) {
+		linknode_t* node_next = node->next;
+		exchange_z(node,node_next);
+	}
 
+	while(node->prev != NULL && node->pos.z < node->prev->pos.z) {
+		exchange_z(node->prev,node);
+	}
 }
 
 void
