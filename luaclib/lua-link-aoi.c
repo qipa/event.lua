@@ -74,35 +74,121 @@ insert_node(aoi_context_t* aoi_ctx,int xorz,linknode_t* linknode) {
 	}
 }
 
+void
+within_view_range(aoi_object_t* self,aoi_object_t* other) {
+
+}
+
 static inline void
-exchange_x(linknode_t* node,linknode_t* node_next,int dir) {
-	node->next = node_next->next;
-	if (node_next->next) {
-		node_next->next->prev = node;
+link_enter_result(aoi_object_t* self,aoi_object_t* other,int flag) {
+
+}
+
+static inline void
+link_leave_result(aoi_object_t* self,aoi_object_t* other,int flag) {
+
+}
+
+static inline void
+exchange_x(linknode_t* A,linknode_t* B,int dir,int flag) {
+	A->next = B->next;
+	if (B->next) {
+		B->next->prev = A;
 	}
 
-	linknode_t* tmp_prev = node->prev;
-	node_next->prev = tmp_prev;
+	linknode_t* tmp_prev = A->prev;
+	B->prev = tmp_prev;
 	if (tmp_prev) {
-		tmp_prev->next = node_next;
+		tmp_prev->next = B;
 	}
-	node_next->next = node;
-	node->prev = node_next;
+	B->next = A;
+	A->prev = B;
 
-	if (node->flag & AOI_ENTITY && node_next->flag & AOI_LOW_BOUND) {
+	linknode_t* self,other;
+	if (flag == 0) {
+		self = A;
+		other = B;
+	} else {
+		self = B;
+		other = A;
+	}
 
-	} else if (node->flag & AOI_ENTITY && node_next->flag & AOI_HIGH_BOUND) {
-
-	} else if (node->flag & AOI_LOW_BOUND && node_next->flag & AOI_ENTITY) {
-
-	} else if (node->flag & AOI_HIGH_BOUND && node_next->flag & AOI_ENTITY) {
-
+	if (self->flag & AOI_ENTITY && other->flag & AOI_LOW_BOUND) {
+		if (dir < 0 && within_view_range(other,self)) {
+			link_enter_result(self->owner,other->owner,0);
+		} else {
+			link_leave_result(self->owner,other->owner,0);
+		}
+	} else if (self->flag & AOI_ENTITY && other->flag & AOI_HIGH_BOUND) {
+		if (dir < 0) {
+			link_leave_result(self->owner,other->owner,0);
+		} else {
+			link_enter_result(self->owner,other->owner,0);
+		}
+	} else if (self->flag & AOI_LOW_BOUND && other->flag & AOI_ENTITY) {
+		if (dir < 0) {
+			link_leave_result(self->owner,other->owner,1);
+		} else {
+			link_enter_result(self->owner,other->owner,1);
+		}
+	} else if (self->flag & AOI_HIGH_BOUND && other->flag & AOI_ENTITY) {
+		if (dir < 0) {
+			link_enter_result(self->owner,other->owner,1);
+		} else {
+			link_leave_result(self->owner,other->owner,1);
+		}
 	}
 }
 
 static inline void
-exchange_z(linknode_t* node,linknode_t* node_next,int dir) {
+exchange_z(linknode_t* node,linknode_t* node_next,int dir,int flag) {
+	A->next = B->next;
+	if (B->next) {
+		B->next->prev = A;
+	}
 
+	linknode_t* tmp_prev = A->prev;
+	B->prev = tmp_prev;
+	if (tmp_prev) {
+		tmp_prev->next = B;
+	}
+	B->next = A;
+	A->prev = B;
+
+	linknode_t* self,other;
+	if (flag == 0) {
+		self = A;
+		other = B;
+	} else {
+		self = B;
+		other = A;
+	}
+
+	if (self->flag & AOI_ENTITY && other->flag & AOI_LOW_BOUND) {
+		if (dir < 0) {
+			link_enter_result(self->owner,other->owner,0);
+		} else {
+			link_leave_result(self->owner,other->owner,0);
+		}
+	} else if (self->flag & AOI_ENTITY && other->flag & AOI_HIGH_BOUND) {
+		if (dir < 0) {
+			link_leave_result(self->owner,other->owner,0);
+		} else {
+			link_enter_result(self->owner,other->owner,0);
+		}
+	} else if (self->flag & AOI_LOW_BOUND && other->flag & AOI_ENTITY) {
+		if (dir < 0) {
+			link_leave_result(self->owner,other->owner,1);
+		} else {
+			link_enter_result(self->owner,other->owner,1);
+		}
+	} else if (self->flag & AOI_HIGH_BOUND && other->flag & AOI_ENTITY) {
+		if (dir < 0) {
+			link_enter_result(self->owner,other->owner,1);
+		} else {
+			link_leave_result(self->owner,other->owner,1);
+		}
+	}
 }
 
 int
@@ -111,11 +197,11 @@ shuffle_x(aoi_context_t* aoi_ctx,linknode_t* node,int x,int dir) {
 	node->pos.x = x;
 	while(node->next != NULL && node->pos.x > node->next->pos.x) {
 		linknode_t* node_next = node->next;
-		exchange_x(node,node_next);
+		exchange_x(node,node_next,dir,0);
 	}
 
 	while(node->prev != NULL && node->pos.x < node->prev->pos.x) {
-		exchange_x(node->prev,node);
+		exchange_x(node->prev,node,dir,1);
 	}
 }
 
@@ -125,11 +211,11 @@ shuffle_z(aoi_context_t* aoi_ctx,linknode_t* node,int z,int dir) {
 	node->pos.z = z;
 	while(node->next != NULL && node->pos.z > node->next->pos.z) {
 		linknode_t* node_next = node->next;
-		exchange_z(node,node_next);
+		exchange_z(node,node_next,dir,0);
 	}
 
 	while(node->prev != NULL && node->pos.z < node->prev->pos.z) {
-		exchange_z(node->prev,node);
+		exchange_z(node->prev,node,dir,1);
 	}
 }
 
