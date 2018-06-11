@@ -1,8 +1,18 @@
+#include <stdint.h>
+#include <string.h>
+#include <stdlib.h>
+#include <assert.h>
+#include <stdio.h>
 
+#include "aoi.h"
 
 #define AOI_ENTITY 		1
 #define AOI_LOW_BOUND 	2
 #define AOI_HIGH_BOUND 	4
+
+#ifdef _WIN32
+#define inline __inline
+#endif
 
 typedef struct position {
 	int x;
@@ -10,10 +20,6 @@ typedef struct position {
 } position_t;
 
 
-typedef struct linklist {
-	linknode_t* head;
-	linknode_t* tail;
-} linklist_t;
 
 struct aoi_entity;
 struct aoi_trigger;
@@ -41,6 +47,12 @@ typedef struct linknode {
 	uint8_t flag;
 } linknode_t;
 
+typedef struct linklist {
+	linknode_t* head;
+	linknode_t* tail;
+} linklist_t;
+
+
 typedef struct aoi_entity {
 	position_t center;
 	linknode_t node[2];
@@ -57,224 +69,296 @@ typedef struct aoi_context {
 } aoi_context_t;
 
 void
-insert_node(aoi_context_t* aoi_ctx,int xorz,linknode_t* linknode) {
-	linknode_t* first
-	if (xorz == 0) {
+insert_node(aoi_context_t* aoi_ctx, int xorz, linknode_t* linknode) {
+	linklist_t* first;
+	if ( xorz == 0 ) {
 		first = &aoi_ctx->linklist[0];
-	} else {
+	}
+	else {
 		first = &aoi_ctx->linklist[1];
 	}
-	if (first->head == NULL) {
+	if ( first->head == NULL ) {
 		assert(first->head == first->tail);
 		first->head = first->tail = linknode;
-	} else {
-		linknode->next = first->head->next;
-		first->head->next->prev = linknode;
-		first->head = linknode;
+	}
+	else {
+		if (first->head == first->tail) {
+			first->head = linknode;
+			linknode->next = first->tail;
+			first->tail->prev = linknode;
+		}
+		else {
+			linknode->next = first->head;
+			if ( first->head->next ) {
+				first->head->next->prev = linknode;
+			}
+			first->head = linknode;
+		}
+		
 	}
 }
 
 void
-within_view_range(aoi_object_t* self,aoi_object_t* other) {
+within_view_range(aoi_object_t* self, aoi_object_t* other) {
 
 }
 
 static inline void
-link_enter_result(aoi_object_t* self,aoi_object_t* other,int flag) {
-
+link_enter_result(aoi_object_t* self, aoi_object_t* other, int flag) {
+	if ( self->enter_head == NULL ) {
+		assert(self->enter_head == self->enter_tail);
+		self->enter_head = self->enter_tail = other;
+	}
+	else {
+		other->prev = self->enter_tail;
+		self->enter_tail->next = other;
+		self->enter_tail = other;
+	}
 }
 
 static inline void
-link_leave_result(aoi_object_t* self,aoi_object_t* other,int flag) {
+link_leave_result(aoi_object_t* self, aoi_object_t* other, int flag) {
+	if ( other->next ) {
+		if ( other->prev ) {
+			other->prev->next = other->next;
+		}
+		other->next->prev = other->prev;
+	}
 
+	if ( self->leave_head == NULL ) {
+		assert(self->leave_head == self->leave_tail);
+		self->leave_head = self->leave_tail = other;
+	}
+	else {
+		other->prev = self->leave_tail;
+		self->leave_tail->next = other;
+		self->leave_tail = other;
+	}
 }
 
 static inline void
-exchange_x(linknode_t* A,linknode_t* B,int dir,int flag) {
+exchange_x(linklist_t* first, linknode_t* A, linknode_t* B, int dir, int flag) {
 	A->next = B->next;
-	if (B->next) {
+	if ( B->next ) {
+		B->next->prev = A;
+	}
+		
+	linknode_t* tmp_prev = A->prev;
+	B->prev = tmp_prev;
+	if ( tmp_prev ) {
+		tmp_prev->next = B;
+	}
+		
+	B->next = A;
+	A->prev = B;
+
+	if ( first->head == A ) {
+		first->head = B;
+	}
+	else if ( first->head == B ) {
+		first->head = A;
+	}
+
+	if ( first->tail == A ) {
+		first->tail = B;
+	} else if ( first->tail == B ) {
+		first->tail = A;
+	}
+		
+	linknode_t* self, *other;
+
+	if ( flag == 0 ) {
+		self = A;
+		other = B;
+	}
+	else {
+		self = B;
+		other = A;
+	}
+
+	if ( self->flag & AOI_ENTITY && other->flag & AOI_LOW_BOUND ) {
+		if ( dir < 0 ) {
+			link_enter_result(self->owner, other->owner, 0);
+		}
+		else {
+			link_leave_result(self->owner, other->owner, 0);
+		}
+	}
+	else if ( self->flag & AOI_ENTITY && other->flag & AOI_HIGH_BOUND ) {
+		if ( dir < 0 ) {
+			link_leave_result(self->owner, other->owner, 0);
+		}
+		else {
+			link_enter_result(self->owner, other->owner, 0);
+		}
+	}
+	else if ( self->flag & AOI_LOW_BOUND && other->flag & AOI_ENTITY ) {
+		if ( dir < 0 ) {
+			link_leave_result(self->owner, other->owner, 1);
+		}
+		else {
+			link_enter_result(self->owner, other->owner, 1);
+		}
+	}
+	else if ( self->flag & AOI_HIGH_BOUND && other->flag & AOI_ENTITY ) {
+		if ( dir < 0 ) {
+			link_enter_result(self->owner, other->owner, 1);
+		}
+		else {
+			link_leave_result(self->owner, other->owner, 1);
+		}
+	}
+}
+
+static inline void
+exchange_z(linklist_t* first, linknode_t* A, linknode_t* B, int dir, int flag) {
+	A->next = B->next;
+	if ( B->next ) {
 		B->next->prev = A;
 	}
 
 	linknode_t* tmp_prev = A->prev;
 	B->prev = tmp_prev;
-	if (tmp_prev) {
+	if ( tmp_prev ) {
 		tmp_prev->next = B;
 	}
 	B->next = A;
 	A->prev = B;
 
-	linknode_t* self,other;
-	if (flag == 0) {
+	linknode_t* self, *other;
+	if ( flag == 0 ) {
 		self = A;
 		other = B;
-	} else {
+	}
+	else {
 		self = B;
 		other = A;
 	}
 
-	if (self->flag & AOI_ENTITY && other->flag & AOI_LOW_BOUND) {
-		if (dir < 0 && within_view_range(other,self)) {
-			link_enter_result(self->owner,other->owner,0);
-		} else {
-			link_leave_result(self->owner,other->owner,0);
+	if ( self->flag & AOI_ENTITY && other->flag & AOI_LOW_BOUND ) {
+		if ( dir < 0 ) {
+			link_enter_result(self->owner, other->owner, 0);
 		}
-	} else if (self->flag & AOI_ENTITY && other->flag & AOI_HIGH_BOUND) {
-		if (dir < 0) {
-			link_leave_result(self->owner,other->owner,0);
-		} else {
-			link_enter_result(self->owner,other->owner,0);
-		}
-	} else if (self->flag & AOI_LOW_BOUND && other->flag & AOI_ENTITY) {
-		if (dir < 0) {
-			link_leave_result(self->owner,other->owner,1);
-		} else {
-			link_enter_result(self->owner,other->owner,1);
-		}
-	} else if (self->flag & AOI_HIGH_BOUND && other->flag & AOI_ENTITY) {
-		if (dir < 0) {
-			link_enter_result(self->owner,other->owner,1);
-		} else {
-			link_leave_result(self->owner,other->owner,1);
+		else {
+			link_leave_result(self->owner, other->owner, 0);
 		}
 	}
-}
-
-static inline void
-exchange_z(linknode_t* node,linknode_t* node_next,int dir,int flag) {
-	A->next = B->next;
-	if (B->next) {
-		B->next->prev = A;
-	}
-
-	linknode_t* tmp_prev = A->prev;
-	B->prev = tmp_prev;
-	if (tmp_prev) {
-		tmp_prev->next = B;
-	}
-	B->next = A;
-	A->prev = B;
-
-	linknode_t* self,other;
-	if (flag == 0) {
-		self = A;
-		other = B;
-	} else {
-		self = B;
-		other = A;
-	}
-
-	if (self->flag & AOI_ENTITY && other->flag & AOI_LOW_BOUND) {
-		if (dir < 0) {
-			link_enter_result(self->owner,other->owner,0);
-		} else {
-			link_leave_result(self->owner,other->owner,0);
+	else if ( self->flag & AOI_ENTITY && other->flag & AOI_HIGH_BOUND ) {
+		if ( dir < 0 ) {
+			link_leave_result(self->owner, other->owner, 0);
 		}
-	} else if (self->flag & AOI_ENTITY && other->flag & AOI_HIGH_BOUND) {
-		if (dir < 0) {
-			link_leave_result(self->owner,other->owner,0);
-		} else {
-			link_enter_result(self->owner,other->owner,0);
+		else {
+			link_enter_result(self->owner, other->owner, 0);
 		}
-	} else if (self->flag & AOI_LOW_BOUND && other->flag & AOI_ENTITY) {
-		if (dir < 0) {
-			link_leave_result(self->owner,other->owner,1);
-		} else {
-			link_enter_result(self->owner,other->owner,1);
+	}
+	else if ( self->flag & AOI_LOW_BOUND && other->flag & AOI_ENTITY ) {
+		if ( dir < 0 ) {
+			link_leave_result(self->owner, other->owner, 1);
 		}
-	} else if (self->flag & AOI_HIGH_BOUND && other->flag & AOI_ENTITY) {
-		if (dir < 0) {
-			link_enter_result(self->owner,other->owner,1);
-		} else {
-			link_leave_result(self->owner,other->owner,1);
+		else {
+			link_enter_result(self->owner, other->owner, 1);
+		}
+	}
+	else if ( self->flag & AOI_HIGH_BOUND && other->flag & AOI_ENTITY ) {
+		if ( dir < 0 ) {
+			link_enter_result(self->owner, other->owner, 1);
+		}
+		else {
+			link_leave_result(self->owner, other->owner, 1);
 		}
 	}
 }
 
 int
-shuffle_x(aoi_context_t* aoi_ctx,linknode_t* node,int x,int dir) {
-	linknode_t* first = &aoi_ctx->linklist[0];
+shuffle_x(aoi_context_t* aoi_ctx, linknode_t* node, int x, int dir) {
+	linklist_t* first = &aoi_ctx->linklist[0];
 	node->pos.x = x;
-	while(node->next != NULL && node->pos.x > node->next->pos.x) {
+	if ( first->head == first->tail )
+		return 0;
+	
+	while ( node->next != NULL && node->pos.x > node->next->pos.x ) {
 		linknode_t* node_next = node->next;
-		exchange_x(node,node_next,dir,0);
+		exchange_x(first, node, node_next, dir, 0);
 	}
 
-	while(node->prev != NULL && node->pos.x < node->prev->pos.x) {
-		exchange_x(node->prev,node,dir,1);
+	while ( node->prev != NULL && node->pos.x < node->prev->pos.x ) {
+		exchange_x(first, node->prev, node, dir, 1);
 	}
 }
 
 int
-shuffle_z(aoi_context_t* aoi_ctx,linknode_t* node,int z,int dir) {
-	linknode_t* first = &aoi_ctx->linklist[1];
+shuffle_z(aoi_context_t* aoi_ctx, linknode_t* node, int z, int dir) {
+	linklist_t* first = &aoi_ctx->linklist[1];
 	node->pos.z = z;
-	while(node->next != NULL && node->pos.z > node->next->pos.z) {
+	if ( first->head == first->tail )
+		return 0;
+	while ( node->next != NULL && node->pos.z > node->next->pos.z ) {
 		linknode_t* node_next = node->next;
-		exchange_z(node,node_next,dir,0);
+		exchange_z(first, node, node_next, dir, 0);
 	}
 
-	while(node->prev != NULL && node->pos.z < node->prev->pos.z) {
-		exchange_z(node->prev,node,dir,1);
+	while ( node->prev != NULL && node->pos.z < node->prev->pos.z ) {
+		exchange_z(first, node->prev, node, dir, 1);
 	}
 }
 
 void
-shuffle_entity(aoi_context_t* aoi_ctx,aoi_entity_t* entity,int x,int z) {
+shuffle_entity(aoi_context_t* aoi_ctx, aoi_entity_t* entity, int x, int z) {
 	int dir;
-	if (entity->node[0].pos.x < x)
+	if ( entity->node[0].pos.x < x )
 		dir = -1;
 	else
 		dir = 1;
-	shuffle_x(aoi_ctx,&entity->node[0],x,dir);
+	shuffle_x(aoi_ctx, &entity->node[0], x, dir);
 
-	if (entity->node[0].pos.z < z)
+	if ( entity->node[0].pos.z < z )
 		dir = -1;
 	else
 		dir = 1;
-	shuffle_z(aoi_ctx,&entity->node[1],z,dir);
+	shuffle_z(aoi_ctx, &entity->node[1], z, dir);
 }
 
 void
-shuffle_trigger(aoi_context_t* aoi_ctx,aoi_trigger_t* trigger,int x,int z) {
+shuffle_trigger(aoi_context_t* aoi_ctx, aoi_trigger_t* trigger, int x, int z) {
 	int dir;
-	if (trigger->node[0].pos.x < x)
+	if ( trigger->node[0].pos.x < x )
 		dir = -1;
 	else
 		dir = 1;
-	shuffle_x(aoi_ctx,&trigger->node[0],x,dir);
+	shuffle_x(aoi_ctx, &trigger->node[0], x, dir);
 
-	if (trigger->node[2].pos.x < x)
+	if ( trigger->node[2].pos.x < x )
 		dir = -1;
 	else
 		dir = 1;
-	shuffle_x(aoi_ctx,&trigger->node[2],x,dir);
+	shuffle_x(aoi_ctx, &trigger->node[2], x, dir);
 
-	if (trigger->node[1].pos.z < z)
-		dir = -1;
-	else
-		dir = 1;
-
-	shuffle_z(aoi_ctx,&trigger->node[1],z,dir);
-
-	if (trigger->node[3].pos.z < z)
+	if ( trigger->node[1].pos.z < z )
 		dir = -1;
 	else
 		dir = 1;
 
-	shuffle_z(aoi_ctx,&trigger->node[3],z,dir);
+	shuffle_z(aoi_ctx, &trigger->node[1], z, dir);
+
+	if ( trigger->node[3].pos.z < z )
+		dir = -1;
+	else
+		dir = 1;
+
+	shuffle_z(aoi_ctx, &trigger->node[3], z, dir);
 }
 
 void
-create_entity(aoi_context_t* aoi_ctx,aoi_object_t* aoi_object,int x,int z) {
-	aoi_object->entity = malloc(sizeof(aoi_entity_t));
-	memset(aoi_object->entity,0,sizeof(aoi_entity_t));
-	
+create_entity(aoi_context_t* aoi_ctx, aoi_object_t* aoi_object, int x, int z) {
+	aoi_object->entity = malloc(sizeof( aoi_entity_t ));
+	memset(aoi_object->entity, 0, sizeof( aoi_entity_t ));
+
 	aoi_object->entity->center.x = x;
 	aoi_object->entity->center.z = z;
-	
-	aoi_object->entity->owner = aoi_object;
-	
+
+	aoi_object->entity->node[0].owner = aoi_object;
+	aoi_object->entity->node[1].owner = aoi_object;
+
 	aoi_object->entity->node[0].flag |= AOI_ENTITY;
 	aoi_object->entity->node[1].flag |= AOI_ENTITY;
 
@@ -284,23 +368,26 @@ create_entity(aoi_context_t* aoi_ctx,aoi_object_t* aoi_object,int x,int z) {
 	aoi_object->entity->node[1].pos.x = -1000;
 	aoi_object->entity->node[1].pos.z = -1000;
 
-	insert_node(aoi_ctx,0,&aoi_object->entity->node[0]);
-	insert_node(aoi_ctx,1,&aoi_object->entity->node[1]);
+	insert_node(aoi_ctx, 0, &aoi_object->entity->node[0]);
+	insert_node(aoi_ctx, 1, &aoi_object->entity->node[1]);
 
-	shuffle_entity(aoi_ctx,aoi_object->entity,x,z);
+	shuffle_entity(aoi_ctx, aoi_object->entity, x, z);
 }
 
 void
-create_trigger(aoi_context_t* aoi_ctx,aoi_object_t* aoi_object,int x,int z,int range) {
-	aoi_object->trigger = malloc(sizeof(aoi_trigger_t));
-	memset(aoi_object->trigger,0,sizeof(aoi_trigger_t));
-	
+create_trigger(aoi_context_t* aoi_ctx, aoi_object_t* aoi_object, int x, int z, int range) {
+	aoi_object->trigger = malloc(sizeof( aoi_trigger_t ));
+	memset(aoi_object->trigger, 0, sizeof( aoi_trigger_t ));
+
 	aoi_object->trigger->range = range;
-	
+
 	aoi_object->trigger->center.x = x;
 	aoi_object->trigger->center.z = z;
-	
-	aoi_object->trigger->owner = aoi_object;
+
+	aoi_object->trigger->node[0].owner = aoi_object;
+	aoi_object->trigger->node[1].owner = aoi_object;
+	aoi_object->trigger->node[2].owner = aoi_object;
+	aoi_object->trigger->node[3].owner = aoi_object;
 
 	aoi_object->trigger->node[0].flag |= AOI_LOW_BOUND;
 	aoi_object->trigger->node[1].flag |= AOI_LOW_BOUND;
@@ -320,32 +407,77 @@ create_trigger(aoi_context_t* aoi_ctx,aoi_object_t* aoi_object,int x,int z,int r
 	aoi_object->trigger->node[3].pos.x = -1000;
 	aoi_object->trigger->node[3].pos.z = -1000;
 
-	insert_node(aoi_ctx,0,&aoi_object->trigger->node[0]);
-	insert_node(aoi_ctx,0,&aoi_object->trigger->node[2]);
+	insert_node(aoi_ctx, 0, &aoi_object->trigger->node[0]);
+	insert_node(aoi_ctx, 0, &aoi_object->trigger->node[2]);
 
-	insert_node(aoi_ctx,1,&aoi_object->trigger->node[1]);
-	insert_node(aoi_ctx,1,&aoi_object->trigger->node[3]);
+	insert_node(aoi_ctx, 1, &aoi_object->trigger->node[1]);
+	insert_node(aoi_ctx, 1, &aoi_object->trigger->node[3]);
 
-	shuffle_trigger(aoi_ctx,aoi_object->trigger,x,z);
-
-}
-
-void
-delete_entity(aoi_context_t* aoi_ctx,aoi_object_t* aoi_object) {
+	shuffle_trigger(aoi_ctx, aoi_object->trigger, x, z);
 
 }
 
 void
-delete_trigger(aoi_context_t* aoi_ctx,aoi_object_t* aoi_object) {
+delete_entity(aoi_context_t* aoi_ctx, aoi_object_t* aoi_object) {
 
 }
 
 void
-move_entity(aoi_context_t* aoi_ctx,aoi_object_t* aoi_object,int x,int z) {
-	shuffle_entity(aoi_ctx,aoi_object->entity,x,z);
+delete_trigger(aoi_context_t* aoi_ctx, aoi_object_t* aoi_object) {
+
 }
 
 void
-move_trigger(aoi_context_t* aoi_ctx,aoi_object_t* aoi_object,int x,int z) {
-	shuffle_trigger(aoi_ctx,aoi_object->trigger,x,z);
+move_entity(aoi_context_t* aoi_ctx, aoi_object_t* aoi_object, int x, int z) {
+	shuffle_entity(aoi_ctx, aoi_object->entity, x, z);
+}
+
+void
+move_trigger(aoi_context_t* aoi_ctx, aoi_object_t* aoi_object, int x, int z) {
+	shuffle_trigger(aoi_ctx, aoi_object->trigger, x, z);
+}
+
+struct aoi_context*
+create_aoi_ctx() {
+	struct aoi_context* aoi_ctx = malloc(sizeof( *aoi_ctx ));
+	memset(aoi_ctx, 0, sizeof( *aoi_ctx ));
+	return aoi_ctx;
+}
+
+struct aoi_object*
+create_aoi_object(struct aoi_context* aoi_ctx, int uid) {
+	struct aoi_object* object = malloc(sizeof( *object ));
+	memset(object, 0, sizeof( *object ));
+	object->uid = uid;
+	return object;
+}
+
+void
+foreach_aoi_entity(struct aoi_context* aoi_ctx, foreach_entity_func func, void* ud) {
+	linklist_t* list = &aoi_ctx->linklist[0];
+	linknode_t* cursor = list->head;
+	while (cursor)
+	{
+		if (cursor->flag & AOI_ENTITY)
+		{
+			aoi_object_t* object = cursor->owner;
+			func(object->uid, object->entity->center.x, object->entity->center.z, ud);
+		}
+		cursor = cursor->next;
+	}
+}
+
+void
+foreach_aoi_trigger(struct aoi_context* aoi_ctx, foreach_trigger_func func, void* ud) {
+	linklist_t* list = &aoi_ctx->linklist[0];
+	linknode_t* cursor = list->head;
+	while ( cursor )
+	{
+		if ( cursor->flag & AOI_LOW_BOUND )
+		{
+			aoi_object_t* object = cursor->owner;
+			func(object->uid, object->trigger->center.x, object->trigger->center.z, object->trigger->range, ud);
+		}
+		cursor = cursor->next;
+	}
 }
