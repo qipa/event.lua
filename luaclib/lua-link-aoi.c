@@ -107,6 +107,7 @@ within_view_range(aoi_object_t* self, aoi_object_t* other) {
 
 static inline void
 link_enter_result(aoi_object_t* self, aoi_object_t* other, int flag) {
+	printf("enter:%d %d\n", self->uid, other->uid);
 	if ( self->enter_head == NULL ) {
 		assert(self->enter_head == self->enter_tail);
 		self->enter_head = self->enter_tail = other;
@@ -122,6 +123,7 @@ link_enter_result(aoi_object_t* self, aoi_object_t* other, int flag) {
 
 static inline void
 link_leave_result(aoi_object_t* self, aoi_object_t* other, int flag) {
+	printf("leave:%d %d\n", self->uid, other->uid);
 	if ( other->next ) {
 		other->next->prev = other->prev;
 		other->prev->next = other->next;
