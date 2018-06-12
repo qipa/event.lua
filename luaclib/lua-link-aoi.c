@@ -131,11 +131,9 @@ link_enter_result(aoi_context_t* aoi_ctx, aoi_object_t* self, aoi_object_t* othe
 	if ( other->inout == IN ) {
 		return;
 	} 
-	else if (other->inout == 0)
-	{
+	else if (other->inout == 0) {
 		if ( flag & FLAG_AXIS_X ) {
-			if ( flag & FLAG_ENTITY )
-			{
+			if ( flag & FLAG_ENTITY ) {
 				if ( within_z_range(&self->entity->center, &other->trigger->center, other->trigger->range) < 0 )
 					return;
 			}
