@@ -113,6 +113,11 @@ remove_node(aoi_context_t* aoi_ctx, int flag, linknode_t* linknode) {
 	else {
 		first = &aoi_ctx->linklist[1];
 	}
+	assert(first->head == linknode);
+	first->head = first->head->next;
+	first->head->prev = NULL;
+	if (first->head == NULL)
+		first->head = first->tail = NULL;
 }
 
 static inline int
