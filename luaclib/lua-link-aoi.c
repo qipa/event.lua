@@ -105,7 +105,7 @@ insert_node(aoi_context_t* aoi_ctx, int xorz, linknode_t* linknode) {
 }
 
 static inline int
-within_x_range(position_t* entity, position_t* trigger,int range) {
+within_x_range(position_t* entity, position_t* trigger, int range) {
 	if ( range >= abs(entity->x - trigger->x) ) {
 		return 0;
 	}
@@ -124,29 +124,40 @@ static inline void
 link_enter_result(aoi_context_t* aoi_ctx, aoi_object_t* self, aoi_object_t* other, int flag) {
 	if ( flag & FLAG_AXIS_X ) {
 		printf("x:enter:%d %d\n", self->uid, other->uid);
-		if ( flag & FLAG_ENTITY )
-		{
-			if ( within_z_range(&self->entity->center, &other->trigger->center, other->trigger->range) < 0 )
-				return;
-		}
-		else {
-			if ( within_z_range(&other->entity->center, &self->trigger->center, self->trigger->range) < 0 )
-				return;
-		}
 	}
 	else {
 		printf("z:enter:%d %d\n", self->uid, other->uid);
-		if ( flag & FLAG_ENTITY ) {
-			if ( within_x_range(&self->entity->center, &other->trigger->center, other->trigger->range) < 0 )
-				return;
+	}
+	if ( other->inout == IN ) {
+		return;
+	} 
+	else if (other->inout == 0)
+	{
+		if ( flag & FLAG_AXIS_X ) {
+			if ( flag & FLAG_ENTITY )
+			{
+				if ( within_z_range(&self->entity->center, &other->trigger->center, other->trigger->range) < 0 )
+					return;
+			}
+			else {
+				if ( within_z_range(&other->entity->center, &self->trigger->center, self->trigger->range) < 0 )
+					return;
+			}
 		}
 		else {
-			if ( within_x_range(&other->entity->center, &self->trigger->center, self->trigger->range) < 0 )
-				return;
+			if ( flag & FLAG_ENTITY ) {
+				if ( within_x_range(&self->entity->center, &other->trigger->center, other->trigger->range) < 0 )
+					return;
+			}
+			else {
+				if ( within_x_range(&other->entity->center, &self->trigger->center, self->trigger->range) < 0 )
+					return;
+			}
 		}
 	}
-	if ( other->inout == IN)
-		return;
+	else {
+		assert(other->inout != OUT);
+	}
 
 	if ( !aoi_ctx->enter ) {
 		aoi_ctx->enter = other;
@@ -183,15 +194,15 @@ link_leave_result(aoi_context_t* aoi_ctx, aoi_object_t* self, aoi_object_t* othe
 		other->next = other->prev = NULL;
 		other->inout = 0;
 		return;
-	} 
-	else if (other->inout == OUT) {
+	}
+	else if ( other->inout == OUT ) {
 		return;
 	}
 	else {
 		if ( flag & FLAG_AXIS_X ) {
 			if ( flag & FLAG_ENTITY )
 			{
-				if ( within_z_range(&self->entity->ocenter, &other->trigger->center,other->trigger->range) < 0 )
+				if ( within_z_range(&self->entity->ocenter, &other->trigger->center, other->trigger->range) < 0 )
 					return;
 			}
 			else {
@@ -550,7 +561,6 @@ create_trigger(aoi_context_t* aoi_ctx, aoi_object_t* aoi_object, int x, int z, i
 	insert_node(aoi_ctx, 1, &aoi_object->trigger->node[3]);
 
 	shuffle_trigger(aoi_ctx, aoi_object->trigger, x, z);
-
 }
 
 void
