@@ -14,27 +14,18 @@
 #define inline __inline
 #endif
 
+struct aoi_entity;
+struct aoi_trigger;
+
 typedef struct position {
 	int x;
 	int z;
 } position_t;
 
-
-
-struct aoi_entity;
-struct aoi_trigger;
-
 typedef struct aoi_object {
 	int uid;
 	struct aoi_entity* entity;
 	struct aoi_trigger* trigger;
-
-	struct aoi_object* enter_head;
-	struct aoi_object* enter_tail;
-
-	struct aoi_object* leave_head;
-	struct aoi_object* leave_tail;
-
 	struct aoi_object* next;
 	struct aoi_object* prev;
 } aoi_object_t;
@@ -51,7 +42,6 @@ typedef struct linklist {
 	linknode_t* head;
 	linknode_t* tail;
 } linklist_t;
-
 
 typedef struct aoi_entity {
 	position_t center;
@@ -70,6 +60,13 @@ typedef struct aoi_trigger {
 
 typedef struct aoi_context {
 	linklist_t linklist[2];
+
+	struct aoi_object* enter_head;
+	struct aoi_object* enter_tail;
+
+	struct aoi_object* leave_head;
+	struct aoi_object* leave_tail;
+
 } aoi_context_t;
 
 void
@@ -106,45 +103,56 @@ within_view_range(aoi_object_t* self, aoi_object_t* other) {
 }
 
 static inline void
-link_enter_result(aoi_object_t* self, aoi_object_t* other, int flag) {
-	printf("enter:%d %d\n", self->uid, other->uid);
-	if ( self->enter_head == NULL ) {
-		assert(self->enter_head == self->enter_tail);
-		self->enter_head = self->enter_tail = other;
-		other->next = &other;
-		other->prev = &other;
+link_enter_result(aoi_context_t* aoi_ctx, aoi_object_t* self, aoi_object_t* other, int flag) {
+	if ( flag == 0 ) {
+		printf("x:enter:%d %d\n", self->uid, other->uid);
 	}
 	else {
-		other->prev = self->enter_tail;
-		self->enter_tail->next = other;
-		self->enter_tail = other;
+		printf("z:enter:%d %d\n", self->uid, other->uid);
+	}
+	if ( aoi_ctx->enter_head == NULL ) {
+		assert(aoi_ctx->enter_head == aoi_ctx->enter_tail);
+		aoi_ctx->enter_head = aoi_ctx->enter_tail = other;
+		other->next = other;
+		other->prev = other;
+	}
+	else {
+		other->prev = aoi_ctx->enter_tail;
+		aoi_ctx->enter_tail->next = other;
+		aoi_ctx->enter_tail = other;
 	}
 }
 
 static inline void
-link_leave_result(aoi_object_t* self, aoi_object_t* other, int flag) {
-	printf("leave:%d %d\n", self->uid, other->uid);
+link_leave_result(aoi_context_t* aoi_ctx, aoi_object_t* self, aoi_object_t* other, int flag) {
+	if ( flag == 0 ) {
+		printf("x:leave:%d %d\n", self->uid, other->uid);
+	}
+	else {
+		printf("z:leave:%d %d\n", self->uid, other->uid);
+	}
+
 	if ( other->next ) {
 		other->next->prev = other->prev;
 		other->prev->next = other->next;
 		other->next = other->prev = NULL;
 	}
 
-	if ( self->leave_head == NULL ) {
-		assert(self->leave_head == self->leave_tail);
-		self->leave_head = self->leave_tail = other;
-		other->next = &other;
-		other->prev = &other;
+	if ( aoi_ctx->leave_head == NULL ) {
+		assert(aoi_ctx->leave_head == aoi_ctx->leave_tail);
+		aoi_ctx->leave_head = aoi_ctx->leave_tail = other;
+		other->next = other;
+		other->prev = other;
 	}
 	else {
-		other->prev = self->leave_tail;
-		self->leave_tail->next = other;
-		self->leave_tail = other;
+		other->prev = aoi_ctx->leave_tail;
+		aoi_ctx->leave_tail->next = other;
+		aoi_ctx->leave_tail = other;
 	}
 }
 
 static inline void
-exchange_x(linklist_t* first, linknode_t* A, linknode_t* B, int dir, int flag) {
+exchange_x(aoi_context_t* aoi_ctx, linklist_t* first, linknode_t* A, linknode_t* B, int dir, int flag) {
 	A->next = B->next;
 	if ( B->next ) {
 		B->next->prev = A;
@@ -183,42 +191,54 @@ exchange_x(linklist_t* first, linknode_t* A, linknode_t* B, int dir, int flag) {
 		other = A;
 	}
 
-	if ( self->flag & AOI_ENTITY && other->flag & AOI_LOW_BOUND ) {
-		if ( dir < 0 ) {
-			link_enter_result(self->owner, other->owner, 0);
+	if ( self->flag & AOI_ENTITY )
+	{
+		if ( other->flag & AOI_LOW_BOUND )
+		{
+			if ( dir < 0 ) {
+				link_enter_result(aoi_ctx, self->owner, other->owner, 0);
+			}
+			else {
+				link_leave_result(aoi_ctx, self->owner, other->owner, 0);
+			}
 		}
-		else {
-			link_leave_result(self->owner, other->owner, 0);
-		}
-	}
-	else if ( self->flag & AOI_ENTITY && other->flag & AOI_HIGH_BOUND ) {
-		if ( dir < 0 ) {
-			link_leave_result(self->owner, other->owner, 0);
-		}
-		else {
-			link_enter_result(self->owner, other->owner, 0);
-		}
-	}
-	else if ( self->flag & AOI_LOW_BOUND && other->flag & AOI_ENTITY ) {
-		if ( dir < 0 ) {
-			link_leave_result(self->owner, other->owner, 1);
-		}
-		else {
-			link_enter_result(self->owner, other->owner, 1);
+		else if ( other->flag & AOI_HIGH_BOUND )
+		{
+			if ( dir < 0 ) {
+				link_leave_result(aoi_ctx, self->owner, other->owner, 0);
+			}
+			else {
+				link_enter_result(aoi_ctx, self->owner, other->owner, 0);
+			}
 		}
 	}
-	else if ( self->flag & AOI_HIGH_BOUND && other->flag & AOI_ENTITY ) {
-		if ( dir < 0 ) {
-			link_enter_result(self->owner, other->owner, 1);
-		}
-		else {
-			link_leave_result(self->owner, other->owner, 1);
+	else {
+		if ( other->flag & AOI_ENTITY )
+		{
+			if ( self->flag & AOI_LOW_BOUND)
+			{
+				if ( dir < 0 ) {
+					link_leave_result(aoi_ctx, self->owner, other->owner, 0);
+				}
+				else {
+					link_enter_result(aoi_ctx, self->owner, other->owner, 0);
+				}
+			} 
+			else if ( self->flag & AOI_HIGH_BOUND )
+			{
+				if ( dir < 0 ) {
+					link_enter_result(aoi_ctx, self->owner, other->owner, 0);
+				}
+				else {
+					link_leave_result(aoi_ctx, self->owner, other->owner, 0);
+				}
+			}
 		}
 	}
 }
 
 static inline void
-exchange_z(linklist_t* first, linknode_t* A, linknode_t* B, int dir, int flag) {
+exchange_z(aoi_context_t* aoi_ctx, linklist_t* first, linknode_t* A, linknode_t* B, int dir, int flag) {
 	A->next = B->next;
 	if ( B->next ) {
 		B->next->prev = A;
@@ -258,36 +278,48 @@ exchange_z(linklist_t* first, linknode_t* A, linknode_t* B, int dir, int flag) {
 		other = A;
 	}
 
-	if ( self->flag & AOI_ENTITY && other->flag & AOI_LOW_BOUND ) {
-		if ( dir < 0 ) {
-			link_enter_result(self->owner, other->owner, 0);
+	if ( self->flag & AOI_ENTITY )
+	{
+		if ( other->flag & AOI_LOW_BOUND )
+		{
+			if ( dir < 0 ) {
+				link_enter_result(aoi_ctx, self->owner, other->owner, 1);
+			}
+			else {
+				link_leave_result(aoi_ctx, self->owner, other->owner, 1);
+			}
 		}
-		else {
-			link_leave_result(self->owner, other->owner, 0);
-		}
-	}
-	else if ( self->flag & AOI_ENTITY && other->flag & AOI_HIGH_BOUND ) {
-		if ( dir < 0 ) {
-			link_leave_result(self->owner, other->owner, 0);
-		}
-		else {
-			link_enter_result(self->owner, other->owner, 0);
-		}
-	}
-	else if ( self->flag & AOI_LOW_BOUND && other->flag & AOI_ENTITY ) {
-		if ( dir < 0 ) {
-			link_leave_result(self->owner, other->owner, 1);
-		}
-		else {
-			link_enter_result(self->owner, other->owner, 1);
+		else if ( other->flag & AOI_HIGH_BOUND )
+		{
+			if ( dir < 0 ) {
+				link_leave_result(aoi_ctx, self->owner, other->owner, 1);
+			}
+			else {
+				link_enter_result(aoi_ctx, self->owner, other->owner, 1);
+			}
 		}
 	}
-	else if ( self->flag & AOI_HIGH_BOUND && other->flag & AOI_ENTITY ) {
-		if ( dir < 0 ) {
-			link_enter_result(self->owner, other->owner, 1);
-		}
-		else {
-			link_leave_result(self->owner, other->owner, 1);
+	else {
+		if ( other->flag & AOI_ENTITY )
+		{
+			if ( self->flag & AOI_LOW_BOUND )
+			{
+				if ( dir < 0 ) {
+					link_leave_result(aoi_ctx, self->owner, other->owner, 1);
+				}
+				else {
+					link_enter_result(aoi_ctx, self->owner, other->owner, 1);
+				}
+			}
+			else if ( self->flag & AOI_HIGH_BOUND )
+			{
+				if ( dir < 0 ) {
+					link_enter_result(aoi_ctx, self->owner, other->owner, 1);
+				}
+				else {
+					link_leave_result(aoi_ctx, self->owner, other->owner, 1);
+				}
+			}
 		}
 	}
 }
@@ -300,12 +332,11 @@ shuffle_x(aoi_context_t* aoi_ctx, linknode_t* node, int x, int dir) {
 		return 0;
 	
 	while ( node->next != NULL && node->pos.x > node->next->pos.x ) {
-		linknode_t* node_next = node->next;
-		exchange_x(first, node, node_next, dir, 0);
+		exchange_x(aoi_ctx, first, node, node->next, dir, 0);
 	}
 
 	while ( node->prev != NULL && node->pos.x < node->prev->pos.x ) {
-		exchange_x(first, node->prev, node, dir, 1);
+		exchange_x(aoi_ctx, first, node->prev, node, dir, 1);
 	}
 }
 
@@ -316,12 +347,11 @@ shuffle_z(aoi_context_t* aoi_ctx, linknode_t* node, int z, int dir) {
 	if ( first->head == first->tail )
 		return 0;
 	while ( node->next != NULL && node->pos.z > node->next->pos.z ) {
-		linknode_t* node_next = node->next;
-		exchange_z(first, node, node_next, dir, 0);
+		exchange_z(aoi_ctx, first, node, node->next, dir, 0);
 	}
 
 	while ( node->prev != NULL && node->pos.z < node->prev->pos.z ) {
-		exchange_z(first, node->prev, node, dir, 1);
+		exchange_z(aoi_ctx, first, node->prev, node, dir, 1);
 	}
 }
 
@@ -345,7 +375,7 @@ shuffle_entity(aoi_context_t* aoi_ctx, aoi_entity_t* entity, int x, int z) {
 	entity->center.z = z;
 
 	aoi_object_t* owner = entity->node[0].owner;
-	aoi_object_t* cursor = owner->enter_head;
+	aoi_object_t* cursor = aoi_ctx->enter_head;
 	while (cursor)
 	{
 		owner->entity->func(owner->uid, cursor->uid, 1, owner->entity->ud);
@@ -353,9 +383,9 @@ shuffle_entity(aoi_context_t* aoi_ctx, aoi_entity_t* entity, int x, int z) {
 		cursor = cursor->next;
 		tmp->next = tmp->prev = NULL;
 	}
-	owner->enter_head = owner->enter_tail = NULL;
+	aoi_ctx->enter_head = aoi_ctx->enter_tail = NULL;
 
-	cursor = owner->leave_head;
+	cursor = aoi_ctx->leave_head;
 	while ( cursor )
 	{
 		owner->entity->func(owner->uid, cursor->uid, 0, owner->entity->ud);
@@ -363,7 +393,7 @@ shuffle_entity(aoi_context_t* aoi_ctx, aoi_entity_t* entity, int x, int z) {
 		cursor = cursor->next;
 		tmp->next = tmp->prev = NULL;
 	}
-	owner->leave_head = owner->leave_tail = NULL;
+	aoi_ctx->leave_head = aoi_ctx->leave_tail = NULL;
 }
 
 void
