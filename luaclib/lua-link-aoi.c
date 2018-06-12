@@ -195,7 +195,7 @@ link_leave_result(aoi_context_t* aoi_ctx, aoi_object_t* self, aoi_object_t* othe
 }
 
 static inline void
-exchange_x(aoi_context_t* aoi_ctx, linklist_t* first, linknode_t* A, linknode_t* B, int dir, int flag) {
+exchange_x(aoi_context_t* aoi_ctx, linklist_t* first, linknode_t* A, linknode_t* B, int dir) {
 	A->next = B->next;
 	if ( B->next ) {
 		B->next->prev = A;
@@ -225,7 +225,7 @@ exchange_x(aoi_context_t* aoi_ctx, linklist_t* first, linknode_t* A, linknode_t*
 		
 	linknode_t* self, *other;
 
-	if ( flag == 0 ) {
+	if ( dir < 0 ) {
 		self = A;
 		other = B;
 	}
@@ -281,7 +281,7 @@ exchange_x(aoi_context_t* aoi_ctx, linklist_t* first, linknode_t* A, linknode_t*
 }
 
 static inline void
-exchange_z(aoi_context_t* aoi_ctx, linklist_t* first, linknode_t* A, linknode_t* B, int dir, int flag) {
+exchange_z(aoi_context_t* aoi_ctx, linklist_t* first, linknode_t* A, linknode_t* B, int dir) {
 	A->next = B->next;
 	if ( B->next ) {
 		B->next->prev = A;
@@ -312,7 +312,7 @@ exchange_z(aoi_context_t* aoi_ctx, linklist_t* first, linknode_t* A, linknode_t*
 
 	linknode_t* self, *other;
 
-	if ( flag == 0 ) {
+	if ( dir < 0 ) {
 		self = A;
 		other = B;
 	}
@@ -368,53 +368,44 @@ exchange_z(aoi_context_t* aoi_ctx, linklist_t* first, linknode_t* A, linknode_t*
 }
 
 int
-shuffle_x(aoi_context_t* aoi_ctx, linknode_t* node, int x, int dir) {
+shuffle_x(aoi_context_t* aoi_ctx, linknode_t* node, int x) {
 	linklist_t* first = &aoi_ctx->linklist[0];
 	node->pos.x = x;
 	if ( first->head == first->tail )
 		return 0;
 	
 	while ( node->next != NULL && node->pos.x > node->next->pos.x ) {
-		exchange_x(aoi_ctx, first, node, node->next, dir, 0);
+		exchange_x(aoi_ctx, first, node, node->next, -1);
 	}
 
 	while ( node->prev != NULL && node->pos.x < node->prev->pos.x ) {
-		exchange_x(aoi_ctx, first, node->prev, node, dir, 1);
+		exchange_x(aoi_ctx, first, node->prev, node, 1);
 	}
 }
 
 int
-shuffle_z(aoi_context_t* aoi_ctx, linknode_t* node, int z, int dir) {
+shuffle_z(aoi_context_t* aoi_ctx, linknode_t* node, int z) {
 	linklist_t* first = &aoi_ctx->linklist[1];
 	node->pos.z = z;
 	if ( first->head == first->tail )
 		return 0;
 	while ( node->next != NULL && node->pos.z > node->next->pos.z ) {
-		exchange_z(aoi_ctx, first, node, node->next, dir, 0);
+		exchange_z(aoi_ctx, first, node, node->next, -1);
 	}
 
 	while ( node->prev != NULL && node->pos.z < node->prev->pos.z ) {
-		exchange_z(aoi_ctx, first, node->prev, node, dir, 1);
+		exchange_z(aoi_ctx, first, node->prev, node, 1);
 	}
 }
 
 void
 shuffle_entity(aoi_context_t* aoi_ctx, aoi_entity_t* entity, int x, int z) {
-	if ( entity->center.x < x ) {
-		shuffle_x(aoi_ctx, &entity->node[0], x, -1);
-	}
-	else {
-		shuffle_x(aoi_ctx, &entity->node[0], x, 1);
-	}
+	shuffle_x(aoi_ctx, &entity->node[0], x);
 	
 	entity->center.x = x;
 
-	if ( entity->center.z < z ) {
-		shuffle_z(aoi_ctx, &entity->node[1], z, -1);
-	}
-	else {
-		shuffle_z(aoi_ctx, &entity->node[1], z, 1);
-	}
+	shuffle_z(aoi_ctx, &entity->node[1], z);
+	
 	entity->center.z = z;
 
 	aoi_object_t* owner = entity->node[0].owner;
@@ -446,23 +437,23 @@ shuffle_entity(aoi_context_t* aoi_ctx, aoi_entity_t* entity, int x, int z) {
 void
 shuffle_trigger(aoi_context_t* aoi_ctx, aoi_trigger_t* trigger, int x, int z) {
 	if (trigger->center.x < x) {
-		shuffle_x(aoi_ctx, &trigger->node[2], x + trigger->range, -1);
-		shuffle_x(aoi_ctx, &trigger->node[0], x - trigger->range, -1);
+		shuffle_x(aoi_ctx, &trigger->node[2], x + trigger->range);
+		shuffle_x(aoi_ctx, &trigger->node[0], x - trigger->range);
 	}
 	else {
-		shuffle_x(aoi_ctx, &trigger->node[0], x - trigger->range, 1);
-		shuffle_x(aoi_ctx, &trigger->node[2], x + trigger->range, 1);
+		shuffle_x(aoi_ctx, &trigger->node[0], x - trigger->range);
+		shuffle_x(aoi_ctx, &trigger->node[2], x + trigger->range);
 	}
 	
 	trigger->center.x = x;
 
 	if ( trigger->center.z < z ) {
-		shuffle_z(aoi_ctx, &trigger->node[3], z + trigger->range, -1);
-		shuffle_z(aoi_ctx, &trigger->node[1], z - trigger->range, -1);
+		shuffle_z(aoi_ctx, &trigger->node[3], z + trigger->range);
+		shuffle_z(aoi_ctx, &trigger->node[1], z - trigger->range);
 	}
 	else {
-		shuffle_z(aoi_ctx, &trigger->node[1], z - trigger->range, 1);
-		shuffle_z(aoi_ctx, &trigger->node[3], z + trigger->range, 1);
+		shuffle_z(aoi_ctx, &trigger->node[1], z - trigger->range);
+		shuffle_z(aoi_ctx, &trigger->node[3], z + trigger->range);
 	}
 
 	trigger->center.z = z;
@@ -545,12 +536,12 @@ create_trigger(aoi_context_t* aoi_ctx, aoi_object_t* aoi_object, int x, int z, i
 
 void
 delete_entity(aoi_context_t* aoi_ctx, aoi_object_t* aoi_object) {
-
+	shuffle_entity(aoi_ctx, aoi_object->entity, -1000, -1000);
 }
 
 void
 delete_trigger(aoi_context_t* aoi_ctx, aoi_object_t* aoi_object) {
-
+	shuffle_trigger(aoi_ctx, aoi_object->trigger, -1000, -1000);
 }
 
 void
@@ -582,10 +573,8 @@ void
 foreach_aoi_entity(struct aoi_context* aoi_ctx, foreach_entity_func func, void* ud) {
 	linklist_t* list = &aoi_ctx->linklist[0];
 	linknode_t* cursor = list->head;
-	while (cursor)
-	{
-		if (cursor->flag & AOI_ENTITY)
-		{
+	while (cursor) {
+		if (cursor->flag & AOI_ENTITY) {
 			aoi_object_t* object = cursor->owner;
 			func(object->uid, object->entity->center.x, object->entity->center.z, ud);
 		}
@@ -597,10 +586,8 @@ void
 foreach_aoi_trigger(struct aoi_context* aoi_ctx, foreach_trigger_func func, void* ud) {
 	linklist_t* list = &aoi_ctx->linklist[0];
 	linknode_t* cursor = list->head;
-	while ( cursor )
-	{
-		if ( cursor->flag & AOI_LOW_BOUND )
-		{
+	while ( cursor ) {
+		if ( cursor->flag & AOI_LOW_BOUND ) {
 			aoi_object_t* object = cursor->owner;
 			func(object->uid, object->trigger->center.x, object->trigger->center.z, object->trigger->range, ud);
 		}
