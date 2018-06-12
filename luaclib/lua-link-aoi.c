@@ -31,11 +31,9 @@ typedef struct aoi_object {
 
 	struct aoi_object* next_x;
 	struct aoi_object* prev_x;
-	uint8_t x_where;
 
 	struct aoi_object* next_z;
 	struct aoi_object* prev_z;
-	uint8_t z_where;
 } aoi_object_t;
 
 typedef struct linknode {
@@ -116,7 +114,6 @@ link_enter_result(aoi_context_t* aoi_ctx, aoi_object_t* self, aoi_object_t* othe
 			other->next_x = aoi_ctx->enter_x;
 			aoi_ctx->enter_x = other;
 		}
-		other->x_where = 1;
 	}
 	else {
 		//printf("z:enter:%d %d\n", self->uid, other->uid);
@@ -128,7 +125,6 @@ link_enter_result(aoi_context_t* aoi_ctx, aoi_object_t* self, aoi_object_t* othe
 			other->next_z = aoi_ctx->enter_z;
 			aoi_ctx->enter_z = other;
 		}
-		other->z_where = 1;
 	}
 }
 
@@ -150,7 +146,6 @@ link_leave_result(aoi_context_t* aoi_ctx, aoi_object_t* self, aoi_object_t* othe
 			}
 
 			other->next_x = other->prev_x = NULL;
-			other->x_where = 0;
 			return;
 		}
 
@@ -162,7 +157,6 @@ link_leave_result(aoi_context_t* aoi_ctx, aoi_object_t* self, aoi_object_t* othe
 			other->next_x = aoi_ctx->leave_x;
 			aoi_ctx->leave_x = other;
 		}
-		other->x_where = 2;
 	}
 	else {
 		//printf("z:leave:%d %d\n", self->uid, other->uid);
@@ -180,7 +174,6 @@ link_leave_result(aoi_context_t* aoi_ctx, aoi_object_t* self, aoi_object_t* othe
 			}
 
 			other->next_z = other->prev_z = NULL;
-			other->z_where = 0;
 			return;
 		}
 
@@ -192,7 +185,6 @@ link_leave_result(aoi_context_t* aoi_ctx, aoi_object_t* self, aoi_object_t* othe
 			other->next_z = aoi_ctx->leave_z;
 			aoi_ctx->leave_z = other;
 		}
-		other->z_where = 2;
 	}
 }
 
@@ -417,7 +409,6 @@ shuffle_entity(aoi_context_t* aoi_ctx, aoi_entity_t* entity, int x, int z) {
 		aoi_object_t* tmp = cursor;
 		cursor = cursor->next_x;
 		tmp->next_x = tmp->prev_x = NULL;
-		tmp->z_where = 0;
 	}
 
 	cursor = aoi_ctx->enter_z;
@@ -426,7 +417,6 @@ shuffle_entity(aoi_context_t* aoi_ctx, aoi_entity_t* entity, int x, int z) {
 		aoi_object_t* tmp = cursor;
 		cursor = cursor->next_z;
 		tmp->next_z = tmp->prev_z = NULL;
-		tmp->z_where = 0;
 	}
 
 	aoi_ctx->enter_x = aoi_ctx->enter_z = NULL;
@@ -437,7 +427,6 @@ shuffle_entity(aoi_context_t* aoi_ctx, aoi_entity_t* entity, int x, int z) {
 		aoi_object_t* tmp = cursor;
 		cursor = cursor->next_x;
 		tmp->next_x = tmp->prev_x = NULL;
-		tmp->x_where = 0;
 	}
 
 	cursor = aoi_ctx->leave_z;
@@ -446,7 +435,6 @@ shuffle_entity(aoi_context_t* aoi_ctx, aoi_entity_t* entity, int x, int z) {
 		aoi_object_t* tmp = cursor;
 		cursor = cursor->next_z;
 		tmp->next_z = tmp->prev_z = NULL;
-		tmp->x_where = 0;
 	}
 	aoi_ctx->leave_x = aoi_ctx->leave_z = NULL;
 }
@@ -482,7 +470,6 @@ shuffle_trigger(aoi_context_t* aoi_ctx, aoi_trigger_t* trigger, int x, int z) {
 		aoi_object_t* tmp = cursor;
 		cursor = cursor->next_x;
 		tmp->next_x = tmp->prev_x = NULL;
-		tmp->z_where = 0;
 	}
 
 	cursor = aoi_ctx->enter_z;
@@ -491,7 +478,6 @@ shuffle_trigger(aoi_context_t* aoi_ctx, aoi_trigger_t* trigger, int x, int z) {
 		aoi_object_t* tmp = cursor;
 		cursor = cursor->next_z;
 		tmp->next_z = tmp->prev_z = NULL;
-		tmp->z_where = 0;
 	}
 
 	aoi_ctx->enter_x = aoi_ctx->enter_z = NULL;
@@ -502,7 +488,6 @@ shuffle_trigger(aoi_context_t* aoi_ctx, aoi_trigger_t* trigger, int x, int z) {
 		aoi_object_t* tmp = cursor;
 		cursor = cursor->next_x;
 		tmp->next_x = tmp->prev_x = NULL;
-		tmp->x_where = 0;
 	}
 
 	cursor = aoi_ctx->leave_z;
@@ -511,7 +496,6 @@ shuffle_trigger(aoi_context_t* aoi_ctx, aoi_trigger_t* trigger, int x, int z) {
 		aoi_object_t* tmp = cursor;
 		cursor = cursor->next_z;
 		tmp->next_z = tmp->prev_z = NULL;
-		tmp->x_where = 0;
 	}
 	aoi_ctx->leave_x = aoi_ctx->leave_z = NULL;
 }
