@@ -29,11 +29,8 @@ typedef struct aoi_object {
 	struct aoi_entity* entity;
 	struct aoi_trigger* trigger;
 
-	struct aoi_object* next_x;
-	struct aoi_object* prev_x;
-
-	struct aoi_object* next_z;
-	struct aoi_object* prev_z;
+	struct aoi_object* next;
+	struct aoi_object* prev;
 } aoi_object_t;
 
 typedef struct linknode {
@@ -67,12 +64,8 @@ typedef struct aoi_trigger {
 typedef struct aoi_context {
 	linklist_t linklist[2];
 
-	struct aoi_object* enter_x;
-	struct aoi_object* leave_x;
-
-	struct aoi_object* enter_z;
-	struct aoi_object* leave_z;
-
+	struct aoi_object* enter;
+	struct aoi_object* leave;
 } aoi_context_t;
 
 void
@@ -102,89 +95,77 @@ insert_node(aoi_context_t* aoi_ctx, int xorz, linknode_t* linknode) {
 	}
 }
 
+static inline int
+within_x_range(aoi_object_t* entity, aoi_object_t* trigger) {
+	if ( trigger->trigger->range  >= abs(entity->entity->center.x - trigger->trigger->center.x)) {
+		return 0;
+	}
+	return -1;
+}
+
+static inline int
+within_z_range(aoi_object_t* entity, aoi_object_t* trigger) {
+	if ( trigger->trigger->range >= abs(entity->entity->center.z - trigger->trigger->center.z) ) {
+		return 0;
+	}
+	return -1;
+}
+
 static inline void
 link_enter_result(aoi_context_t* aoi_ctx, aoi_object_t* self, aoi_object_t* other, int flag) {
 	if ( flag == 0 ) {
-		//printf("x:enter:%d %d\n", self->uid, other->uid);
-		if (!aoi_ctx->enter_x) {
-			aoi_ctx->enter_x = other;
-		}
-		else {
-			aoi_ctx->enter_x->prev_x = other;
-			other->next_x = aoi_ctx->enter_x;
-			aoi_ctx->enter_x = other;
-		}
+		printf("x:enter:%d %d\n", self->uid, other->uid);
+		if ( within_z_range(self, other) < 0 )
+			return;
+		
 	}
 	else {
-		//printf("z:enter:%d %d\n", self->uid, other->uid);
-		if ( !aoi_ctx->enter_z ) {
-			aoi_ctx->enter_z = other;
-		}
-		else {
-			aoi_ctx->enter_z->prev_z = other;
-			other->next_z = aoi_ctx->enter_z;
-			aoi_ctx->enter_z = other;
-		}
+		printf("z:enter:%d %d\n", self->uid, other->uid);
+		if ( within_x_range(self, other) < 0 )
+			return;
+	}
+	if ( !aoi_ctx->enter ) {
+		aoi_ctx->enter = other;
+	}
+	else {
+		aoi_ctx->enter->prev = other;
+		other->next = aoi_ctx->enter;
+		aoi_ctx->enter = other;
 	}
 }
 
 static inline void
 link_leave_result(aoi_context_t* aoi_ctx, aoi_object_t* self, aoi_object_t* other, int flag) {
 	if ( flag == 0 ) {
-		//printf("x:leave:%d %d\n", self->uid, other->uid);
-		if ( other->next_x || other->prev_x || aoi_ctx->enter_x == other) {
-			if ( aoi_ctx->enter_x == other ) {
-				aoi_ctx->enter_x = other->next_x;
-			}
-
-			if ( other->next_x ) {
-				other->next_x->prev_x = other->prev_x;
-			}
-
-			if ( other->prev_x ) {
-				other->prev_x->next_x = other->next_x;
-			}
-
-			other->next_x = other->prev_x = NULL;
-			return;
-		}
-
-		if ( !aoi_ctx->leave_x) {
-			aoi_ctx->leave_x = other;
-		}
-		else {
-			aoi_ctx->leave_x->prev_x = other;
-			other->next_x = aoi_ctx->leave_x;
-			aoi_ctx->leave_x = other;
-		}
+		printf("x:leave:%d %d\n", self->uid, other->uid);
 	}
 	else {
-		//printf("z:leave:%d %d\n", self->uid, other->uid);
-		if ( other->next_z || other->prev_z || aoi_ctx->enter_z == other ) {
-			if ( aoi_ctx->enter_z == other ) {
-				aoi_ctx->enter_z = other->next_z;
-			}
-
-			if ( other->next_z ) {
-				other->next_z->prev_z = other->prev_z;
-			}
-
-			if ( other->prev_z ) {
-				other->prev_z->next_z = other->next_z;
-			}
-
-			other->next_z = other->prev_z = NULL;
-			return;
+		printf("z:leave:%d %d\n", self->uid, other->uid);
+	}
+	if ( other->next || other->prev || aoi_ctx->enter == other ) {
+		if ( aoi_ctx->enter == other ) {
+			aoi_ctx->enter = other->next;
 		}
 
-		if ( !aoi_ctx->leave_z ) {
-			aoi_ctx->leave_z = other;
+		if ( other->next ) {
+			other->next->prev = other->prev;
 		}
-		else {
-			aoi_ctx->leave_z->prev_x = other;
-			other->next_z = aoi_ctx->leave_z;
-			aoi_ctx->leave_z = other;
+
+		if ( other->prev ) {
+			other->prev->next = other->next;
 		}
+
+		other->next = other->prev = NULL;
+		return;
+	}
+
+	if ( !aoi_ctx->leave ) {
+		aoi_ctx->leave = other;
+	}
+	else {
+		aoi_ctx->leave->prev = other;
+		other->next = aoi_ctx->leave;
+		aoi_ctx->leave = other;
 	}
 }
 
@@ -394,53 +375,39 @@ shuffle_z(aoi_context_t* aoi_ctx, linknode_t* node, int z) {
 
 void
 shuffle_entity(aoi_context_t* aoi_ctx, aoi_entity_t* entity, int x, int z) {
-	shuffle_x(aoi_ctx, &entity->node[0], x);
-	
 	entity->center.x = x;
-
-	shuffle_z(aoi_ctx, &entity->node[1], z);
-	
 	entity->center.z = z;
 
+	shuffle_x(aoi_ctx, &entity->node[0], x);
+	shuffle_z(aoi_ctx, &entity->node[1], z);
+	
 	aoi_object_t* owner = entity->node[0].owner;
-	aoi_object_t* cursor = aoi_ctx->enter_x;
+	aoi_object_t* cursor = aoi_ctx->enter;
 	while (cursor) {
 		owner->entity->func(owner->uid, cursor->uid, 1, 'x', owner->entity->ud);
 		aoi_object_t* tmp = cursor;
-		cursor = cursor->next_x;
-		tmp->next_x = tmp->prev_x = NULL;
+		cursor = cursor->next;
+		tmp->next = tmp->prev = NULL;
 	}
 
-	cursor = aoi_ctx->enter_z;
-	while ( cursor ) {
-		owner->entity->func(owner->uid, cursor->uid, 1, 'z', owner->entity->ud);
-		aoi_object_t* tmp = cursor;
-		cursor = cursor->next_z;
-		tmp->next_z = tmp->prev_z = NULL;
-	}
+	aoi_ctx->enter = NULL;
 
-	aoi_ctx->enter_x = aoi_ctx->enter_z = NULL;
-
-	cursor = aoi_ctx->leave_x;
+	cursor = aoi_ctx->leave;
 	while ( cursor ) {
 		owner->entity->func(owner->uid, cursor->uid, 0, 'x', owner->entity->ud);
 		aoi_object_t* tmp = cursor;
-		cursor = cursor->next_x;
-		tmp->next_x = tmp->prev_x = NULL;
+		cursor = cursor->next;
+		tmp->next = tmp->prev = NULL;
 	}
 
-	cursor = aoi_ctx->leave_z;
-	while ( cursor ) {
-		owner->entity->func(owner->uid, cursor->uid, 0, 'z', owner->entity->ud);
-		aoi_object_t* tmp = cursor;
-		cursor = cursor->next_z;
-		tmp->next_z = tmp->prev_z = NULL;
-	}
-	aoi_ctx->leave_x = aoi_ctx->leave_z = NULL;
+	aoi_ctx->leave = NULL;
 }
 
 void
 shuffle_trigger(aoi_context_t* aoi_ctx, aoi_trigger_t* trigger, int x, int z) {
+	trigger->center.x = x;
+	trigger->center.z = z;
+
 	if (trigger->center.x < x) {
 		shuffle_x(aoi_ctx, &trigger->node[2], x + trigger->range);
 		shuffle_x(aoi_ctx, &trigger->node[0], x - trigger->range);
@@ -450,8 +417,6 @@ shuffle_trigger(aoi_context_t* aoi_ctx, aoi_trigger_t* trigger, int x, int z) {
 		shuffle_x(aoi_ctx, &trigger->node[2], x + trigger->range);
 	}
 	
-	trigger->center.x = x;
-
 	if ( trigger->center.z < z ) {
 		shuffle_z(aoi_ctx, &trigger->node[3], z + trigger->range);
 		shuffle_z(aoi_ctx, &trigger->node[1], z - trigger->range);
@@ -460,44 +425,6 @@ shuffle_trigger(aoi_context_t* aoi_ctx, aoi_trigger_t* trigger, int x, int z) {
 		shuffle_z(aoi_ctx, &trigger->node[1], z - trigger->range);
 		shuffle_z(aoi_ctx, &trigger->node[3], z + trigger->range);
 	}
-
-	trigger->center.z = z;
-
-	aoi_object_t* owner = trigger->node[0].owner;
-	aoi_object_t* cursor = aoi_ctx->enter_x;
-	while ( cursor ) {
-		owner->trigger->func(owner->uid, cursor->uid, 1, 'x', owner->trigger->ud);
-		aoi_object_t* tmp = cursor;
-		cursor = cursor->next_x;
-		tmp->next_x = tmp->prev_x = NULL;
-	}
-
-	cursor = aoi_ctx->enter_z;
-	while ( cursor ) {
-		owner->trigger->func(owner->uid, cursor->uid, 1, 'z', owner->trigger->ud);
-		aoi_object_t* tmp = cursor;
-		cursor = cursor->next_z;
-		tmp->next_z = tmp->prev_z = NULL;
-	}
-
-	aoi_ctx->enter_x = aoi_ctx->enter_z = NULL;
-
-	cursor = aoi_ctx->leave_x;
-	while ( cursor ) {
-		owner->trigger->func(owner->uid, cursor->uid, 0, 'x', owner->trigger->ud);
-		aoi_object_t* tmp = cursor;
-		cursor = cursor->next_x;
-		tmp->next_x = tmp->prev_x = NULL;
-	}
-
-	cursor = aoi_ctx->leave_z;
-	while ( cursor ) {
-		owner->trigger->func(owner->uid, cursor->uid, 0, 'z', owner->trigger->ud);
-		aoi_object_t* tmp = cursor;
-		cursor = cursor->next_z;
-		tmp->next_z = tmp->prev_z = NULL;
-	}
-	aoi_ctx->leave_x = aoi_ctx->leave_z = NULL;
 }
 
 void
